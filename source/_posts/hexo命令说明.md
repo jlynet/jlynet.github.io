@@ -1,8 +1,8 @@
 ---
 title: hexo命令说明 #⽂章⻚⾯上的显示名称，⼀般是中⽂
 date: 2021-07-28 12:27:05 #⽂章⽣成时间，⼀般不改，当然也可以任意修改
-categories: 默认分类 #分类
-tags: [hexo,github] #⽂章标签，可空，多标签请⽤格式，注意:后⾯有个空格
+categories: [默认分类,技术笔记] #分类
+tags: [技术笔记,hexo,随笔] #⽂章标签，可空，多标签请⽤格式，注意:后⾯有个空格
 description: hexo 搭建博客命令收集备忘
 ---
 
@@ -39,25 +39,49 @@ $ ssh -T git@github.com # # 注意邮箱地址不⽤改
 
 常见命令：
 ```bash
-hexo new "postName" # hexo new "postName" #新新建建⽂⽂章章
-hexo new page "pageName" # hexo new page "pageName" #新新建建⻚⾯⻚⾯
-hexo generate # hexo generate #⽣⽣成成静静态态⻚⾯⻚⾯⾄⾄public public⽬⽬录录
-hexo server # hexo server #开开启启预预览访览访问问端端⼝⼝（（默默认认端端⼝⼝4000 4000，，'ctrl + c' 'ctrl + c'关关闭闭server server））
-hexo deploy # hexo deploy #部部署署到到GitHub GitHub
-hexo help # hexo help # 查查看看帮帮助助
-hexo version # hexo version #查查看看Hexo Hexo的的版版本本
+$ hexo new "postName" #新建⽂章
+$ hexo new page "pageName" #新建⻚⾯
+$ hexo generate #⽣⽣成成静静态态⻚⾯⻚⾯⾄⾄public public⽬⽬录录
+$ hexo server #开启预览访问端⼝（默认端⼝4000，，'ctrl + c'关闭server）
+$ hexo deploy #部署到GitHub
+$ hexo help # 查看帮助
+$ hexo version #查看Hexo的版本
+$ hexo clean #清楚
 ```
 
 缩写：
 ```bash
-hexo n == hexo new
-hexo g == hexo generate
-hexo s == hexo server
-hexo d == hexo deploy
+$ hexo n == hexo new
+$ hexo g == hexo generate
+$ hexo s == hexo server
+$ hexo d == hexo deploy
 ```
 
 组合命令：
 ```bash
-hexo s -g # hexo s -g #⽣⽣成成并并本本地地预预览览
-hexo d -g # hexo d -g #⽣⽣成成并并上上传
+hexo s -g #⽣成并本地预览
+hexo d -g #⽣成并上传
 ```
+
+新建⽂章：
+```bash
+hexo new "JsonFormatTool" 
+hexo new "swagger2word"
+hexo new "Lockbox"
+
+
+```
+
+新建⻚⾯:
+```bash
+hexo new page "个人作品展示"
+```
+
+文字里面添加图片
+> 在`_config.yml`配置文件中，修改为 `post_asset_folder: true`
+```bash
+npm install https://github.com/CodeFalling/hexo-asset-image --save
+```
+> 此时再执行命令 `hexo n article_name` 创建新的文章，在 `source/_posts` 中会生成文章 `post_name.md` 和同名文件夹 post_name,我们将文章中所使用到的将图片资源均放在 post_name 中，这时就可以在文章中使用相对路径引用图片资源了
+`![img_name](img_name.jpg) #文章中的图片资源路径格式`
+

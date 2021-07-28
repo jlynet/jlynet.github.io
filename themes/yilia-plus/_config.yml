@@ -1,15 +1,16 @@
 ﻿# Header-菜单
 menu:
   主页: /
-  技术笔记: https://zhousiwei.gitee.io/ibooks/
+  技术笔记: /tags/技术笔记/
+  个人作品展示: /categories/个人作品展示/
   随笔: /tags/随笔/
 
 # subNav-子导航
 subNav:
-  - github: "#"
-  - github: "#" # (支持设置多个)
-  - gitee: "#" # 码云
-  - jianshu: "#" #简书
+  - github: "https://github.com/ai930"
+  # - github: "#" # (支持设置多个)
+  - gitee: "https://gitee.com/jlynet007" # 码云
+  # - jianshu: "#" #简书
   # - cnblog: "#"
   # - blog: "#"
   # - csdn: "#"
@@ -17,7 +18,7 @@ subNav:
   # - zhihu: "#"
   # - qq: "img/2434387555.jpg"
   # - weixin: "img/weixin_.png"
-  # - weibo: "#"
+  - weibo: "https://weibo.com/u/2650563234"
   # - douban: "#"
   # - segmentfault: "#"
   # - bilibili: "#"
@@ -32,7 +33,7 @@ subNav:
 hover_effect:
   ## `global` 0: Set separately, 1: Enable global 2: Close global
   ## `global` 0: 分开设置, 1: 全局启用, 2: 全局关闭
-  global: 2
+  global: 0
   # SubNav-导航
   subNav: true
 
@@ -52,7 +53,7 @@ excerpt_link: more
 # 文章卡片右下角常驻链接，不需要请设置为false
 show_all_link: '展开全文'
 # 数学公式
-mathjax: false
+mathjax: true
 
 # Open link in a new tab | 是否在新窗口打开链接
 open_in_new:
@@ -157,7 +158,7 @@ clickLove:
 # GitHub Ribbons(https://github.blog/2008-12-19-github-ribbons/)
 github:
   # (关闭请设置为false)
-  url: https://github.com/JoeyBling/hexo-theme-yilia-plus
+  url: false
 
 # 页脚 Litten(此配置项已弃用)
 # 帮助我们让更多人可以更方便使用Hexo，请尽量不要修改此主题配置
@@ -171,7 +172,7 @@ baidu_push: false
 # 版权声明type设定：0-关闭版权声明； 1-文章对应的md文件里有copyright: true属性，才有版权声明； 2-所有文章均有版权声明
 copyright_type: 2
 # 版权声明自定义文本(关闭请设置为false)
-copyright_text: 
+copyright_text:  本博客所有文章除特别声明外，均采用 <a href='LICENSE.txt'>MIT</a> 许可协议。转载请注明出处！
 
 # 网站成立年份(默认为 2018，若填入年份小于当前年份，则显示为 2018-2019 类似的格式)
 since: 2018
@@ -211,19 +212,19 @@ activate_power_mode:
   # 使输入模式丰富多彩
   colorful: true
   # 是否开启摇动
-  shake: false
+  shake: true
 
 # 飘雪特效
 # https://github.com/MlgmXyysd/snow.js
-snow: false
+snow: true
 
 # 看板娘动态模型插件
 ## https://github.com/JoeyBling/live2d-widget.js
 live2d:
   # (关闭请设置为false)
-  enable: false
+  enable: true
   # 模型名称(取值请参考：https://github.com/JoeyBling/hexo-theme-yilia-plus/wiki/live2d%E6%A8%A1%E5%9E%8B%E5%8C%85%E5%B1%95%E7%A4%BA)
-  model: hibiki
+  model: tororo # hibiki epsilon2_1 chitose izumi gf haru/01 haru/02 miku ni-j nico nietzsche nipsilon nito shizuku tsumiki wanko z16 koharu haruto unitychan tororo hijiki
   display:
     position: right # 显示位置：left/right(default: 'right')
     width: 145  # 模型的长度(default: 150)
@@ -231,7 +232,7 @@ live2d:
     hOffset: 50 # 水平偏移(default: 0)
     #vOffset: -20 # 垂直偏移(default: -20)
   mobile:
-    show: false # 是否在移动设备上显示(default: true)
+    show: true # 是否在移动设备上显示(default: true)
     scale: 0.6 # 移动设备上的缩放(default: 0.5)
   react:
     opacity: 0.8 # 模型透明度(default: 0.7)
@@ -243,7 +244,7 @@ style:
   header: '#4d4d4d'
   gif:
     # 是否启用左侧边栏动态图效果
-    enable: false
+    enable: true
     # 自定义背景图路径(默认可以不设置，提供默认背景图)
     # path: /img/biubiubiu.gif
   # 右滑板块背景
@@ -268,20 +269,20 @@ smart_menu:
 friends:
   技术笔记:  #网站名称
     #网站地址
-    url: https://zhousiwei.gitee.io/ibooks/
+    url: /
     #网站图片(可忽略不写)
-    img: https://zhousiwei.gitee.io/ibooks/favicon.ico
+    # img: https://zhousiwei.gitee.io/ibooks/favicon.ico
     #网站简介(可忽略不写)
     description: 记录工作和学习过程中的笔记：Java、前端开发、Hexo博客、聚合支付、Linux笔记、ElasticSearch、ELK日志分析
   GitHub:
-    url: https://github.com/JoeyBling
+    url: https://github.com/ai930
   码云:
-    url: https://gitee.com/zhousiwei
-  简书:
-    url: https://www.jianshu.com/u/02cbf31a043a
-  CSDN:
-    url: https://blog.csdn.net/qq_30930805
+    url: https://gitee.com/jlynet007
+  # 简书:
+  #   url: https://www.jianshu.com/u/02cbf31a043a
+  # CSDN:
+  #   url: https://blog.csdn.net/qq_30930805
 
 # 关于我
-aboutme: 主要涉及技术：<br>Java后端开发、聚合支付、<br>公众号开发、开源爱好者、Linux<br><br>联系QQ:2434387555<br><br>很惭愧<br><br>只做了一点微小的工作<br>谢谢大家
+aboutme: 主要涉及技术：<br>Java后端开发、聚合支付、<br>公众号开发、开源爱好者、Linux<br><br>联系QQ:1036368005<br><br>很惭愧<br><br>只做了一点微小的工作<br>谢谢大家
 
