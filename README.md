@@ -38,3 +38,24 @@
 
 
 https://ai930.github.io/jlynet.github.io
+
+
+cd themes/yilia-plus;
+npm install
+
+npm run dev
+npm run dist
+npm run build
+
+ERROR in Node Sass does not yet support your current environment: OS X 64-bit with Unsupported runtime (83)
+不用回退node版本，而是升级node-sass。
+update你的sass版本即可：
+npm rebuild node-sass
+或者自己手动升级：
+1.先卸载
+npm uninstall --save node-sass
+2.清除缓存
+npm cache clean -f
+3.升级node-sass模块
+npm install --save node-sass
+
