@@ -78,9 +78,9 @@ hexo new page "个人作品展示"
 ```
 
 文字里面添加图片
-> 在`_config.yml`配置文件中，修改为 `post_asset_folder: true`
+> 在`_config.yml`配置文件中，修改为 `post_asset_folder: true` 网站切割域名路径前缀位置 `post_asset_folder_position_length: 4`
 ```bash
-npm install https://github.com/CodeFalling/hexo-asset-image --save
+npm install https://github.com/ai930/hexo-asset-image --save
 ```
 > 此时再执行命令 `hexo n article_name` 创建新的文章，在 `source/_posts` 中会生成文章 `post_name.md` 和同名文件夹 post_name,我们将文章中所使用到的将图片资源均放在 post_name 中，这时就可以在文章中使用相对路径引用图片资源了
 `![img_name](img_name.jpg) #文章中的图片资源路径格式`
