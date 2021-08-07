@@ -6,12 +6,13 @@ description: 基于Qt5 框架开发的 JsonFormatTool，一款跨平台的json�
 tags:
 ---
 
+> 基于Qt5 框架开发的 JsonFormatTool，一款跨平台的json格式化工具
+
 依托强大跨平台和高效的qt5框架，简洁明了的UI界面布局，使用便捷的文本按操作功能
 
 ![文本操作展示模板](JsonFormatTool-01.png)
 
-
-
 支持搜索高亮的json树展示结构
 
 ![树状操作展示模板](JsonFormatTool-02.png)
+

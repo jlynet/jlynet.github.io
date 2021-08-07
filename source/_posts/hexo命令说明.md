@@ -68,6 +68,59 @@ hexo d -g #⽣成并上传
 hexo new "JsonFormatTool" 
 hexo new "swagger2word"
 hexo new "Lockbox"
+hexo new "Arthas安装使用"
+hexo new "awk命令使用介绍"
+
+#Java 诊断工具 Arthas 入门教程
+#文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=qDlgqpBT
+hexo new "Arthas 基础教程"
+hexo new "Arthas 进阶"
+
+#Java 诊断工具 Arthas 最佳实践
+#文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM
+hexo new "Arthas后台异步任务案例"
+hexo new "学习Arthasarthas-boot支持的参数案例"
+hexo new "学习Arthasclassloader案例"
+hexo new "Arthas获取Spring上下文案例"
+hexo new "Arthas排查HTTP请求返回401案例"
+hexo new "Arthas排查HTTP请求返回404案例"
+hexo new "ArthasHttpAPI案例"
+hexo new "Arthas热更新代码案例"
+hexo new "Arthas排查logger冲突问题案例"
+hexo new "Arthas执行结果存日志案例"
+hexo new "Arthas查找TopN线程案例"
+hexo new "Arthas排查函数调用异常案例"
+hexo new "ArthasWebConsole案例"
+hexo new "Arthas动态更新应用LoggerLevel案例"
+
+
+#Java 诊断工具 Arthas 高级命令教程
+#文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=W52ZYGKJ
+hexo new "Arthasvmoption命令"
+hexo new "Arthasthread命令"
+hexo new "Arthassysenv命令"
+hexo new "Arthassysprop命令"
+hexo new "Arthasognl命令"
+hexo new "Arthasperfcounter命令"
+hexo new "Arthaslogger命令"
+hexo new "Arthasmbean命令"
+hexo new "Arthasjvm命令"
+hexo new "Arthasheapdump命令"
+hexo new "Arthasdashboard命令"
+hexo new "Arthasgetstatic命令"
+hexo new "Arthastt命令"
+hexo new "Arthaswatch命令"
+hexo new "Arthastrace命令"
+hexo new "Arthasstack命令"
+hexo new "Arthasprofiler命令"
+hexo new "Arthasmonitor命令"
+hexo new "Arthasmc-retransform命令"
+hexo new "Arthassm命令"
+hexo new "Arthassc命令"
+hexo new "Arthasmc-redefine命令"
+hexo new "Arthasjad命令"
+hexo new "Arthasdump命令"
+hexo new "Arthasclassloader命令"
 
 
 ```
