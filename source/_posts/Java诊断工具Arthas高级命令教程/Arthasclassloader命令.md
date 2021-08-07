@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:45
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar
 ```
 
-
-
 `demo-arthas-spring-boot`是一个很简单的spring boot应用，源代码：[查看](https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot)
 
 启动之后，可以访问61000端口： 点击查看
@@ -49,8 +49,6 @@ wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/ma
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -59,15 +57,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -100,8 +94,6 @@ help
 ```bash
 classloader -l
 ```
-
-
 
 ```console
 $ classloader -l
@@ -152,8 +144,6 @@ $ classloader --classLoaderClass org.apache.jasper.servlet.JasperLoader
 classloader -a --classLoaderClass org.apache.jasper.servlet.JasperLoader
 ```
 
-
-
 ```console
 $ classloader -a --classLoaderClass org.apache.jasper.servlet.JasperLoader
  hash:1698045338, org.apache.jasper.servlet.JasperLoader@65361d9a
@@ -166,15 +156,11 @@ $ classloader -a --classLoaderClass org.apache.jasper.servlet.JasperLoader
 sc -d org.apache.jsp.jsp.hello_jsp
 ```
 
-
-
 #### 查看ClassLoader树
 
 ```bash
 classloader -t
 ```
-
-
 
 ```
 $ classloader -t
@@ -192,8 +178,6 @@ $ classloader -t
         +-org.apache.jasper.servlet.JasperLoader@21ae0fe2
 ```
 
-
-
 #### 查看URLClassLoader实际的urls
 
 比如上面查看到的spring LaunchedURLClassLoader的 hashcode是`1be6f5c3`，可以通过`-c`参数来指定classloader，或者直接使用`--classLoaderClass`，从而查看URLClassLoader实际的urls：
@@ -201,8 +185,6 @@ $ classloader -t
 ```bash
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader
 ```
-
-
 
 ```
 $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader
@@ -212,8 +194,6 @@ jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/spri
 ...
 ```
 
-
-
 #### 加载指定ClassLoader里的资源文件
 
 查找指定的资源文件： `classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml`
@@ -222,22 +202,16 @@ jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/spri
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml
 ```
 
-
-
 ```
 $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml
  jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/logback-spring.xml
 ```
-
-
 
 也可以尝试查找类的class文件：
 
 ```bash
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r java/lang/String.class
 ```
-
-
 
 ```console
 $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r java/lang/String.class
@@ -254,8 +228,6 @@ $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClas
 sc ch.qos.logback.classic.spi.StackTraceElementProxy
 ```
 
-
-
 ```console
 Affect(row-cnt:0) cost in 18 ms.
 ```
@@ -265,8 +237,6 @@ Affect(row-cnt:0) cost in 18 ms.
 ```bash
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --load ch.qos.logback.classic.spi.StackTraceElementProxy
 ```
-
-
 
 ```console
 $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --load ch.qos.logback.classic.spi.StackTraceElementProxy
@@ -301,8 +271,6 @@ load class success.
 sc ch.qos.logback.classic.spi.StackTraceElementProxy
 ```
 
-
-
 ```console
 ch.qos.logback.classic.spi.StackTraceElementProxy
 Affect(row-cnt:1) cost in 19 ms.
@@ -316,3 +284,5 @@ Affect(row-cnt:1) cost in 19 ms.
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM

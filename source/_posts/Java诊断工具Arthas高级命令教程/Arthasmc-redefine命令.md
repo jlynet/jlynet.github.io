@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:43
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar
 ```
 
-
-
 `demo-arthas-spring-boot`是一个很简单的spring boot应用，源代码：[查看](https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot)
 
 启动之后，可以访问61000端口： 点击查看
@@ -49,8 +49,6 @@ wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/ma
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -59,15 +57,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -118,13 +112,9 @@ help
 curl http://localhost:61000/user/0
 ```
 
-
-
 ```
 {"timestamp":1550223186170,"status":500,"error":"Internal Server Error","exception":"java.lang.IllegalArgumentException","message":"id < 1","path":"/user/0"}
 ```
-
-
 
 下面通过热更新代码，修改这个逻辑。
 
@@ -134,8 +124,6 @@ curl http://localhost:61000/user/0
 jad --source-only com.example.demo.arthas.user.UserController > /tmp/UserController.java
 ```
 
-
-
 jad反编译的结果保存在 `/tmp/UserController.java`文件里了。
 
 再打开一个`Terminal 3`，然后用vim来编辑`/tmp/UserController.java`：
@@ -143,8 +131,6 @@ jad反编译的结果保存在 `/tmp/UserController.java`文件里了。
 ```bash
 vim /tmp/UserController.java
 ```
-
-
 
 比如当 user id 小于1时，也正常返回，不抛出异常：
 
@@ -160,15 +146,11 @@ vim /tmp/UserController.java
     }
 ```
 
-
-
 #### sc查找加载UserController的ClassLoader
 
 ```bash
 sc -d *UserController | grep classLoaderHash
 ```
-
-
 
 ```console
 $ sc -d *UserController | grep classLoaderHash
@@ -193,8 +175,6 @@ $ sc -d *UserController | grep classLoaderHash
 mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp
 ```
 
-
-
 ```console
 $ mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp
 Memory compiler output:
@@ -216,14 +196,10 @@ $ mc -c 1be6f5c3 /tmp/UserController.java -d /tmp
 redefine /tmp/com/example/demo/arthas/user/UserController.class
 ```
 
-
-
 ```
 $ redefine /tmp/com/example/demo/arthas/user/UserController.class
 redefine success, size: 1
 ```
-
-
 
 #### 热修改代码结果
 
@@ -236,8 +212,6 @@ redefine success, size: 1
 }
 ```
 
-
-
 ## 更多信息
 
 在“mc-redefine”中，我们演示了了Arthas的mc-redefine命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。
@@ -246,3 +220,5 @@ redefine success, size: 1
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM

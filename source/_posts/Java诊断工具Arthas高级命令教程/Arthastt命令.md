@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:36
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 ```
 
-
-
 `arthas-demo`是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。
 
 ## 启动arthas-boot
@@ -45,8 +45,6 @@ wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -55,15 +53,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -87,15 +81,11 @@ help
 tt -t demo.MathGame primeFactors
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ tt -t demo.MathGame primeFactors
@@ -170,8 +160,6 @@ Affect(class-cnt:1 , method-cnt:1) cost in 66 ms.
 tt -l
 ```
 
-
-
 ```console
 $ tt -l
  INDEX   TIMESTAMP            COST(ms)  IS-RET  IS-EXP   OBJECT         CLASS                          METHOD
@@ -191,8 +179,6 @@ Affect(row-cnt:6) cost in 4 ms.
 ```bash
 tt -s 'method.name=="primeFactors"'
 ```
-
-
 
 ```console
 $ tt -s 'method.name=="primeFactors"'
@@ -217,8 +203,6 @@ Affect(row-cnt:6) cost in 607 ms.
 ```bash
 tt -i 1003
 ```
-
-
 
 ```console
 $ tt -i 1003
@@ -248,8 +232,6 @@ Affect(row-cnt:1) cost in 11 ms.
 ```bash
 tt -i 1004 -p
 ```
-
-
 
 ```console
 $ tt -i 1004 -p
@@ -294,3 +276,5 @@ Affect(row-cnt:1) cost in 14 ms.
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM

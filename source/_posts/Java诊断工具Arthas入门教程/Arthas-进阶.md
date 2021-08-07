@@ -4,6 +4,8 @@ date: 2021-08-07 08:01:59
 tags: ['Java 诊断工具 Arthas 入门教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。

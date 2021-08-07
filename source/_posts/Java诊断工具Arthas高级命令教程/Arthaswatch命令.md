@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:36
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 ```
 
-
-
 `arthas-demo`是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。
 
 ## 启动arthas-boot
@@ -45,8 +45,6 @@ wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -55,15 +53,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -112,15 +106,11 @@ watch 的参数比较多，主要是因为它能在 4 个不同的场景观察�
 watch demo.MathGame primeFactors "{params,returnObj}" -x 2
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors "{params,returnObj}" -x 2
@@ -145,15 +135,11 @@ ts=2018-12-03 19:16:51; [cost=1.280502ms] result=@ArrayList[
 watch demo.MathGame primeFactors "{params,returnObj}" -x 2 -b
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors "{params,returnObj}" -x 2 -b
@@ -175,15 +161,11 @@ ts=2018-12-03 19:23:23; [cost=0.0353ms] result=@ArrayList[
 watch demo.MathGame primeFactors "{params,target,returnObj}" -x 2 -b -s -n 2
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors "{params,target,returnObj}" -x 2 -b -s -n 2
@@ -230,15 +212,11 @@ ts=2018-12-03 19:29:54; [cost=4.277392ms] result=@ArrayList[
 watch demo.MathGame primeFactors "{params,target}" -x 3
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors "{params,target}" -x 3
@@ -279,15 +257,11 @@ ts=2018-12-03 19:34:19; [cost=0.587833ms] result=@ArrayList[
 watch demo.MathGame primeFactors "{params[0],target}" "params[0]<0"
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors "{params[0],target}" "params[0]<0"
@@ -313,15 +287,11 @@ ts=2018-12-03 19:36:04; [cost=0.530255ms] result=@ArrayList[
 watch demo.MathGame primeFactors '{params, params[0].class.name}' 'params[0].class.name == "java.lang.Integer"'
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 - 根据参数个数进行过滤
 
@@ -331,15 +301,11 @@ q
 watch demo.MathGame primeFactors '{params, params.length}' 'params.length==1'
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ##### 观察异常信息的例子
 
@@ -347,15 +313,11 @@ q
 watch demo.MathGame primeFactors "{params[0],throwExp}" -e -x 2
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors "{params[0],throwExp}" -e -x 2
@@ -380,15 +342,11 @@ ts=2018-12-03 19:38:00; [cost=1.414993ms] result=@ArrayList[
 watch demo.MathGame primeFactors '{params, throwExp}' '#msg=throwExp.toString(), #msg.contains("IllegalArgumentException")' -e -x 2
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ##### 按照耗时进行过滤
 
@@ -396,15 +354,11 @@ q
 watch demo.MathGame primeFactors '{params, returnObj}' '#cost>200' -x 2
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors '{params, returnObj}' '#cost>200' -x 2
@@ -429,15 +383,11 @@ ts=2018-12-03 19:40:28; [cost=2112.168897ms] result=@ArrayList[
 watch demo.MathGame primeFactors 'target'
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 如果想查看方法运行前后，当前对象中的属性，可以使用`target`关键字，代表当前对象
 
@@ -457,15 +407,11 @@ ts=2018-12-03 19:41:52; [cost=0.477882ms] result=@MathGame[
 watch demo.MathGame primeFactors 'target.illegalArgumentCount'
 ```
 
-
-
 按`q`或者`Ctrl+c`退出
 
 ```bash
 q
 ```
-
-
 
 ```console
 $ watch demo.MathGame primeFactors 'target.illegalArgumentCount'
@@ -483,3 +429,5 @@ ts=2018-12-03 20:04:35; [cost=0.961441ms] result=@Integer[8]
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM

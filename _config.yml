@@ -135,3 +135,8 @@ jsonContent:
       categories: false
       tags: true
 
+# npm install hexo-toc --save
+toc:
+  maxDepth: 3
+  slugify: true
+

@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:30
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar
 ```
 
-
-
 `demo-arthas-spring-boot`是一个很简单的spring boot应用，源代码：[查看](https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot)
 
 启动之后，可以访问61000端口： 点击查看
@@ -49,8 +49,6 @@ wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/ma
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -59,15 +57,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -79,15 +73,11 @@ help
 ognl --help
 ```
 
-
-
 #### 调用static函数
 
 ```bash
 ognl '@java.lang.System@out.println("hello ognl")'
 ```
-
-
 
 可以检查`Terminal 1`里的进程输出，可以发现打印出了`hello ognl`。
 
@@ -96,8 +86,6 @@ ognl '@java.lang.System@out.println("hello ognl")'
 ```bash
 sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash
 ```
-
-
 
 ```console
 $ sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash
@@ -133,23 +121,17 @@ $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader @com.example.demo.arthas.user.UserController@logger
 ```
 
-
-
 还可以通过`-x`参数控制返回值的展开层数。比如：
 
 ```bash
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -x 2 @com.example.demo.arthas.user.UserController@logger
 ```
 
-
-
 #### 执行多行表达式，赋值给临时变量，返回一个List
 
 ```bash
 ognl '#value1=@System@getProperty("java.home"), #value2=@System@getProperty("java.runtime.name"), {#value1, #value2}'
 ```
-
-
 
 ```console
 $ ognl '#value1=@System@getProperty("java.home"), #value2=@System@getProperty("java.runtime.name"), {#value1, #value2}'
@@ -178,8 +160,6 @@ $ ognl '#value1=@System@getProperty("java.home"), #value2=@System@getProperty("j
 sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash
 ```
 
-
-
 ```console
 $ sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash
  classLoaderHash   1be6f5c3
@@ -190,8 +170,6 @@ $ sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash
 ```bash
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger'
 ```
-
-
 
 ```console
 $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger'
@@ -217,15 +195,11 @@ $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger.setLevel(@ch.qos.logback.classic.Level@DEBUG)'
 ```
 
-
-
 再次获取`UserController@logger`，可以发现已经是`DEBUG`了：
 
 ```bash
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger'
 ```
-
-
 
 ```console
 $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger'
@@ -251,8 +225,6 @@ $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@org.slf4j.LoggerFactory@getLogger("root").setLevel(@ch.qos.logback.classic.Level@DEBUG)'
 ```
 
-
-
 ## 案例: 排查logger冲突问题
 
 在这个案例里，展示排查logger冲突的方法。
@@ -264,8 +236,6 @@ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '
 ```bash
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger'
 ```
-
-
 
 ```console
 $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '@com.example.demo.arthas.user.UserController@logger'
@@ -289,15 +259,11 @@ $ ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader
 ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader '#map1=@org.slf4j.LoggerFactory@getLogger("root").loggerContext.objectMap, #map1.get("CONFIGURATION_WATCH_LIST")'
 ```
 
-
-
 #### 使用classloader命令查找可能存在的logger配置文件
 
 ```bash
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml
 ```
-
-
 
 ```
 $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml
@@ -305,8 +271,6 @@ $ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClas
 
 Affect(row-cnt:1) cost in 13 ms.
 ```
-
-
 
 可以知道加载的配置的具体来源。
 
@@ -316,13 +280,9 @@ Affect(row-cnt:1) cost in 13 ms.
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback.xml
 ```
 
-
-
 ```bash
 classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r log4j.properties
 ```
-
-
 
 ## 更多信息
 
@@ -332,3 +292,5 @@ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassL
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM

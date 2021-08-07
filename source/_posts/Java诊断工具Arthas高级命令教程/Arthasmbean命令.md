@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:32
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 ```
 
-
-
 `arthas-demo`是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。
 
 ## 启动arthas-boot
@@ -45,8 +45,6 @@ wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -55,15 +53,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -92,15 +86,11 @@ help
 mbean
 ```
 
-
-
 #### 查看 Mbean 的元信息
 
 ```bash
 mbean -m java.lang:type=Threading
 ```
-
-
 
 #### 查看mbean属性信息
 
@@ -108,15 +98,11 @@ mbean -m java.lang:type=Threading
 mbean java.lang:type=Threading 
 ```
 
-
-
 #### mbean的name支持通配符匹配
 
 ```bash
 mbean java.lang:type=Th*
 ```
-
-
 
 注意：ObjectName 的匹配规则与正常的通配符存在差异，详细参见：[javax.management.ObjectName](https://docs.oracle.com/javase/8/docs/api/javax/management/ObjectName.html?is-external=true)
 
@@ -128,15 +114,11 @@ mbean java.lang:type=Th*
 mbean java.lang:name=*,type=MemoryPool
 ```
 
-
-
 #### 通配符匹配特定的属性字段
 
 ```bash
 mbean java.lang:type=Threading *Count
 ```
-
-
 
 #### 使用`-E`命令切换为正则匹配
 
@@ -144,23 +126,17 @@ mbean java.lang:type=Threading *Count
 mbean -E java.lang:type=Threading PeakThreadCount|ThreadCount|DaemonThreadCount
 ```
 
-
-
 查看内存池：
 
 ```bash
 mbean -E java.lang:name=*,type=MemoryPool Name|Usage|Type | grep " HEAP" -A3 -B1
 ```
 
-
-
 #### 使用`-i`命令实时监控
 
 ```bash
 mbean -i 1000 java.lang:type=Threading *Count
 ```
-
-
 
 ## 更多信息
 
@@ -170,3 +146,5 @@ mbean -i 1000 java.lang:type=Threading *Count
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM

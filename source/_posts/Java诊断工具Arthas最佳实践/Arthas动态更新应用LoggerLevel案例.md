@@ -4,6 +4,8 @@ date: 2021-08-07 08:35:41
 tags: ['Java 诊断工具 Arthas 最佳实践']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。

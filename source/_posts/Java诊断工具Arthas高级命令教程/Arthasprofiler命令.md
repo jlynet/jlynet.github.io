@@ -4,6 +4,8 @@ date: 2021-08-07 09:51:39
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
+<!-- toc -->
+
 ![Arthas](arthas.png)
 
 `Arthas` 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。
@@ -33,8 +35,6 @@ tags: ['Java 诊断工具 Arthas 高级命令教程']
 wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 ```
 
-
-
 `arthas-demo`是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。
 
 ## 启动arthas-boot
@@ -45,8 +45,6 @@ wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar
 wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 ```
 
-
-
 `arthas-boot`是`Arthas`的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。
 
 选择第一个进程，输入 `1` ，再`Enter/回车`：
@@ -55,15 +53,11 @@ wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar
 1
 ```
 
-
-
 Attach成功之后，会打印Arthas LOGO。输入 `help` 可以获取到更多的帮助信息。
 
 ```bash
 help
 ```
-
-
 
 ![Arthas Boot](O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png)
 
@@ -94,8 +88,6 @@ profiler` 命令基本运行结构是 `profiler action [actionArg]
 profiler actions
 ```
 
-
-
 ```console
 $ profiler actions
 Supported Actions: [resume, dumpCollapsed, getSamples, start, list, execute, version, stop, load, dumpFlat, actions, dumpTraces, status]
@@ -106,8 +98,6 @@ Supported Actions: [resume, dumpCollapsed, getSamples, start, list, execute, ver
 ```bash
 profiler version
 ```
-
-
 
 ```console
 $ profiler version
@@ -121,14 +111,10 @@ Copyright 2019 Andrei Pangin
 profiler start -e itimer
 ```
 
-
-
 ```
 $ profiler start -e itimer
 Started [itimer] profiling
 ```
-
-
 
 > 默认情况下，生成的是cpu的火焰图，即event为`cpu`。可以用`--event`参数来指定。 因为katacoda环境不支持perf_events，所以这里使用`-e itimer`参数指定event为itimer
 
@@ -138,22 +124,16 @@ Started [itimer] profiling
 profiler getSamples
 ```
 
-
-
 ```
 $ profiler getSamples
 23
 ```
-
-
 
 #### 查看profiler状态
 
 ```bash
 profiler status
 ```
-
-
 
 ```console
 $ profiler status
@@ -170,23 +150,17 @@ $ profiler status
 profiler stop
 ```
 
-
-
 ```
 $ profiler stop
 profiler output file: /tmp/demo/arthas-output/20191125-135546.svg
 OK
 ```
 
-
-
 默认情况下，生成的结果保存到应用的`工作目录`下的`arthas-output`目录。可以通过 `--file`参数来指定输出结果路径。比如：
 
 ```bash
 profiler stop --file /tmp/output.svg
 ```
-
-
 
 ```console
 $ profiler stop --file /tmp/output.svg
@@ -202,8 +176,6 @@ OK
 profiler stop --format html
 ```
 
-
-
 ```console
 $ profiler stop --format html
 profiler output file: /tmp/test/arthas-output/20191125-143329.html
@@ -215,8 +187,6 @@ OK
 ```bash
 profiler stop --file /tmp/result.html
 ```
-
-
 
 #### 通过浏览器查看arthas-output下面的profiler结果
 
@@ -235,8 +205,6 @@ profiler stop --file /tmp/result.html
 ```bash
 profiler list
 ```
-
-
 
 在不同的平台，不同的OS下面，支持的events各有不同。比如在macos下面：
 
@@ -285,8 +253,6 @@ Perf events:
 profiler start --event alloc
 ```
 
-
-
 ```console
 $ profiler start --event alloc
 ```
@@ -296,8 +262,6 @@ $ profiler start --event alloc
 ```bash
 profiler resume
 ```
-
-
 
 ```console
 $ profiler resume
@@ -316,8 +280,6 @@ Started [cpu] profiling
 profiler execute 'start,framebuf=5000000'
 ```
 
-
-
 ```console
 profiler execute 'start,framebuf=5000000'
 ```
@@ -327,8 +289,6 @@ profiler execute 'start,framebuf=5000000'
 ```bash
 profiler execute 'stop,file=/tmp/result.svg'
 ```
-
-
 
 ```console
 profiler execute 'stop,file=/tmp/result.svg'
@@ -344,3 +304,5 @@ profiler execute 'stop,file=/tmp/result.svg'
 - 文档： https://arthas.aliyun.com/doc
 
 如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：[查看](https://github.com/alibaba/arthas/issues/111)
+
+文章拷贝来源：https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&id=PaiFAkJM
