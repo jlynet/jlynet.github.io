@@ -230,6 +230,191 @@
             
 
   
+    <article id="post-Java诊断工具Arthas最佳实践/Arthas查找TopN线程案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/" target="_blank">Arthas 查找Top N线程 案例</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/" class="archive-article-date">
+        <time datetime="2021-08-07T00:35:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#arthas-demo">Arthas demo</a></li>
+<li><a href="#start-arthas-boot">Start arthas-boot</a></li>
+<li><a href="#%E6%9F%A5%E6%89%BEtop-n%E7%BA%BF%E7%A8%8B">查找Top N线程</a><ul>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E7%BA%BF%E7%A8%8B%E4%BF%A1%E6%81%AF">查看所有线程信息</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E5%85%B7%E4%BD%93%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%A0%88">查看具体线程的栈</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Bcpu%E4%BD%BF%E7%94%A8%E7%8E%87top-n%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%A0%88">查看CPU使用率top n线程的栈</a></li>
+<li><a href="#%E6%9F%A5%E6%89%BE%E7%BA%BF%E7%A8%8B%E6%98%AF%E5%90%A6%E6%9C%89%E9%98%BB%E5%A1%9E">查找线程是否有阻塞</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示查找Top N线程。</p>
+<ul>
+<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="查找top-n线程">查找Top N线程</span></h2><h4><span id="查看所有线程信息">查看所有线程信息</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="查看具体线程的栈">查看具体线程的栈</span></h4><p>查看线程ID 16的栈：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread 16</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="查看cpu使用率top-n线程的栈">查看CPU使用率top n线程的栈</span></h4><p>参数<code>n</code>用来指定最忙的前N个线程并打印堆栈</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3</span><br></pre></td></tr></table></figure>
+
+
+
+<p>参数<code>i</code>用来指定cpu占比统计的采样间隔，单位为毫秒</p>
+<p>查看5秒内的CPU使用率top n线程栈</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3 -i 5000</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="查找线程是否有阻塞">查找线程是否有阻塞</span></h4><p>参数<code>b</code>用来指定找出当前阻塞其他线程的线程</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -b</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas查找Top N线程。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas最佳实践/Arthas排查logger冲突问题案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2176,635 +2361,6 @@
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas入门教程/Arthas-进阶" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/" target="_blank">Arthas 进阶</a>
-  
-    </h1>
-  
-
-
-  
-  
-<a href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/" class="archive-article-date">
-        <time datetime="2021-08-07T00:01:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Bjvm%E4%BF%A1%E6%81%AF">查看JVM信息</a><ul>
-<li><a href="#sysprop">sysprop</a></li>
-<li><a href="#sysenv">sysenv</a></li>
-<li><a href="#jvm">jvm</a></li>
-<li><a href="#dashboard">dashboard</a></li>
-</ul>
-</li>
-<li><a href="#tips">Tips</a><ul>
-<li><a href="#help">help</a></li>
-<li><a href="#%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8">自动补全</a></li>
-<li><a href="#readline%E7%9A%84%E5%BF%AB%E6%8D%B7%E9%94%AE%E6%94%AF%E6%8C%81">readline的快捷键支持</a></li>
-<li><a href="#%E5%8E%86%E5%8F%B2%E5%91%BD%E4%BB%A4%E7%9A%84%E8%A1%A5%E5%85%A8">历史命令的补全</a></li>
-<li><a href="#pipeline">pipeline</a></li>
-</ul>
-</li>
-<li><a href="#scsm-%E6%9F%A5%E7%9C%8B%E5%B7%B2%E5%8A%A0%E8%BD%BD%E7%9A%84%E7%B1%BB">sc/sm 查看已加载的类</a><ul>
-<li><a href="#sc">sc</a></li>
-<li><a href="#sm">sm</a></li>
-</ul>
-</li>
-<li><a href="#jad">Jad</a></li>
-<li><a href="#ognl">Ognl</a><ul>
-<li><a href="#%E8%B0%83%E7%94%A8static%E5%87%BD%E6%95%B0">调用static函数</a></li>
-<li><a href="#%E6%9F%A5%E6%89%BEusercontroller%E7%9A%84classloader">查找UserController的ClassLoader</a></li>
-<li><a href="#%E8%8E%B7%E5%8F%96%E9%9D%99%E6%80%81%E7%B1%BB%E7%9A%84%E9%9D%99%E6%80%81%E5%AD%97%E6%AE%B5">获取静态类的静态字段</a></li>
-<li><a href="#%E6%89%A7%E8%A1%8C%E5%A4%9A%E8%A1%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%B5%8B%E5%80%BC%E7%BB%99%E4%B8%B4%E6%97%B6%E5%8F%98%E9%87%8F%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AAlist">执行多行表达式，赋值给临时变量，返回一个List</a></li>
-<li><a href="#%E6%9B%B4%E5%A4%9A">更多</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8">案例: 排查函数调用异常</a><ul>
-<li><a href="#%E7%8E%B0%E8%B1%A1">现象</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Busercontroller%E7%9A%84-%E5%8F%82%E6%95%B0%E5%BC%82%E5%B8%B8">查看UserController的 参数/异常</a></li>
-<li><a href="#%E8%BF%94%E5%9B%9E%E5%80%BC%E8%A1%A8%E8%BE%BE%E5%BC%8F">返回值表达式</a></li>
-<li><a href="#%E6%9D%A1%E4%BB%B6%E8%A1%A8%E8%BE%BE%E5%BC%8F">条件表达式</a></li>
-<li><a href="#%E5%BD%93%E5%BC%82%E5%B8%B8%E6%97%B6%E6%8D%95%E8%8E%B7">当异常时捕获</a></li>
-<li><a href="#%E6%8C%89%E7%85%A7%E8%80%97%E6%97%B6%E8%BF%9B%E8%A1%8C%E8%BF%87%E6%BB%A4">按照耗时进行过滤</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E7%83%AD%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81">案例: 热更新代码</a><ul>
-<li><a href="#jad%E5%8F%8D%E7%BC%96%E8%AF%91usercontroller">jad反编译UserController</a></li>
-<li><a href="#sc%E6%9F%A5%E6%89%BE%E5%8A%A0%E8%BD%BDusercontroller%E7%9A%84classloader">sc查找加载UserController的ClassLoader</a></li>
-<li><a href="#mc">mc</a></li>
-<li><a href="#redefine">redefine</a></li>
-<li><a href="#%E7%83%AD%E4%BF%AE%E6%94%B9%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%9C">热修改代码结果</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8logger-level">案例: 动态更新应用Logger Level</a><ul>
-<li><a href="#%E6%9F%A5%E6%89%BEusercontroller%E7%9A%84classloader-1">查找UserController的ClassLoader</a></li>
-<li><a href="#%E7%94%A8ognl%E8%8E%B7%E5%8F%96logger">用ognl获取logger</a></li>
-<li><a href="#%E5%8D%95%E7%8B%AC%E8%AE%BE%E7%BD%AEusercontroller%E7%9A%84logger-level">单独设置UserController的logger level</a></li>
-<li><a href="#%E4%BF%AE%E6%94%B9logback%E7%9A%84%E5%85%A8%E5%B1%80logger-level">修改logback的全局logger level</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E6%8E%92%E6%9F%A5logger%E5%86%B2%E7%AA%81%E9%97%AE%E9%A2%98">案例: 排查logger冲突问题</a><ul>
-<li><a href="#%E7%A1%AE%E8%AE%A4%E5%BA%94%E7%94%A8%E4%BD%BF%E7%94%A8%E7%9A%84logger%E7%B3%BB%E7%BB%9F">确认应用使用的logger系统</a></li>
-<li><a href="#%E8%8E%B7%E5%8F%96logback%E5%AE%9E%E9%99%85%E5%8A%A0%E8%BD%BD%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">获取logback实际加载的配置文件</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8classloader%E5%91%BD%E4%BB%A4%E6%9F%A5%E6%89%BE%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E7%9A%84logger%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">使用classloader命令查找可能存在的logger配置文件</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E8%8E%B7%E5%8F%96spring-context">案例: 获取Spring Context</a><ul>
-<li><a href="#%E4%BD%BF%E7%94%A8tt%E5%91%BD%E4%BB%A4%E8%8E%B7%E5%8F%96%E5%88%B0spring-context">使用tt命令获取到spring context</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8tt%E5%91%BD%E4%BB%A4%E4%BB%8E%E8%B0%83%E7%94%A8%E8%AE%B0%E5%BD%95%E9%87%8C%E8%8E%B7%E5%8F%96%E5%88%B0spring-context">使用tt命令从调用记录里获取到spring context</a></li>
-</ul>
-<ul>
-<li><a href="#%E8%8E%B7%E5%8F%96spring-bean%E5%B9%B6%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0">获取spring bean，并调用函数</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E6%8E%92%E6%9F%A5http%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E401">案例: 排查HTTP请求返回401</a><ul>
-<li><a href="#%E8%B7%9F%E8%B8%AA%E6%89%80%E6%9C%89%E7%9A%84filter%E5%87%BD%E6%95%B0">跟踪所有的Filter函数</a></li>
-<li><a href="#%E9%80%9A%E8%BF%87stack%E8%8E%B7%E5%8F%96%E8%B0%83%E7%94%A8%E6%A0%88">通过stack获取调用栈</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E6%8E%92%E6%9F%A5http%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404">案例: 排查HTTP请求返回404</a><ul>
-<li><a href="#%E8%B7%9F%E8%B8%AA%E6%89%80%E6%9C%89%E7%9A%84servlet%E5%87%BD%E6%95%B0">跟踪所有的Servlet函数</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B-%E7%90%86%E8%A7%A3spring-boot%E5%BA%94%E7%94%A8%E7%9A%84classloader%E7%BB%93%E6%9E%84">案例: 理解Spring Boot应用的ClassLoader结构</a><ul>
-<li><a href="#%E5%88%97%E5%87%BA%E6%89%80%E6%9C%89classloader">列出所有ClassLoader</a></li>
-<li><a href="#%E5%88%97%E5%87%BAclassloader%E9%87%8C%E5%8A%A0%E8%BD%BD%E7%9A%84%E6%89%80%E6%9C%89%E7%B1%BB">列出ClassLoader里加载的所有类</a></li>
-<li><a href="#%E5%8F%8D%E7%BC%96%E8%AF%91jsp%E7%9A%84%E4%BB%A3%E7%A0%81">反编译jsp的代码</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Bclassloader%E6%A0%91">查看ClassLoader树</a></li>
-<li><a href="#%E5%88%97%E5%87%BAclassloader%E7%9A%84urls">列出ClassLoader的urls</a></li>
-<li><a href="#%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9Aclassloader%E9%87%8C%E7%9A%84%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6">加载指定ClassLoader里的资源文件</a></li>
-<li><a href="#%E5%B0%9D%E8%AF%95%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9A%E7%9A%84%E7%B1%BB">尝试加载指定的类</a></li>
-</ul>
-</li>
-<li><a href="#%E6%A1%88%E4%BE%8B%E6%9F%A5%E6%89%BEtop-n%E7%BA%BF%E7%A8%8B">案例：查找Top N线程</a><ul>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E7%BA%BF%E7%A8%8B%E4%BF%A1%E6%81%AF">查看所有线程信息</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E5%85%B7%E4%BD%93%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%A0%88">查看具体线程的栈</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Bcpu%E4%BD%BF%E7%94%A8%E7%8E%87top-n%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%A0%88">查看CPU使用率top n线程的栈</a></li>
-<li><a href="#%E6%9F%A5%E6%89%BE%E7%BA%BF%E7%A8%8B%E6%98%AF%E5%90%A6%E6%9C%89%E9%98%BB%E5%A1%9E">查找线程是否有阻塞</a></li>
-</ul>
-</li>
-<li><a href="#web-console">Web Console</a><ul>
-<li><a href="#%E6%9C%AC%E5%9C%B0%E4%BD%93%E9%AA%8C">本地体验</a></li>
-</ul>
-</li>
-<li><a href="#exitstop">Exit/Stop</a><ul>
-<li><a href="#reset">reset</a></li>
-<li><a href="#%E9%80%80%E5%87%BAarthas">退出Arthas</a></li>
-<li><a href="#%E5%BD%BB%E5%BA%95%E9%80%80%E5%87%BAarthas">彻底退出Arthas</a></li>
-</ul>
-</li>
-<li><a href="#arthas-boot%E6%94%AF%E6%8C%81%E7%9A%84%E5%8F%82%E6%95%B0">arthas-boot支持的参数</a><ul>
-<li><a href="#%E5%85%81%E8%AE%B8%E5%A4%96%E9%83%A8%E8%AE%BF%E9%97%AE">允许外部访问</a></li>
-<li><a href="#%E5%88%97%E5%87%BA%E6%89%80%E6%9C%89%E7%9A%84%E7%89%88%E6%9C%AC">列出所有的版本</a></li>
-<li><a href="#%E5%8F%AA%E4%BE%A6%E5%90%ACtelnet%E7%AB%AF%E5%8F%A3%E4%B8%8D%E4%BE%A6%E5%90%AChttp%E7%AB%AF%E5%8F%A3">只侦听Telnet端口，不侦听HTTP端口</a></li>
-<li><a href="#%E6%89%93%E5%8D%B0%E8%BF%90%E8%A1%8C%E7%9A%84%E8%AF%A6%E6%83%85">打印运行的详情</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。</p>
-<p>本教程会以一个普通的Spring Boot应用为例，演示Arthas命令的详细用法。</p>
-<ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
-<p>启动之后，可以访问61000端口： 点击查看</p>
-<p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar --target-ip 0.0.0.0</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="查看jvm信息">查看JVM信息</span></h2><p>下面介绍Arthas里查看<code>JVM</code>信息的命令。</p>
-<h4><span id="sysprop">sysprop</span></h4><p><code>sysprop</code> 可以打印所有的System Properties信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysprop</span><br></pre></td></tr></table></figure>
-
-<p>也可以指定单个key： <code>sysprop java.version</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysprop java.version</span><br></pre></td></tr></table></figure>
-
-<p>也可以通过<code>grep</code>来过滤： <code>sysprop | grep user</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysprop | grep user</span><br></pre></td></tr></table></figure>
-
-<p>可以设置新的value： <code>sysprop testKey testValue</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysprop testKey testValue</span><br></pre></td></tr></table></figure>
-
-<h4><span id="sysenv">sysenv</span></h4><p><code>sysenv</code> 命令可以获取到环境变量。和<code>sysprop</code>命令类似。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysenv</span><br></pre></td></tr></table></figure>
-
-<h4><span id="jvm">jvm</span></h4><p><code>jvm</code> 命令会打印出<code>JVM</code>的各种详细信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jvm</span><br></pre></td></tr></table></figure>
-
-<h4><span id="dashboard">dashboard</span></h4><p><code>dashboard</code> 命令可以查看当前系统的实时数据面板。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dashboard</span><br></pre></td></tr></table></figure>
-
-<p>输入 <code>q</code> 或者 <code>Ctrl+C</code> 可以退出dashboard命令。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
-
-<h2><span id="tips">Tips</span></h2><p>为了更好使用Arthas，下面先介绍Arthas里的一些使用技巧。</p>
-<h4><span id="help">help</span></h4><p>Arthas里每一个命令都有详细的帮助信息。可以用<code>-h</code>来查看。帮助信息里有<code>EXAMPLES</code>和<code>WIKI</code>链接。</p>
-<p>比如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysprop -h</span><br></pre></td></tr></table></figure>
-
-<h4><span id="自动补全">自动补全</span></h4><p>Arthas支持丰富的自动补全功能，在使用有疑惑时，可以输入<code>Tab</code>来获取更多信息。</p>
-<p>比如输入 <code>sysprop java.</code> 之后，再输入<code>Tab</code>，会补全出对应的key：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sysprop java.</span><br><span class="line">java.runtime.name             java.protocol.handler.pkgs    java.vm.version</span><br><span class="line">java.vm.vendor                java.vendor.url               java.vm.name</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h4><span id="readline的快捷键支持">readline的快捷键支持</span></h4><p>Arthas支持常见的命令行快捷键，比如<code>Ctrl + A</code>跳转行首，<code>Ctrl + E</code>跳转行尾。</p>
-<p>更多的快捷键可以用 <code>keymap</code> 命令查看。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keymap</span><br></pre></td></tr></table></figure>
-
-<h4><span id="历史命令的补全">历史命令的补全</span></h4><p>如果想再执行之前的命令，可以在输入一半时，按<code>Up/↑</code> 或者 <code>Ddown/↓</code>，来匹配到之前的命令。</p>
-<p>比如之前执行过<code>sysprop java.version</code>，那么在输入<code>sysprop ja</code>之后，可以输入<code>Up/↑</code>，就会自动补全为<code>sysprop java.version</code>。</p>
-<p>如果想查看所有的历史命令，也可以通过 <code>history</code> 命令查看到。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">history</span></span><br></pre></td></tr></table></figure>
-
-<h4><span id="pipeline">pipeline</span></h4><p>Arthas支持在pipeline之后，执行一些简单的命令，比如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysprop | grep java</span><br><span class="line">sysprop | grep java</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysprop | wc -l</span><br><span class="line">sysprop | wc -l</span><br></pre></td></tr></table></figure>
-
-<h2><span id="scsm-查看已加载的类">sc/sm 查看已加载的类</span></h2><p>下面介绍Arthas里查找已加载类的命令。</p>
-<h4><span id="sc">sc</span></h4><p><code>sc</code> 命令可以查找到所有JVM已经加载到的类。 如果搜索的是接口，还会搜索所有的实现类。比如查看所有的<code>Filter</code>实现类：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc javax.servlet.Filter</span><br></pre></td></tr></table></figure>
-
-<p>通过<code>-d</code>参数，可以打印出类加载的具体信息，很方便查找类加载问题。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d javax.servlet.Filter</span><br></pre></td></tr></table></figure>
-
-<p><code>sc</code>支持通配，比如搜索所有的<code>StringUtils</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc *StringUtils</span><br></pre></td></tr></table></figure>
-
-<h4><span id="sm">sm</span></h4><p><code>sm</code>命令则是查找类的具体函数。比如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm java.math.RoundingMode</span><br></pre></td></tr></table></figure>
-
-<p>通过<code>-d</code>参数可以打印函数的具体属性：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm -d java.math.RoundingMode</span><br></pre></td></tr></table></figure>
-
-<p>也可以查找特定的函数，比如查找构造函数：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sm java.math.RoundingMode &lt;init&gt;</span><br></pre></td></tr></table></figure>
-
-<h2><span id="jad">Jad</span></h2><p>可以通过 <code>jad</code> 命令来反编译代码：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad com.example.demo.arthas.user.UserController</span><br></pre></td></tr></table></figure>
-
-<p>通过<code>--source-only</code>参数可以只打印出在反编译的源代码：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad --source-only com.example.demo.arthas.user.UserController</span><br></pre></td></tr></table></figure>
-
-<h2><span id="ognl">Ognl</span></h2><p>在Arthas里，有一个单独的<code>ognl</code>命令，可以动态执行代码。</p>
-<h4><span id="调用static函数">调用static函数</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl <span class="string">&#x27;@java.lang.System@out.println(&quot;hello ognl&quot;)&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>可以检查<code>Terminal 1</code>里的进程输出，可以发现打印出了<code>hello ognl</code>。</p>
-<h4><span id="查找usercontroller的classloader">查找UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash</span></span><br><span class="line"> classLoaderHash   1be6f5c3</span><br></pre></td></tr></table></figure>
-
-<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ognl -c 1be6f5c3 @com.example.demo.arthas.user.UserController@logger</span></span><br></pre></td></tr></table></figure>
-
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader  @org.springframework.boot.SpringApplication@logger</span></span><br><span class="line">@Slf4jLocationAwareLog[</span><br><span class="line">    FQCN=@String[org.apache.commons.logging.LogAdapter$Slf4jLocationAwareLog],</span><br><span class="line">    name=@String[org.springframework.boot.SpringApplication],</span><br><span class="line">    logger=@Logger[Logger[org.springframework.boot.SpringApplication]],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h4><span id="获取静态类的静态字段">获取静态类的静态字段</span></h4><p>获取<code>UserController</code>类里的<code>logger</code>字段：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader @com.example.demo.arthas.user.UserController@logger</span><br></pre></td></tr></table></figure>
-
-<p>还可以通过<code>-x</code>参数控制返回值的展开层数。比如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -x 2 @com.example.demo.arthas.user.UserController@logger</span><br></pre></td></tr></table></figure>
-
-<h4><span id="执行多行表达式赋值给临时变量返回一个list">执行多行表达式，赋值给临时变量，返回一个List</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl <span class="string">&#x27;#value1=@System@getProperty(&quot;java.home&quot;), #value2=@System@getProperty(&quot;java.runtime.name&quot;), &#123;#value1, #value2&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ognl <span class="string">&#x27;#value1=@System@getProperty(&quot;java.home&quot;), #value2=@System@getProperty(&quot;java.runtime.name&quot;), &#123;#value1, #value2&#125;&#x27;</span></span></span><br><span class="line">@ArrayList[</span><br><span class="line">    @String[/Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre],</span><br><span class="line">    @String[Java(TM) SE Runtime Environment],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<h4><span id="更多">更多</span></h4><p>在Arthas里<code>ognl</code>表达式是很重要的功能，在很多命令里都可以使用<code>ognl</code>表达式。</p>
-<p>一些更复杂的用法，可以参考：</p>
-<ul>
-<li>OGNL特殊用法请参考：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
-<li>OGNL表达式官方指南：<a target="_blank" rel="noopener" href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
-</ul>
-<h2><span id="案例-排查函数调用异常">案例: 排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>但请求的具体参数，异常栈是什么呢？</p>
-<h4><span id="查看usercontroller的-参数异常">查看UserController的 参数/异常</span></h4><p>在Arthas里执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params, throwExp&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<ol>
-<li>第一个参数是类名，支持通配</li>
-<li>第二个参数是函数名，支持通配 访问 <code>curl http://localhost:61000/user/0</code> ,<code>watch</code>命令会打印调用的参数和异常</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params, throwExp&#125;&#x27;</span></span></span><br><span class="line">Press Q or Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:2) cost in 53 ms.</span><br><span class="line">ts=2019-02-15 01:35:25; [cost=0.996655ms] result=@ArrayList[</span><br><span class="line">    @Object[][isEmpty=false;size=1],</span><br><span class="line">    @IllegalArgumentException[java.lang.IllegalArgumentException: id &lt; 1],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p>可以看到实际抛出的异常是<code>IllegalArgumentException</code>。</p>
-<p>可以输入 <code>q</code> 或者 <code>Ctrl+C</code> 退出watch命令。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
-
-<p>如果想把获取到的结果展开，可以用<code>-x</code>参数：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params, throwExp&#125;&#x27;</span> -x 2</span><br></pre></td></tr></table></figure>
-
-<h4><span id="返回值表达式">返回值表达式</span></h4><p>在上面的例子里，第三个参数是<code>返回值表达式</code>，它实际上是一个<code>ognl</code>表达式，它支持一些内置对象：</p>
-<ul>
-<li>loader</li>
-<li>clazz</li>
-<li>method</li>
-<li>target</li>
-<li>params</li>
-<li>returnObj</li>
-<li>throwExp</li>
-<li>isBefore</li>
-<li>isThrow</li>
-<li>isReturn</li>
-</ul>
-<p>你可以利用这些内置对象来组成不同的表达式。比如返回一个数组：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params[0], target, returnObj&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>更多参考： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
-<h4><span id="条件表达式">条件表达式</span></h4><p><code>watch</code>命令支持在第4个参数里写条件表达式，比如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * returnObj <span class="string">&#x27;params[0] &gt; 100&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>当访问 user/1 时，<code>watch</code>命令没有输出</p>
-<p>当访问 user/101 时，<code>watch</code>会打印出结果。</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch com.example.demo.arthas.user.UserController * returnObj <span class="string">&#x27;params[0] &gt; 100&#x27;</span></span></span><br><span class="line">Press Q or Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:2) cost in 47 ms.</span><br><span class="line">ts=2019-02-13 19:42:12; [cost=0.821443ms] result=@User[</span><br><span class="line">    id=@Integer[101],</span><br><span class="line">    name=@String[name101],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<h4><span id="当异常时捕获">当异常时捕获</span></h4><p><code>watch</code>命令支持<code>-e</code>选项，表示只捕获抛出异常时的请求：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&quot;&#123;params[0],throwExp&#125;&quot;</span> -e</span><br></pre></td></tr></table></figure>
-
-<h4><span id="按照耗时进行过滤">按照耗时进行过滤</span></h4><p>watch命令支持按请求耗时进行过滤，比如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params, returnObj&#125;&#x27;</span> <span class="string">&#x27;#cost&gt;200&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-热更新代码">案例: 热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>redefine</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>下面通过热更新代码，修改这个逻辑。</p>
-<h4><span id="jad反编译usercontroller">jad反编译UserController</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad --source-only com.example.demo.arthas.user.UserController &gt; /tmp/UserController.java</span><br></pre></td></tr></table></figure>
-
-<p>jad反编译的结果保存在 <code>/tmp/UserController.java</code>文件里了。</p>
-<p>再打开一个<code>Terminal 3</code>，然后用vim来编辑<code>/tmp/UserController.java</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /tmp/UserController.java</span><br></pre></td></tr></table></figure>
-
-<p>比如当 user id 小于1时，也正常返回，不抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(value=&#123;&quot;/user/&#123;id&#125;&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> User <span class="title">findUserById</span><span class="params">(<span class="meta">@PathVariable</span> Integer id)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">&quot;id: &#123;&#125;&quot;</span>, (Object)id);</span><br><span class="line">    <span class="keyword">if</span> (id != <span class="keyword">null</span> &amp;&amp; id &lt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> User(id, <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">        <span class="comment">// throw new IllegalArgumentException(&quot;id &lt; 1&quot;);</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> User(id.intValue(), <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4><span id="sc查找加载usercontroller的classloader">sc查找加载UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d *UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sc -d *UserController | grep classLoaderHash</span></span><br><span class="line"> classLoaderHash   1be6f5c3</span><br></pre></td></tr></table></figure>
-
-<p>可以发现是 spring boot <code>LaunchedURLClassLoader@1be6f5c3</code> 加载的。</p>
-<p>请记下你的classLoaderHash，后面需要使用它。在这里，它是 <code>1be6f5c3</code>。</p>
-<h4><span id="mc">mc</span></h4><p>保存好<code>/tmp/UserController.java</code>之后，使用<code>mc</code>(Memory Compiler)命令来编译，并且通过<code>-c</code>或者<code>--classLoaderClass</code>参数指定ClassLoader：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span></span><br><span class="line">Memory compiler output:</span><br><span class="line">/tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">Affect(row-cnt:1) cost in 346 ms</span><br></pre></td></tr></table></figure>
-
-<p>也可以通过<code>mc -c &lt;classLoaderHash&gt; /tmp/UserController.java -d /tmp</code>，使用<code>-c</code>参数指定ClassLoaderHash:</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc -c 1be6f5c3 /tmp/UserController.java -d /tmp</span></span><br></pre></td></tr></table></figure>
-
-<h4><span id="redefine">redefine</span></h4><p>再使用<code>redefine</code>命令重新加载新编译好的<code>UserController.class</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redefine /tmp/com/example/demo/arthas/user/UserController.class</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ redefine /tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">redefine success, size: 1</span><br></pre></td></tr></table></figure>
-
-<h4><span id="热修改代码结果">热修改代码结果</span></h4><p><code>redefine</code>成功之后，再次访问 user/0 ，结果是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 0,</span><br><span class="line">  &quot;name&quot;: &quot;name0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-动态更新应用logger-level">案例: 动态更新应用Logger Level</span></h2><p>在这个案例里，动态修改应用的Logger Level。</p>
-<h4><span id="查找usercontroller的classloader">查找UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash</span></span><br><span class="line"> classLoaderHash   1be6f5c3</span><br></pre></td></tr></table></figure>
-
-<h4><span id="用ognl获取logger">用ognl获取logger</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger&#x27;</span></span></span><br><span class="line">@Logger[</span><br><span class="line">    serialVersionUID=@Long[5454405123156820674],</span><br><span class="line">    FQCN=@String[ch.qos.logback.classic.Logger],</span><br><span class="line">    name=@String[com.example.demo.arthas.user.UserController],</span><br><span class="line">    level=null,</span><br><span class="line">    effectiveLevelInt=@Integer[20000],</span><br><span class="line">    parent=@Logger[Logger[com.example.demo.arthas.user]],</span><br><span class="line">    childrenList=null,</span><br><span class="line">    aai=null,</span><br><span class="line">    additive=@Boolean[true],</span><br><span class="line">    loggerContext=@LoggerContext[ch.qos.logback.classic.LoggerContext[default]],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p>可以知道<code>UserController@logger</code>实际使用的是logback。可以看到<code>level=null</code>，则说明实际最终的level是从<code>root</code> logger里来的。</p>
-<h4><span id="单独设置usercontroller的logger-level">单独设置UserController的logger level</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger.setLevel(@ch.qos.logback.classic.Level@DEBUG)&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>再次获取<code>UserController@logger</code>，可以发现已经是<code>DEBUG</code>了：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger&#x27;</span></span></span><br><span class="line">@Logger[</span><br><span class="line">    serialVersionUID=@Long[5454405123156820674],</span><br><span class="line">    FQCN=@String[ch.qos.logback.classic.Logger],</span><br><span class="line">    name=@String[com.example.demo.arthas.user.UserController],</span><br><span class="line">    level=@Level[DEBUG],</span><br><span class="line">    effectiveLevelInt=@Integer[10000],</span><br><span class="line">    parent=@Logger[Logger[com.example.demo.arthas.user]],</span><br><span class="line">    childrenList=null,</span><br><span class="line">    aai=null,</span><br><span class="line">    additive=@Boolean[true],</span><br><span class="line">    loggerContext=@LoggerContext[ch.qos.logback.classic.LoggerContext[default]],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<h4><span id="修改logback的全局logger-level">修改logback的全局logger level</span></h4><p>通过获取<code>root</code> logger，可以修改全局的logger level：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@org.slf4j.LoggerFactory@getLogger(&quot;root&quot;).setLevel(@ch.qos.logback.classic.Level@DEBUG)&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-排查logger冲突问题">案例: 排查logger冲突问题</span></h2><p>在这个案例里，展示排查logger冲突的方法。</p>
-<h4><span id="确认应用使用的logger系统">确认应用使用的logger系统</span></h4><p>以<code>UserController</code>为例，它使用的是slf4j api，但实际使用到的logger系统是logback。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;@com.example.demo.arthas.user.UserController@logger&#x27;</span></span></span><br><span class="line">@Logger[</span><br><span class="line">    serialVersionUID=@Long[5454405123156820674],</span><br><span class="line">    FQCN=@String[ch.qos.logback.classic.Logger],</span><br><span class="line">    name=@String[com.example.demo.arthas.user.UserController],</span><br><span class="line">    level=null,</span><br><span class="line">    effectiveLevelInt=@Integer[20000],</span><br><span class="line">    parent=@Logger[Logger[com.example.demo.arthas.user]],</span><br><span class="line">    childrenList=null,</span><br><span class="line">    aai=null,</span><br><span class="line">    additive=@Boolean[true],</span><br><span class="line">    loggerContext=@LoggerContext[ch.qos.logback.classic.LoggerContext[default]],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<h4><span id="获取logback实际加载的配置文件">获取logback实际加载的配置文件</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ognl --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader <span class="string">&#x27;#map1=@org.slf4j.LoggerFactory@getLogger(&quot;root&quot;).loggerContext.objectMap, #map1.get(&quot;CONFIGURATION_WATCH_LIST&quot;)&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h4><span id="使用classloader命令查找可能存在的logger配置文件">使用classloader命令查找可能存在的logger配置文件</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</span><br><span class="line"> jar:file:/Users/hengyunabc/code/java/spring-boot-inside/demo-arthas-spring-boot/target/demo-arthas-spring-boot-0.0.1-SNAPSHOT.jar!/BOOT-INF/classes!/logback-spring.xml</span><br><span class="line"></span><br><span class="line">Affect(row-cnt:1) cost in 13 ms.</span><br></pre></td></tr></table></figure>
-
-<p>可以知道加载的配置的具体来源。</p>
-<p>可以尝试加载容易冲突的文件：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback.xml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r log4j.properties</span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-获取spring-context">案例: 获取Spring Context</span></h2><p>在这个案例里，展示获取spring context，再获取bean，然后调用函数。</p>
-<h4><span id="使用tt命令获取到spring-context">使用tt命令获取到spring context</span></h4><p><code>tt</code>即 TimeTunnel，它可以记录下指定方法每次调用的入参和返回信息，并能对这些不同的时间下调用进行观测。</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/tt.html">https://arthas.aliyun.com/doc/tt.html</a></li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tt -t org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter invokeHandlerMethod</span><br></pre></td></tr></table></figure>
-
-<p>访问：user/1</p>
-<p>可以看到<code>tt</code>命令捕获到了一个请求：</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tt -t org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdaptePress Q or Ctrl+C to abort.</span></span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 252 ms.</span><br><span class="line"> INDE  TIMESTAMP    COST(  IS-R  IS-  OBJECT     CLASS               METHOD</span><br><span class="line"> X                  ms)    ET    EXP</span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line"> 1000  2019-02-15   4.583  true  fal  0xc93cf1a  RequestMappingHand  invokeHandlerMethod</span><br><span class="line">       15:38:32     923          se              lerAdapter</span><br></pre></td></tr></table></figure>
-
-<h4><span id="使用tt命令从调用记录里获取到spring-context">使用tt命令从调用记录里获取到spring context</span></h4><p>输入 <code>q</code> 或者 <code>Ctrl + C</code> 退出上面的 <code>tt -t</code>命令。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tt -i 1000 -w <span class="string">&#x27;target.getApplicationContext()&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tt -i 1000 -w <span class="string">&#x27;target.getApplicationContext()&#x27;</span></span></span><br><span class="line">@AnnotationConfigEmbeddedWebApplicationContext[</span><br><span class="line">    reader=@AnnotatedBeanDefinitionReader[org.springframework.context.annotation.AnnotatedBeanDefinitionReader@2e457641],</span><br><span class="line">    scanner=@ClassPathBeanDefinitionScanner[org.springframework.context.annotation.ClassPathBeanDefinitionScanner@6eb38026],</span><br><span class="line">    annotatedClasses=null,</span><br><span class="line">    basePackages=null,</span><br><span class="line">]</span><br><span class="line">Affect(row-cnt:1) cost in 439 ms.</span><br></pre></td></tr></table></figure>
-
-<h3><span id="获取spring-bean并调用函数">获取spring bean，并调用函数</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tt -i 1000 -w <span class="string">&#x27;target.getApplicationContext().getBean(&quot;helloWorldService&quot;).getHelloMessage()&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>结果是：</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tt -i 1000 -w <span class="string">&#x27;target.getApplicationContext().getBean(&quot;helloWorldService&quot;).getHelloMessage()&#x27;</span></span></span><br><span class="line">@String[Hello World]</span><br><span class="line">Affect(row-cnt:1) cost in 52 ms.</span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-排查http请求返回401">案例: 排查HTTP请求返回401</span></h2><p>在这个案例里，展示排查HTTP 401问题的技巧。</p>
-<p>访问： admin</p>
-<p>结果是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Something went wrong: 401 Unauthorized</span><br></pre></td></tr></table></figure>
-
-<p>我们知道<code>401</code>通常是被权限管理的<code>Filter</code>拦截了，那么到底是哪个<code>Filter</code>处理了这个请求，返回了401？</p>
-<h4><span id="跟踪所有的filter函数">跟踪所有的Filter函数</span></h4><p>开始trace：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace javax.servlet.Filter *</span><br></pre></td></tr></table></figure>
-
-<p>访问： admin</p>
-<p>可以在调用树的最深层，找到<code>AdminFilterConfig$AdminFilter</code>返回了<code>401</code>：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+---[3.806273ms] javax.servlet.FilterChain:doFilter()</span><br><span class="line">|   `---[3.447472ms] com.example.demo.arthas.AdminFilterConfig$AdminFilter:doFilter()</span><br><span class="line">|       `---[0.17259ms] javax.servlet.http.HttpServletResponse:sendError()</span><br></pre></td></tr></table></figure>
-
-<h4><span id="通过stack获取调用栈">通过stack获取调用栈</span></h4><p>上面是通过<code>trace</code>命令来获取信息，从结果里，我们可以知道通过<code>stack</code>跟踪<code>HttpServletResponse:sendError()</code>，同样可以知道是哪个<code>Filter</code>返回了<code>401</code></p>
-<p>执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stack javax.servlet.http.HttpServletResponse sendError <span class="string">&#x27;params[0]==401&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>访问： admin</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> stack javax.servlet.http.HttpServletResponse sendError <span class="string">&#x27;params[0]==401&#x27;</span></span></span><br><span class="line">Press Q or Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:2 , method-cnt:4) cost in 87 ms.</span><br><span class="line">ts=2019-02-15 16:44:06;thread_name=http-nio-8080-exec-6;id=16;is_daemon=true;priority=5;TCCL=org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedWebappClassLoader@8546cd5</span><br><span class="line">    @org.apache.catalina.connector.ResponseFacade.sendError()</span><br><span class="line">        at com.example.demo.arthas.AdminFilterConfig$AdminFilter.doFilter(AdminFilterConfig.java:38)</span><br><span class="line">        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)</span><br><span class="line">        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)</span><br><span class="line">        at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)</span><br><span class="line">        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)</span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-排查http请求返回404">案例: 排查HTTP请求返回404</span></h2><p>在这个案例里，展示排查HTTP 404问题的技巧。</p>
-<p>访问： a.txt</p>
-<p>结果是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Something went wrong: 404 Not Found</span><br></pre></td></tr></table></figure>
-
-<p>那么到底是哪个Servlet处理了这个请求，返回了404？</p>
-<h4><span id="跟踪所有的servlet函数">跟踪所有的Servlet函数</span></h4><p>开始trace：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace javax.servlet.Servlet * &gt; /tmp/servlet.txt</span><br></pre></td></tr></table></figure>
-
-<p>访问： a.txt</p>
-<p>在<code>Terminal 3</code>里，查看<code>/tmp/servlet.txt</code>的内容：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less /tmp/servlet.txt</span><br></pre></td></tr></table></figure>
-
-<p><code>/tmp/servlet.txt</code>里的内容会比较多，需要耐心找到调用树里最长的地方。</p>
-<p>可以发现请求最终是被<code>freemarker</code>处理的：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">`---[13.974188ms] org.springframework.web.servlet.ViewResolver:resolveViewName();    +---[0.045561ms] javax.servlet.GenericServlet:&lt;init&gt;()</span><br><span class="line">    +---[min=0.045545ms,max=0.074342ms,total=0.119887ms,count=2] org.springframework.web.servlet.view.freemarker.FreeMarkerView$GenericServletAdapter:&lt;init&gt;()</span><br><span class="line">    +---[0.170895ms] javax.servlet.GenericServlet:init()</span><br><span class="line">    |   `---[0.068578ms] javax.servlet.GenericServlet:init()</span><br><span class="line">    |       `---[0.021793ms] javax.servlet.GenericServlet:init()</span><br><span class="line">    `---[0.164035ms] javax.servlet.GenericServlet:getServletContext()</span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例-理解spring-boot应用的classloader结构">案例: 理解Spring Boot应用的ClassLoader结构</span></h2><p>下面介绍<code>classloader</code>命令的功能。</p>
-<p>先访问一个jsp网页，触发jsp的加载： hello</p>
-<h4><span id="列出所有classloader">列出所有ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -l</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -l</span></span><br><span class="line"> name                                                             loadedCount  hash      parent</span><br><span class="line"> BootstrapClassLoader                                             2724         null      null</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@411ce1ab               2009         411ce1ab  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@22ae1234               1253         22ae1234  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> org.apache.jasper.servlet.JasperLoader@65361d9a                  1            65361d9a  TomcatEmbeddedWebappClassLoader</span><br><span class="line">                                                                                           context: ROOT</span><br><span class="line">                                                                                           delegate: true</span><br><span class="line">                                                                                         ----------&gt; Parent Classloader:</span><br><span class="line">                                                                                         org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> TomcatEmbeddedWebappClassLoader                                  0            8546cd5   org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line">   context: ROOT</span><br><span class="line">   delegate: true</span><br><span class="line"><span class="meta"> ----------&gt;</span><span class="bash"> Parent Classloader:</span></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3  5416         1be6f5c3  sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line"> sun.misc.Launcher$AppClassLoader@3d4eac69                        45           3d4eac69  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> sun.misc.Launcher$ExtClassLoader@7494e528                        4            7494e528  null</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>TomcatEmbeddedWebappClassLoader 加载的class数量是0，所以在spring boot embedded tomcat里，它只是一个空壳，所有的类加载都是<code>LaunchedURLClassLoader</code>完成的</li>
-</ul>
-<h4><span id="列出classloader里加载的所有类">列出ClassLoader里加载的所有类</span></h4><p>列出上面的<code>org.apache.jasper.servlet.JasperLoader</code>加载的类：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -a --classLoaderClass apache.jasper.servlet.JasperLoader</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -a --classLoaderClass apache.jasper.servlet.JasperLoader</span></span><br><span class="line"> hash:1698045338, org.apache.jasper.servlet.JasperLoader@65361d9a</span><br><span class="line"> org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>注：同ognl, 也可用<code>-c &lt;hashcode&gt;</code>而不用<code>--classLoaderClass</code>指定</li>
-</ul>
-<h4><span id="反编译jsp的代码">反编译jsp的代码</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> jad org.apache.jsp.jsp.hello_jsp</span></span><br><span class="line"></span><br><span class="line">ClassLoader:</span><br><span class="line">+-org.apache.jasper.servlet.JasperLoader@65361d9a</span><br><span class="line">  +-TomcatEmbeddedWebappClassLoader</span><br><span class="line">      context: ROOT</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看classloader树">查看ClassLoader树</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -t</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ classloader -t</span><br><span class="line">+-BootstrapClassLoader</span><br><span class="line">+-sun.misc.Launcher$ExtClassLoader@28cbbddd</span><br><span class="line">  +-com.taobao.arthas.agent.ArthasClassloader@8c25e55</span><br><span class="line">  +-sun.misc.Launcher$AppClassLoader@55f96302</span><br><span class="line">    +-org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line">      +-TomcatEmbeddedWebappClassLoader</span><br><span class="line">          context: ROOT</span><br><span class="line">          delegate: true</span><br><span class="line">        ----------&gt; Parent Classloader:</span><br><span class="line">        org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line">        +-org.apache.jasper.servlet.JasperLoader@21ae0fe2</span><br></pre></td></tr></table></figure>
-
-<p>注意：请使用你的classLoaderHash值覆盖 <code>&lt;classLoaderHash&gt;</code> ，然后手动执行下面相关命令：</p>
-<h4><span id="列出classloader的urls">列出ClassLoader的urls</span></h4><p>比如上面查看到的spring LaunchedURLClassLoader的 hashcode是<code>1be6f5c3</code>，可以通过<code>-c</code>或者<code>--classLoaderClass</code>参数来列出它的所有urls：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span><br><span class="line">jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/</span><br><span class="line">jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/spring-boot-starter-aop-1.5</span><br><span class="line">.13.RELEASE.jar!/</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h4><span id="加载指定classloader里的资源文件">加载指定ClassLoader里的资源文件</span></h4><p>查找指定的资源文件： <code>classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</span><br><span class="line"> jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/logback-spring.xml</span><br></pre></td></tr></table></figure>
-
-<h4><span id="尝试加载指定的类">尝试加载指定的类</span></h4><p>比如用上面的spring LaunchedURLClassLoader 尝试加载 <code>java.lang.String</code> ：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --load java.lang.String</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --load java.lang.String</span><br><span class="line">load class success.</span><br><span class="line"> class-info        java.lang.String</span><br><span class="line"> code-source</span><br><span class="line"> name              java.lang.String</span><br><span class="line"> isInterface       false</span><br><span class="line"> isAnnotation      false</span><br><span class="line"> isEnum            false</span><br><span class="line"> isAnonymousClass  false</span><br><span class="line"> isArray           false</span><br><span class="line"> isLocalClass      false</span><br><span class="line"> isMemberClass     false</span><br><span class="line"> isPrimitive       false</span><br><span class="line"> isSynthetic       false</span><br><span class="line"> simple-name       String</span><br><span class="line"> modifier          final,public</span><br><span class="line"> annotation</span><br><span class="line"> interfaces        java.io.Serializable,java.lang.Comparable,java.lang.CharSequence</span><br><span class="line"> super-class       +-java.lang.Object</span><br><span class="line"> class-loader</span><br><span class="line"> classLoaderHash   null</span><br></pre></td></tr></table></figure>
-
-<h2><span id="案例查找top-n线程">案例：查找Top N线程</span></h2><h4><span id="查看所有线程信息">查看所有线程信息</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看具体线程的栈">查看具体线程的栈</span></h4><p>查看线程ID 16的栈：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread 16</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看cpu使用率top-n线程的栈">查看CPU使用率top n线程的栈</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3</span><br></pre></td></tr></table></figure>
-
-<p>查看5秒内的CPU使用率top n线程栈</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3 -i 5000</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查找线程是否有阻塞">查找线程是否有阻塞</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -b</span><br></pre></td></tr></table></figure>
-
-<h2><span id="web-console">Web Console</span></h2><p>Arthas支持通过Web Socket来连接。</p>
-<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
-<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/O1CN01i041kW1lw0FCaSKNn_!!6000000004882-2-tps-1231-284.png" alt="Arthas WebConsole"></p>
-<p>推荐通过“快速入门”来体验： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
-<h2><span id="exitstop">Exit/Stop</span></h2><h3><span id="reset">reset</span></h3><p>Arthas在 watch/trace 等命令时，实际上是修改了应用的字节码，插入增强的代码。显式执行 <code>reset</code> 命令，可以清除掉这些增强代码。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reset</span><br></pre></td></tr></table></figure>
-
-<h3><span id="退出arthas">退出Arthas</span></h3><p>用 <code>exit</code> 或者 <code>quit</code> 命令可以退出Arthas。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
-
-<p>Ctrl+C</p>
-<p>退出Arthas之后，还可以再次用 <code>java -jar arthas-boot.jar</code> 来连接。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p>Ctrl+C</p>
-<h3><span id="彻底退出arthas">彻底退出Arthas</span></h3><p><code>exit/quit</code>命令只是退出当前session，arthas server还在目标进程中运行。</p>
-<p>想完全退出Arthas，可以执行 <code>stop</code> 命令。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stop</span><br></pre></td></tr></table></figure>
-
-<p>Ctrl+C</p>
-<h2><span id="arthas-boot支持的参数">arthas-boot支持的参数</span></h2><p><code>arthas-boot.jar</code> 支持很多参数，可以执行 <code>java -jar arthas-boot.jar -h</code> 来查看。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar -h</span><br></pre></td></tr></table></figure>
-
-<h3><span id="允许外部访问">允许外部访问</span></h3><p>默认情况下， arthas server侦听的是 <code>127.0.0.1</code> 这个IP，如果希望远程可以访问，可以使用<code>--target-ip</code>的参数。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar --target-ip</span><br></pre></td></tr></table></figure>
-
-<h3><span id="列出所有的版本">列出所有的版本</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar --versions</span><br></pre></td></tr></table></figure>
-
-<p>使用指定版本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar --use-version 3.1.0</span><br></pre></td></tr></table></figure>
-
-<h3><span id="只侦听telnet端口不侦听http端口">只侦听Telnet端口，不侦听HTTP端口</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar --telnet-port 9999 --http-port -1</span><br></pre></td></tr></table></figure>
-
-<h3><span id="打印运行的详情">打印运行的详情</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar -v</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“进阶教程”，演示了Arthas的大部分高级用法，希望对大家排查问题有帮助。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 入门教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/jlynet.github.io/page/3/">&amp;laquo; Prev</a><a class="page-number" href="/jlynet.github.io/">1</a><a class="page-number" href="/jlynet.github.io/page/2/">2</a><a class="page-number" href="/jlynet.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/jlynet.github.io/page/5/">5</a><a class="extend next" rel="next" href="/jlynet.github.io/page/5/">Next &amp;raquo;</a>
@@ -2992,6 +2548,10 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">php</a>
               </li>
             
             <div class="clearfix"></div>

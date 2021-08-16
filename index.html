@@ -230,6 +230,154 @@
             
 
   
+    <article id="post-PHP和Java中的SHA256" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/jlynet.github.io/2021/08/16/PHP%E5%92%8CJava%E4%B8%AD%E7%9A%84SHA256/" target="_blank">PHP和Java中的SHA256</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/jlynet.github.io/2021/08/16/PHP%E5%92%8CJava%E4%B8%AD%E7%9A%84SHA256/" class="archive-article-date">
+        <time datetime="2021-08-16T14:44:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-16</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <p>我正在将一些<a target="_blank" rel="noopener" href="https://codeday.me/tag/Java">Java</a>代码移植到<a target="_blank" rel="noopener" href="https://codeday.me/tag/PHP">PHP</a>代码中.在Java中,我有一个哈希SHA256代码,如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public static String hashSHA256(String input)</span><br><span class="line">        throws NoSuchAlgorithmException &#123;</span><br><span class="line">    MessageDigest mDigest = MessageDigest.getInstance(&quot;SHA-256&quot;);</span><br><span class="line">byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">    StringBuilder hexStrBuilder = new StringBuilder();</span><br><span class="line">    for (int i = 0; i &lt; shaByteArr.length; i++) &#123;</span><br><span class="line">        hexStrBuilder.append(Integer.toHexString(0xFF &amp; shaByteArr[i]));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return hexStrBuilder.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在PHP中,我哈希如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$hash = hash(&quot;sha256&quot;, utf8_encode($input));</span><br></pre></td></tr></table></figure>
+
+<p>我用input =“test”运行示例代码.但是,我得到了2个不同的哈希字符串：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Java: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2bb822cd15d6c15b0f0a8</span><br><span class="line">PHP: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</span><br></pre></td></tr></table></figure>
+
+<p>有人可以向我解释为什么以及如何让它们相互匹配？请注意,我无法修改Java实现代码,只能修改PHP.</p>
+<p>万分感激！</p>
+<p>解决方法:<br>PHP版本是正确的;测试的SHA-256校验和是9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.<br>Java版本返回相同的校验和,其中两个0被剥离.这是因为您将字节转换为十六进制的方式.而不是使用0xFF&amp; ing使用它们,使用String.format(),如<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/2817883/2765666">this answer</a>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexStrBuilder.append(String.format(&quot;%02x&quot;, shaByteArr[i]));</span><br></pre></td></tr></table></figure>
+
+<p>修改方法：</p>
+<pre><code>public static String hashSHA256(String input)
+        throws NoSuchAlgorithmException &#123;
+    MessageDigest mDigest = MessageDigest.getInstance(&quot;SHA-256&quot;);
+
+byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&quot;)));
+    StringBuilder hexStrBuilder = new StringBuilder();
+    for (int i = 0; i &lt; shaByteArr.length; i++) &#123;
+        //hexStrBuilder.append(Integer.toHexString(0xFF &amp; shaByteArr[i]));
+        hexStrBuilder.append(String.format(&quot;%02x&quot;, shaByteArr[i]));
+    &#125;
+
+    return hexStrBuilder.toString();
+&#125;
+
+我意识到你说你不能修改Java代码,但它是不正确的！
+
+来源： https://codeday.me/bug/20190725/1530972.html
+</code></pre>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">php</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/jlynet.github.io/categories/其他//" class="article-tag-list-link color3">其他</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/jlynet.github.io/2021/08/16/PHP%E5%92%8CJava%E4%B8%AD%E7%9A%84SHA256/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas高级命令教程/Arthasclassloader命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2411,220 +2559,6 @@
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasstack命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasstack%E5%91%BD%E4%BB%A4/" target="_blank">Arthas stack命令</a>
-  
-    </h1>
-  
-
-
-  
-  
-<a href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasstack%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#stack%E5%91%BD%E4%BB%A4">stack命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E4%BE%8B%E5%AD%90">使用例子</a><ul>
-<li><a href="#stack">stack</a></li>
-<li><a href="#%E6%8D%AE%E6%9D%A1%E4%BB%B6%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%9D%A5%E8%BF%87%E6%BB%A4">据条件表达式来过滤</a></li>
-<li><a href="#%E6%8D%AE%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4%E6%9D%A5%E8%BF%87%E6%BB%A4">据执行时间来过滤</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasstack%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示stack命令。</p>
-<ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasstack%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="stack命令">stack命令</span></h2><blockquote>
-<p>输出当前方法被调用的调用路径</p>
-</blockquote>
-<p>很多时候我们都知道一个方法被执行，但这个方法被执行的路径非常多，或者你根本就不知道这个方法是从那里被执行了，此时你需要的是 stack 命令。</p>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><em>class-pattern</em></td>
-<td>类名表达式匹配</td>
-</tr>
-<tr>
-<td><em>method-pattern</em></td>
-<td>方法名表达式匹配</td>
-</tr>
-<tr>
-<td><em>condition-express</em></td>
-<td>条件表达式</td>
-</tr>
-<tr>
-<td>[E]</td>
-<td>开启正则表达式匹配，默认为通配符匹配</td>
-</tr>
-<tr>
-<td><code>[n:]</code></td>
-<td>执行次数限制</td>
-</tr>
-</tbody></table>
-<p>这里重点要说明的是观察表达式，观察表达式的构成主要由 ognl 表达式组成，所以你可以这样写<code>&quot;&#123;params,returnObj&#125;&quot;</code>，只要是一个合法的 ognl 表达式，都能被正常支持。</p>
-<p>观察的维度也比较多，主要体现在参数 <code>advice</code> 的数据结构上。<code>Advice</code> 参数最主要是封装了通知节点的所有信息。</p>
-<ul>
-<li>特殊用法请参考：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
-<li>OGNL表达式官网：<a target="_blank" rel="noopener" href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
-</ul>
-<h4><span id="使用例子">使用例子</span></h4><h5><span id="stack">stack</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stack demo.MathGame primeFactors</span><br></pre></td></tr></table></figure>
-
-<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> stack demo.MathGame primeFactors</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 36 ms.</span><br><span class="line">ts=2018-12-04 01:32:19;thread_name=main;id=1;is_daemon=false;priority=5;TCCL=sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line">    @demo.MathGame.run()</span><br><span class="line">        at demo.MathGame.main(MathGame.java:16)</span><br></pre></td></tr></table></figure>
-
-<h5><span id="据条件表达式来过滤">据条件表达式来过滤</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stack demo.MathGame primeFactors <span class="string">&#x27;params[0]&lt;0&#x27;</span> -n 2</span><br></pre></td></tr></table></figure>
-
-<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> stack demo.MathGame primeFactors <span class="string">&#x27;params[0]&lt;0&#x27;</span> -n 2</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 30 ms.</span><br><span class="line">ts=2018-12-04 01:34:27;thread_name=main;id=1;is_daemon=false;priority=5;TCCL=sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line">    @demo.MathGame.run()</span><br><span class="line">        at demo.MathGame.main(MathGame.java:16)</span><br><span class="line"></span><br><span class="line">ts=2018-12-04 01:34:30;thread_name=main;id=1;is_daemon=false;priority=5;TCCL=sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line">    @demo.MathGame.run()</span><br><span class="line">        at demo.MathGame.main(MathGame.java:16)</span><br><span class="line"></span><br><span class="line">Command execution times exceed limit: 2, so command will exit. You can set it with -n option.</span><br></pre></td></tr></table></figure>
-
-<h5><span id="据执行时间来过滤">据执行时间来过滤</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">stack demo.MathGame primeFactors <span class="string">&#x27;#cost&gt;5&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> stack demo.MathGame primeFactors <span class="string">&#x27;#cost&gt;5&#x27;</span></span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 35 ms.</span><br><span class="line">ts=2018-12-04 01:35:58;thread_name=main;id=1;is_daemon=false;priority=5;TCCL=sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line">    @demo.MathGame.run()</span><br><span class="line">        at demo.MathGame.main(MathGame.java:16)</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“stack”中，我们演示了了Arthas的stack命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasstack%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/jlynet.github.io/page/2/">2</a><a class="page-number" href="/jlynet.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/jlynet.github.io/page/5/">5</a><a class="extend next" rel="next" href="/jlynet.github.io/page/2/">Next &amp;raquo;</a>
@@ -2812,6 +2746,10 @@
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">php</a>
               </li>
             
             <div class="clearfix"></div>
