@@ -230,6 +230,196 @@
             
 
   
+    <article id="post-Java诊断工具Arthas最佳实践/Arthas执行结果存日志案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/">Arthas 执行结果存日志 案例</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/" class="archive-article-date">
+        <time datetime="2021-08-07T00:35:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#arthas-demo">Arthas demo</a></li>
+<li><a href="#start-arthas-boot">Start arthas-boot</a></li>
+<li><a href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97">执行结果存日志</a><ul>
+<li><a href="#%E4%BD%BF%E7%94%A8%E6%96%B0%E7%89%88%E6%9C%ACarthas%E7%9A%84%E5%BC%82%E6%AD%A5%E5%90%8E%E5%8F%B0%E4%BB%BB%E5%8A%A1%E5%B0%86%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6">使用新版本Arthas的异步后台任务将结果存日志文件</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示Arthas执行结果存日志。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="执行结果存日志">执行结果存日志</span></h2><p>将命令的结果完整保存在日志文件中，便于后续进行分析</p>
+<ul>
+<li>默认情况下，该功能是关闭的，如果需要开启，请执行以下命令：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">options save-result <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> options save-result <span class="literal">true</span></span></span><br><span class="line"> NAME         BEFORE-VALUE  AFTER-VALUE</span><br><span class="line">----------------------------------------</span><br><span class="line"> save-result  false         true</span><br><span class="line">Affect(row-cnt:1) cost in 3 ms.</span><br></pre></td></tr></table></figure>
+
+<p>看到上面的输出，即表示成功开启该功能；</p>
+<ul>
+<li>日志文件路径</li>
+</ul>
+<p>结果会异步保存在：<code>&#123;user.home&#125;/logs/arthas-cache/result.log</code>，请定期进行清理，以免占据磁盘空间</p>
+<h3><span id="使用新版本arthas的异步后台任务将结果存日志文件">使用新版本Arthas的异步后台任务将结果存日志文件</span></h3><figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> trace Test t &gt;&gt;  &amp;</span></span><br><span class="line">job id  : 2</span><br><span class="line">cache location  : /Users/admin/logs/arthas-cache/28198/2</span><br></pre></td></tr></table></figure>
+
+<p>此时命令会在后台异步执行，并将结果异步保存在文件<code>（~/logs/arthas-cache/$&#123;PID&#125;/$&#123;JobId&#125;）</code>中;</p>
+<ul>
+<li>此时任务的执行不受session断开的影响；任务默认超时时间是1天，可以通过全局 <code>options</code> 命令修改默认超时时间；</li>
+<li>此命令的结果将异步输出到文件中；此时不管 <code>save-result</code> 是否为true，都不会再往<code>~/logs/arthas-cache/result.log</code> 中异步写结果</li>
+</ul>
+<h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas执行结果存日志。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas最佳实践/Arthas查找TopN线程案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2225,212 +2415,6 @@
     
     <p class="article-more-link">
       <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas最佳实践/Arthas后台异步任务案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%A1%88%E4%BE%8B/">Arthas 后台异步任务 案例</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%A1%88%E4%BE%8B/" class="archive-article-date">
-        <time datetime="2021-08-07T00:35:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#arthas-demo">Arthas demo</a></li>
-<li><a href="#start-arthas-boot">Start arthas-boot</a></li>
-<li><a href="#%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1">后台异步任务</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%9C%A8%E5%90%8E%E5%8F%B0%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1">使用&amp;在后台执行任务</a></li>
-<li><a href="#%E9%80%9A%E8%BF%87jobs%E6%9F%A5%E7%9C%8B%E4%BB%BB%E5%8A%A1">通过jobs查看任务</a></li>
-<li><a href="#%E4%BB%BB%E5%8A%A1%E6%9A%82%E5%81%9C%E5%92%8C%E5%8F%96%E6%B6%88">任务暂停和取消</a></li>
-<li><a href="#fg-bg%E5%91%BD%E4%BB%A4%E5%B0%86%E5%91%BD%E4%BB%A4%E8%BD%AC%E5%88%B0%E5%89%8D%E5%8F%B0-%E5%90%8E%E5%8F%B0%E7%BB%A7%E7%BB%AD%E6%89%A7%E8%A1%8C">fg、bg命令，将命令转到前台、后台继续执行</a></li>
-<li><a href="#%E4%BB%BB%E5%8A%A1%E8%BE%93%E5%87%BA%E9%87%8D%E5%AE%9A%E5%90%91">任务输出重定向</a></li>
-<li><a href="#%E5%81%9C%E6%AD%A2%E5%91%BD%E4%BB%A4">停止命令</a></li>
-<li><a href="#%E5%85%B6%E4%BB%96">其他</a></li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示后台异步任务。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="后台异步任务">后台异步任务</span></h2><p>arthas中的后台异步任务，使用了仿linux系统任务相关的命令。<a href="https://ehlxr.me/2017/01/18/Linux-%E4%B8%AD-fg%E3%80%81bg%E3%80%81jobs%E3%80%81-%E6%8C%87%E4%BB%A4/">linux任务相关介绍</a>。</p>
-<h2><span id="使用amp在后台执行任务">使用&amp;在后台执行任务</span></h2><p>比如希望执行后台执行trace命令，那么调用下面命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace demo.MathGame primeFactors &amp;</span><br></pre></td></tr></table></figure>
-
-<p>这时命令在后台执行，可以在console中继续执行其他命令。</p>
-<h2><span id="通过jobs查看任务">通过jobs查看任务</span></h2><p>如果希望查看当前有哪些arthas任务在执行，可以执行jobs命令，执行结果如下</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">jobs</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">jobs</span></span></span><br><span class="line">[1]*</span><br><span class="line">       Running           trace demo.MathGame primeFactors &amp;</span><br><span class="line">       execution count : 49</span><br><span class="line">       start time      : Wed Jul 22 05:47:52 GMT 2020</span><br><span class="line">       timeout date    : Thu Jul 23 05:47:52 GMT 2020</span><br><span class="line">       session         : aa75753d-74f1-4929-a829-7ff965345183 (current)</span><br></pre></td></tr></table></figure>
-
-<p>可以看到目前有一个后台任务在执行。</p>
-<p>job id是10, <code>*</code> 表示此job是当前session创建</p>
-<p>状态是Stopped</p>
-<p>execution count是执行次数，从启动开始已经执行了19次</p>
-<p>timeout date是超时的时间，到这个时间，任务将会自动超时退出</p>
-<h2><span id="任务暂停和取消">任务暂停和取消</span></h2><p>当任务正在前台执行，比如直接调用命令<code>trace Test t</code>或者调用后台执行命令<code>trace Test t &amp;</code>后又通过fg命令将任务转到前台。这时console中无法继续执行命令，但是可以接收并处理以下事件：</p>
-<p><code>ctrl + z</code>：将任务暂停。通过jbos查看任务状态将会变为Stopped，通过<code>bg &lt;job-id&gt;</code>或者<code>fg &lt;job-id&gt;</code>可让任务重新开始执行</p>
-<p><code>ctrl + c</code>：停止任务</p>
-<p><code>ctrl + d</code>：按照linux语义应当是退出终端，目前arthas中是空实现，不处理</p>
-<h2><span id="fg-bg命令将命令转到前台-后台继续执行">fg、bg命令，将命令转到前台、后台继续执行</span></h2><ul>
-<li>任务在后台执行或者暂停状态（<code>ctrl + z</code>暂停任务）时，执行<code>fg &lt;job-id&gt;</code>将可以把对应的任务转到前台继续执行。在前台执行时，无法在console中执行其他命令</li>
-<li>当任务处于暂停状态时（<code>ctrl + z</code>暂停任务），执行<code>bg &lt;job-id&gt;</code>将可以把对应的任务在后台继续执行</li>
-<li>非当前session创建的job，只能由当前session <code>fg</code>到前台执行</li>
-</ul>
-<h2><span id="任务输出重定向">任务输出重定向</span></h2><p>可通过&gt;或者&gt;&gt;将任务输出结果输出到指定的文件中，可以和&amp;一起使用，实现arthas命令的后台异步任务。比如：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace demo.MathGame primeFactors &gt;&gt; test.out &amp;</span><br></pre></td></tr></table></figure>
-
-<p>这时trace命令会在后台执行，并且把结果输出到<code>~/logs/arthas-cache/test.out</code>。可继续执行其他命令。并可查看文件中的命令执行结果。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat test.out</span><br></pre></td></tr></table></figure>
-
-<p>当连接到远程的arthas server时，可能无法查看远程机器的文件，arthas同时支持了自动重定向到本地缓存路径。使用方法如下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace demo.MathGame primeFactors &gt;&gt; &amp;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> trace Test t &gt;&gt;  &amp;</span></span><br><span class="line">job id  : 2</span><br><span class="line">cache location  : /Users/gehui/logs/arthas-cache/28198/2</span><br></pre></td></tr></table></figure>
-
-<p>可以看到并没有指定重定向文件位置，arthas自动重定向到缓存中了，执行命令后会输出<code>job id</code>和<code>cache location</code>。<code>cache location</code>就是重定向文件的路径，在系统logs目录下，路径包括<code>pid</code>和<code>job id</code>，避免和其他任务冲突。命令输出结果到<code>/Users/gehui/logs/arthas-cache/28198/2</code>中，<code>job id</code>为2。</p>
-<h2><span id="停止命令">停止命令</span></h2><p>异步执行的命令，如果希望停止，可执行<code>kill</code></p>
-<h2><span id="其他">其他</span></h2><ul>
-<li>最多同时支持8个命令使用重定向将结果写日志</li>
-<li>请勿同时开启过多的后台异步命令，以免对目标JVM性能造成影响</li>
-<li>如果不想停止arthas，继续执行后台任务，可以执行 <code>quit</code> 退出arthas控制台（<code>stop</code> 会停止arthas 服务）</li>
-</ul>
-<h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas后台异步任务。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%A1%88%E4%BE%8B/">展开全文 >></a>
     </p>
     
 
