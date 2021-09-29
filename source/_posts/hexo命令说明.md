@@ -107,3 +107,47 @@ toc:
 }
 </style>
 ```
+
+# yilia上一页下一页显示的问题
+修改`themes/yilia-plus/layout/_partial/archive.ejs` 文件
+```
+.......
+<% if (page.total > 1){ %>
+    <nav id="page-nav">
+      <%- paginator({
+        prev_text: '上一页',
+        next_text: '下一页'
+      }) %>
+    </nav>
+  <% } %>
+.......
+<% if (page.total > 1){ %>
+    <nav id="page-nav">
+      <%- paginator({
+        prev_text: '上一页',
+        next_text: '下一页'
+      }) %>
+    </nav>
+  <% } %>
+.......
+```
+修改`/Volumes/macData/Documents/jlynet_project/www.jlynet.cn/themes/yilia-plus/source-src/js/fix.js`
+```
+var $nav = document.querySelector('#page-nav')
+  if ($nav && !document.querySelector('#page-nav .extend.prev')) {
+    $nav.innerHTML = '<a class="extend prev disabled" rel="prev">&laquo; Prev</a>' + $nav.innerHTML
+  }
+  if ($nav && !document.querySelector('#page-nav .extend.next')) {
+    $nav.innerHTML = $nav.innerHTML + '<a class="extend next disabled" rel="next">Next &raquo;</a>'
+  }
+```
+修改成
+```
+var $nav = document.querySelector('#page-nav')
+  if ($nav && !document.querySelector('#page-nav .extend.prev')) {
+    $nav.innerHTML = '<a class="extend prev disabled" rel="prev"></a>' + $nav.innerHTML
+  }
+  if ($nav && !document.querySelector('#page-nav .extend.next')) {
+    $nav.innerHTML = $nav.innerHTML + '<a class="extend next disabled" rel="next"></a>'
+  }
+```

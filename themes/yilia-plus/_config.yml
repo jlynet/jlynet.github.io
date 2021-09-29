@@ -9,7 +9,7 @@ menu:
 
 # subNav-子导航
 subNav:
-  - github: "https://github.com/ai930"
+  - github: "https://github.com/jlynet"
   # - github: "#" # (支持设置多个)
   - gitee: "https://gitee.com/jlynet007" # 码云
   # - jianshu: "#" #简书
@@ -59,9 +59,9 @@ mathjax: true
 
 # Open link in a new tab | 是否在新窗口打开链接
 open_in_new:
-  article: true  # 文章链接
-  menu: true   # 导航菜单
-  subNav: true  # 子菜单
+  article: false  # 文章链接
+  menu: false   # 导航菜单
+  subNav: false  # 子菜单
 
 # 打赏
 # 打赏type设定：0-关闭打赏； 1-文章对应的md文件里有reward:true属性，才有打赏； 2-所有文章均有打赏
@@ -111,6 +111,7 @@ disqus: false
 
 # 3、Gitment----基于GitHub的评论系统(关闭请设置gitment_owner为false)
 # 关于如何集成:https://www.jianshu.com/p/ac7658cc912f
+# https://github.com/settings/developers
 gitment_owner: false      #你的 GitHub ID
 # 是否使用官方js(false可以提升访问速度，本地修改过一部分的js，官方js可能会出现服务器不稳定，不太建议使用)
 gitment_remote: false
@@ -135,6 +136,16 @@ giteement:
   gitment_oauth:
     client_id: ''           #client ID
     client_secret: ''       #client secret
+
+# 5、gitalk settings
+gitalk:
+  enable: true #用来做启用判断可以不用
+  gitalk_remote: false
+  owner: 'jlynet' #Github 用户名,
+  repo: 'jlynet.github.io' #储存评论issue的github仓库名
+  admin: ['jlynet'] #Github 用户名,
+  clientID: '6b381612a868a478b8ee' #Github Application clientID
+  clientSecret: '31d062cf7cb194a3c831fc14c05a6df9337c1d62' #Github Application clientSecret
 
 # 访问量统计功能(不蒜子)
 busuanzi:
@@ -276,7 +287,7 @@ friends:
     #网站简介(可忽略不写)
     description: 记录工作和学习过程中的笔记：Java、前端开发、Hexo博客、聚合支付、Linux笔记、ElasticSearch、ELK日志分析
   GitHub:
-    url: https://github.com/ai930
+    url: https://github.com/jlynet
   码云:
     url: https://gitee.com/jlynet007
   # 简书:

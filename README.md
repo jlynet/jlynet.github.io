@@ -37,7 +37,7 @@
 6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
 
 
-https://ai930.github.io/jlynet.github.io
+https://jlynet.github.io
 
 新建⽂章：
 ```bash

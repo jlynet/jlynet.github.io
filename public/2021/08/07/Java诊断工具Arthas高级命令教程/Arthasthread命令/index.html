@@ -20,7 +20,7 @@
 <meta property="og:image" content="https://jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/arthas.png">
 <meta property="og:image" content="https://jlynet.github.io/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png">
 <meta property="article:published_time" content="2021-08-07T01:51:27.000Z">
-<meta property="article:modified_time" content="2021-08-07T05:35:30.000Z">
+<meta property="article:modified_time" content="2021-09-29T02:52:54.000Z">
 <meta property="article:author" content="jlynet">
 <meta property="article:tag" content="Java 诊断工具 Arthas 高级命令教程">
 <meta name="twitter:card" content="summary">
@@ -79,17 +79,17 @@
 		<nav class="header-menu">
 			<ul>
 			
-				<li><a href="/" target="_blank">主页</a></li>
+				<li><a href="/" >主页</a></li>
 			
-				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" target="_blank">技术笔记</a></li>
+				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" >技术笔记</a></li>
 			
-				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" target="_blank">个人作品展示</a></li>
+				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" >个人作品展示</a></li>
 			
-				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" target="_blank">java技术栈</a></li>
+				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" >java技术栈</a></li>
 			
-				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" target="_blank">linux技术</a></li>
+				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" >linux技术</a></li>
 			
-				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" target="_blank">随笔</a></li>
+				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" >随笔</a></li>
 			
 			</ul>
 		</nav>
@@ -112,18 +112,18 @@
 			<div class="social">
 				
 					
-						<a class="github" href="https://github.com/ai930" 
-												title="GitHub" target="_blank"><i class="icon-github"></i></a>
+						<a class="github" href="https://github.com/jlynet" 
+												title="GitHub" ><i class="icon-github"></i></a>
 					
 				
 					
 						<a class="gitee" href="https://gitee.com/jlynet007" 
-												title="码云" target="_blank"><i class="icon-gitee"></i></a>
+												title="码云" ><i class="icon-gitee"></i></a>
 					
 				
 					
 						<a class="weibo" href="https://weibo.com/u/2650563234" 
-												title="微博" target="_blank"><i class="icon-weibo"></i></a>
+												title="微博" ><i class="icon-weibo"></i></a>
 					
 				
 			</div>
@@ -175,7 +175,7 @@
 					
 						
 						<a class="github" target="_blank" 
-							href="https://github.com/ai930" title="GitHub"><i class="icon-github"></i></a>
+							href="https://github.com/jlynet" title="GitHub"><i class="icon-github"></i></a>
 						
 					
 						
@@ -316,8 +316,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示thread命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -375,7 +375,7 @@
 </ul>
 <blockquote>
 <p>注意： 这个统计也会产生一定的开销（JDK这个接口本身开销比较大），因此会看到as的线程占用一定的百分比，为了降低统计自身的开销带来的影响，可以把采样间隔拉长一些，比如5000毫秒。</p>
-<p>另外一种查看Java进程的线程cpu使用率方法：可以使用<a target="_blank" rel="noopener" href="https://github.com/oldratlee/useful-scripts/blob/master/docs/java.md#-show-busy-java-threads">show-busy-java-threads</a>这个脚本</p>
+<p>另外一种查看Java进程的线程cpu使用率方法：可以使用<a href="https://github.com/oldratlee/useful-scripts/blob/master/docs/java.md#-show-busy-java-threads">show-busy-java-threads</a>这个脚本</p>
 <h2><span id="thread用法">Thread用法</span></h2></blockquote>
 <h4><span id="支持一键展示当前最忙的前n个线程并打印堆栈">支持一键展示当前最忙的前N个线程并打印堆栈：</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3</span><br></pre></td></tr></table></figure>
 
@@ -425,11 +425,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“thread”中，我们演示了了Arthas的thread命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -468,7 +468,7 @@
     
 
     
-    <div class="declare"> 
+    <div class="declare">
       <ul class="post-copyright">
         <li>
           <strong>本文作者：</strong>
@@ -505,6 +505,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
 
@@ -614,6 +625,28 @@
 
 
 
+  
+  
+  <div id="gitalk-container"></div>
+  
+    <link rel="stylesheet" href="/lib/gitalk.css">
+    <script src="/lib/gitalk.min.js"></script>
+  
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '6b381612a868a478b8ee',
+        clientSecret: '31d062cf7cb194a3c831fc14c05a6df9337c1d62',
+        id: window.location.pathname,
+        repo: 'jlynet.github.io',
+        owner: 'jlynet',
+        admin: 'jlynet'
+    })
+    gitalk.render('gitalk-container')
+</script>
+
+
+  
+
 
 
 
@@ -677,7 +710,7 @@
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
-		open_in_new: true,
+		open_in_new: false,
 		toc_hide_index: true,
 		root: "/",
 		innerArchive: true,
@@ -780,43 +813,43 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">技术笔记</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">php</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">shell</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">随笔</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 入门教程</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 最佳实践</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
               </li>
@@ -880,7 +913,7 @@
             </li>
           
             <li class="search-li">
-              <a href="https://github.com/ai930" target="_blank" 
+              <a href="https://github.com/jlynet" target="_blank" 
                 class="search-title" >
                 
                   <i class="icon-link icon"></i>

@@ -1,6 +1,7 @@
 ---
 title: Arthas 理解Spring Boot应用的ClassLoader结构 案例
 date: 2021-08-07 08:35:32
+categories: [java技术栈]
 tags: ['Java 诊断工具 Arthas 最佳实践']
 ---
 

@@ -56,7 +56,7 @@
     <% } %>
 
     <% if (((theme.copyright_type === 2) || (theme.copyright_type === 1 && post.copyright)) && !index){ %>
-    <div class="declare"> 
+    <div class="declare">
       <ul class="post-copyright">
         <li>
           <strong>本文作者：</strong>
@@ -147,8 +147,16 @@
     }) %>
 <% } %>
 
-<% if (theme.gitment_owner && theme.gitment_repo &&theme.gitment_oauth && theme.gitment_oauth.client_id && theme.gitment_oauth.client_secret){ %>
+<% if (theme.gitment_owner && theme.gitment_repo && theme.gitment_oauth && theme.gitment_oauth.client_id && theme.gitment_oauth.client_secret){ %>
   <%- partial('post/gitment', {
+      key: post.slug,
+      title: post.title,
+      url: config.url+url_for(post.path)
+    }) %>
+  <% } %>
+
+  <% if (theme.gitalk.enable && theme.gitalk.owner && theme.gitalk.repo && theme.gitalk.clientID && theme.gitalk.clientSecret){ %>
+  <%- partial('post/gitalk', {
       key: post.slug,
       title: post.title,
       url: config.url+url_for(post.path)

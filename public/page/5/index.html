@@ -85,17 +85,17 @@
 		<nav class="header-menu">
 			<ul>
 			
-				<li><a href="/" target="_blank">主页</a></li>
+				<li><a href="/" >主页</a></li>
 			
-				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" target="_blank">技术笔记</a></li>
+				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" >技术笔记</a></li>
 			
-				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" target="_blank">个人作品展示</a></li>
+				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" >个人作品展示</a></li>
 			
-				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" target="_blank">java技术栈</a></li>
+				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" >java技术栈</a></li>
 			
-				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" target="_blank">linux技术</a></li>
+				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" >linux技术</a></li>
 			
-				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" target="_blank">随笔</a></li>
+				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" >随笔</a></li>
 			
 			</ul>
 		</nav>
@@ -118,18 +118,18 @@
 			<div class="social">
 				
 					
-						<a class="github" href="https://github.com/ai930" 
-												title="GitHub" target="_blank"><i class="icon-github"></i></a>
+						<a class="github" href="https://github.com/jlynet" 
+												title="GitHub" ><i class="icon-github"></i></a>
 					
 				
 					
 						<a class="gitee" href="https://gitee.com/jlynet007" 
-												title="码云" target="_blank"><i class="icon-gitee"></i></a>
+												title="码云" ><i class="icon-gitee"></i></a>
 					
 				
 					
 						<a class="weibo" href="https://weibo.com/u/2650563234" 
-												title="微博" target="_blank"><i class="icon-weibo"></i></a>
+												title="微博" ><i class="icon-weibo"></i></a>
 					
 				
 			</div>
@@ -181,7 +181,7 @@
 					
 						
 						<a class="github" target="_blank" 
-							href="https://github.com/ai930" title="GitHub"><i class="icon-github"></i></a>
+							href="https://github.com/jlynet" title="GitHub"><i class="icon-github"></i></a>
 						
 					
 						
@@ -238,8 +238,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/" target="_blank">Arthas 进阶</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/">Arthas 进阶</a>
+	
     </h1>
   
 
@@ -382,13 +382,13 @@
 <p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。</p>
 <p>本教程会以一个普通的Spring Boot应用为例，演示Arthas命令的详细用法。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -504,10 +504,10 @@
 <h4><span id="更多">更多</span></h4><p>在Arthas里<code>ognl</code>表达式是很重要的功能，在很多命令里都可以使用<code>ognl</code>表达式。</p>
 <p>一些更复杂的用法，可以参考：</p>
 <ul>
-<li>OGNL特殊用法请参考：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
-<li>OGNL表达式官方指南：<a target="_blank" rel="noopener" href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
+<li>OGNL特殊用法请参考：<a href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
+<li>OGNL表达式官方指南：<a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
 </ul>
-<h2><span id="案例-排查函数调用异常">案例: 排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<h2><span id="案例-排查函数调用异常">案例: 排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
@@ -547,7 +547,7 @@
 <p>你可以利用这些内置对象来组成不同的表达式。比如返回一个数组：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params[0], target, returnObj&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
 
-<p>更多参考： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
+<p>更多参考： <a href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
 <h4><span id="条件表达式">条件表达式</span></h4><p><code>watch</code>命令支持在第4个参数里写条件表达式，比如：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * returnObj <span class="string">&#x27;params[0] &gt; 100&#x27;</span></span><br></pre></td></tr></table></figure>
 
@@ -562,7 +562,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params, returnObj&#125;&#x27;</span> <span class="string">&#x27;#cost&gt;200&#x27;</span></span><br></pre></td></tr></table></figure>
 
 <h2><span id="案例-热更新代码">案例: 热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>redefine</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
@@ -640,7 +640,7 @@
 <h2><span id="案例-获取spring-context">案例: 获取Spring Context</span></h2><p>在这个案例里，展示获取spring context，再获取bean，然后调用函数。</p>
 <h4><span id="使用tt命令获取到spring-context">使用tt命令获取到spring context</span></h4><p><code>tt</code>即 TimeTunnel，它可以记录下指定方法每次调用的入参和返回信息，并能对这些不同的时间下调用进行观测。</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/tt.html">https://arthas.aliyun.com/doc/tt.html</a></li>
+<li><a href="https://arthas.aliyun.com/doc/tt.html">https://arthas.aliyun.com/doc/tt.html</a></li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tt -t org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter invokeHandlerMethod</span><br></pre></td></tr></table></figure>
 
@@ -751,9 +751,9 @@
 <h4><span id="查找线程是否有阻塞">查找线程是否有阻塞</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -b</span><br></pre></td></tr></table></figure>
 
 <h2><span id="web-console">Web Console</span></h2><p>Arthas支持通过Web Socket来连接。</p>
-<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
+<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/O1CN01i041kW1lw0FCaSKNn_!!6000000004882-2-tps-1231-284.png" alt="Arthas WebConsole"></p>
-<p>推荐通过“快速入门”来体验： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
+<p>推荐通过“快速入门”来体验： <a href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
 <h2><span id="exitstop">Exit/Stop</span></h2><h3><span id="reset">reset</span></h3><p>Arthas在 watch/trace 等命令时，实际上是修改了应用的字节码，插入增强的代码。显式执行 <code>reset</code> 命令，可以清除掉这些增强代码。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reset</span><br></pre></td></tr></table></figure>
 
@@ -787,11 +787,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“进阶教程”，演示了Arthas的大部分高级用法，希望对大家排查问题有帮助。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
 
     
 
@@ -815,6 +815,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -867,8 +878,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/" target="_blank">Arthas 基础教程</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/">Arthas 基础教程</a>
+	
     </h1>
   
 
@@ -911,8 +922,8 @@
 <p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
 <p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas-demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -972,11 +983,11 @@
 <p>Ctrl+C</p>
 <h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas的用法。更多高级特性，可以在下面的进阶指南里继续了解。</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&id=arthas-advanced">Arthas进阶</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">Arthas Github</a></li>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">Arthas 文档</a></li>
+<li><a href="https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&id=arthas-advanced">Arthas进阶</a></li>
+<li><a href="https://github.com/alibaba/arthas">Arthas Github</a></li>
+<li><a href="https://arthas.aliyun.com/doc/">Arthas 文档</a></li>
 </ul>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
 
     
 
@@ -1000,6 +1011,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1052,8 +1074,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/31/awk%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/" target="_blank">awk命令使用介绍</a>
-  
+	  <a class="article-title" href="/2021/07/31/awk%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/">awk命令使用介绍</a>
+	
     </h1>
   
 
@@ -1073,7 +1095,7 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p><strong><a target="_blank" rel="noopener" href="https://www.oschina.net/action/GoToLink?url=http://en.wikipedia.org/wiki/Awk">awk</a></strong> 是一门非常优秀的文本处理工具，甚至可以上升作为一门程序设计语言。<br>它处理文本的速度是快得惊人的，现在很多基于shell 日志分析工具都可以用它完成。特点是设计简单，速度表现很好，本文将介绍awk内置变量。<br>格式： awk [ -F re] [parameter…] [‘pattern {action}’ ] [-f progfile][in_file…]</p>
+    <p><strong><a href="https://www.oschina.net/action/GoToLink?url=http://en.wikipedia.org/wiki/Awk">awk</a></strong> 是一门非常优秀的文本处理工具，甚至可以上升作为一门程序设计语言。<br>它处理文本的速度是快得惊人的，现在很多基于shell 日志分析工具都可以用它完成。特点是设计简单，速度表现很好，本文将介绍awk内置变量。<br>格式： awk [ -F re] [parameter…] [‘pattern {action}’ ] [-f progfile][in_file…]</p>
 <p><strong>一、内置变量</strong></p>
 <table>
 <thead>
@@ -1235,7 +1257,7 @@
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/linux技术//" class="article-tag-list-link color3">linux技术</a>
         		</li>
@@ -1295,8 +1317,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" target="_blank">Arthas安装使用</a>
-  
+	  <a class="article-title" href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/">Arthas安装使用</a>
+	
     </h1>
   
 
@@ -1350,7 +1372,7 @@
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
         		</li>
@@ -1410,8 +1432,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/28/JsonFormatTool/" target="_blank">JsonFormatTool 跨平台json 格式化工具</a>
-  
+	  <a class="article-title" href="/2021/07/28/JsonFormatTool/">JsonFormatTool 跨平台json 格式化工具</a>
+	
     </h1>
   
 
@@ -1453,7 +1475,7 @@
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/个人作品展示//" class="article-tag-list-link color2">个人作品展示</a>
         		</li>
@@ -1513,8 +1535,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/28/Lockbox/" target="_blank">Lockbox跨平台密码记事本管理工具</a>
-  
+	  <a class="article-title" href="/2021/07/28/Lockbox/">Lockbox跨平台密码记事本管理工具</a>
+	
     </h1>
   
 
@@ -1559,7 +1581,7 @@
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/个人作品展示//" class="article-tag-list-link color2">个人作品展示</a>
         		</li>
@@ -1619,8 +1641,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/28/swagger2word/" target="_blank">swagger2word 跨平台json 格式化工具</a>
-  
+	  <a class="article-title" href="/2021/07/28/swagger2word/">swagger2word 跨平台json 格式化工具</a>
+	
     </h1>
   
 
@@ -1659,7 +1681,7 @@
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/个人作品展示//" class="article-tag-list-link color2">个人作品展示</a>
         		</li>
@@ -1719,8 +1741,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/28/hello-world/" target="_blank">Hello World</a>
-  
+	  <a class="article-title" href="/2021/07/28/hello-world/">Hello World</a>
+	
     </h1>
   
 
@@ -1740,19 +1762,19 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <h2><span id="quick-start">Quick Start</span></h2><h3><span id="create-a-new-post">Create a new post</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
 <h3><span id="run-server">Run server</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
 <h3><span id="generate-static-files">Generate static files</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
 <h3><span id="deploy-to-remote-sites">Deploy to remote sites</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 
     
 
@@ -1817,8 +1839,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/" target="_blank">hexo命令说明</a>
-  
+	  <a class="article-title" href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/">hexo命令说明</a>
+	
     </h1>
   
 
@@ -1874,14 +1896,22 @@
 <p>使用方法跟显示文章摘要类似，在Markdown中需要显示文章目录的地方添加 `</p>
 <!-- toc -->
 
-
-
+<ul>
+<li><a href="#yilia%E4%B8%8A%E4%B8%80%E9%A1%B5%E4%B8%8B%E4%B8%80%E9%A1%B5%E6%98%BE%E7%A4%BA%E7%9A%84%E9%97%AE%E9%A2%98">yilia上一页下一页显示的问题</a></li>
+</ul>
 <!-- tocstop -->
 
 <p><code>在博客根目录下的</code>_config.yml` 中如下配置：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">toc:</span></span><br><span class="line">  <span class="attr">maxDepth:</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
 <p><code>maxDepth</code> 表示目录深度为3，即最多生成三级目录。<br>找到主题下的文章模版，我的是<code>themes\yilia\layout\_partial\article.ejs</code>。<br>在其末尾增加代码：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;% if (!index &amp;&amp; theme.toc)&#123; %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="handlebars"><span class="xml"></span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  var tocEx = function(el)&#123;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    var toc = document.querySelector(el), content = toc.innerHTML;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    content = content.replace(&#x27;<span class="comment">&lt;!-- toc --&gt;</span>&#x27;, &#x27;<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;toc&quot;</span>&gt;</span>&#x27;).replace(&#x27;<span class="comment">&lt;!-- tocstop --&gt;</span>&#x27;, &#x27;<span class="tag">&lt;/<span class="name">div</span>&gt;</span>&#x27;);</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    toc.innerHTML = content;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  &#125;(&#x27;.article-entry&#x27;);</span></span></span><br><span class="line"><span class="xml"><span class="handlebars"></span></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">&lt;% &#125; %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css"><span class="selector-class">.toc</span> &#123;</span></span><br><span class="line"><span class="css">  <span class="attribute">float</span>: right;</span></span><br><span class="line"><span class="css">  <span class="attribute">margin-left</span>: <span class="number">40px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">padding</span>: <span class="number">10px</span> <span class="number">20px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">background</span>: <span class="number">#f1f1f1</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">border-radius</span>: <span class="number">10px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">box-shadow</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">3px</span> <span class="number">#bbb</span>;</span></span><br><span class="line"><span class="css">&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h1><span id="yilia上一页下一页显示的问题">yilia上一页下一页显示的问题</span></h1><p>修改<code>themes/yilia-plus/layout/_partial/archive.ejs</code> 文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1)&#123; %&gt;</span><br><span class="line">    &lt;nav id=&quot;page-nav&quot;&gt;</span><br><span class="line">      &lt;%- paginator(&#123;</span><br><span class="line">        prev_text: &#x27;上一页&#x27;,</span><br><span class="line">        next_text: &#x27;下一页&#x27;</span><br><span class="line">      &#125;) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% &#125; %&gt;</span><br><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1)&#123; %&gt;</span><br><span class="line">    &lt;nav id=&quot;page-nav&quot;&gt;</span><br><span class="line">      &lt;%- paginator(&#123;</span><br><span class="line">        prev_text: &#x27;上一页&#x27;,</span><br><span class="line">        next_text: &#x27;下一页&#x27;</span><br><span class="line">      &#125;) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% &#125; %&gt;</span><br><span class="line">.......</span><br></pre></td></tr></table></figure>
+<p>修改<code>/Volumes/macData/Documents/jlynet_project/www.jlynet.cn/themes/yilia-plus/source-src/js/fix.js</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector(&#x27;#page-nav&#x27;)</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.prev&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = &#x27;&lt;a class=&quot;extend prev disabled&quot; rel=&quot;prev&quot;&gt;&amp;laquo; Prev&lt;/a&gt;&#x27; + $nav.innerHTML</span><br><span class="line">  &#125;</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.next&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + &#x27;&lt;a class=&quot;extend next disabled&quot; rel=&quot;next&quot;&gt;Next &amp;raquo;&lt;/a&gt;&#x27;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>修改成</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector(&#x27;#page-nav&#x27;)</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.prev&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = &#x27;&lt;a class=&quot;extend prev disabled&quot; rel=&quot;prev&quot;&gt;&lt;/a&gt;&#x27; + $nav.innerHTML</span><br><span class="line">  &#125;</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.next&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + &#x27;&lt;a class=&quot;extend next disabled&quot; rel=&quot;next&quot;&gt;&lt;/a&gt;&#x27;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 
     
 
@@ -1916,11 +1946,11 @@
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
         		</li>
-      		 
+      		
         		<li class="article-tag-list-item">
         			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
         		</li>
@@ -1974,7 +2004,7 @@
   
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/4/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+      <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
     </nav>
   
 
@@ -2021,7 +2051,7 @@
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
-		open_in_new: true,
+		open_in_new: false,
 		toc_hide_index: true,
 		root: "/",
 		innerArchive: true,
@@ -2124,43 +2154,43 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">技术笔记</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">php</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">shell</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">随笔</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 入门教程</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 最佳实践</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
               </li>
@@ -2224,7 +2254,7 @@
             </li>
           
             <li class="search-li">
-              <a href="https://github.com/ai930" target="_blank" 
+              <a href="https://github.com/jlynet" target="_blank" 
                 class="search-title" >
                 
                   <i class="icon-link icon"></i>

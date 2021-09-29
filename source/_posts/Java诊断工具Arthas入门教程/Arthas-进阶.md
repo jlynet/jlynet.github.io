@@ -1,6 +1,7 @@
 ---
 title: Arthas 进阶
 date: 2021-08-07 08:01:59
+categories: [java技术栈]
 tags: ['Java 诊断工具 Arthas 入门教程']
 ---
 

@@ -85,17 +85,17 @@
 		<nav class="header-menu">
 			<ul>
 			
-				<li><a href="/" target="_blank">主页</a></li>
+				<li><a href="/" >主页</a></li>
 			
-				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" target="_blank">技术笔记</a></li>
+				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" >技术笔记</a></li>
 			
-				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" target="_blank">个人作品展示</a></li>
+				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" >个人作品展示</a></li>
 			
-				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" target="_blank">java技术栈</a></li>
+				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" >java技术栈</a></li>
 			
-				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" target="_blank">linux技术</a></li>
+				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" >linux技术</a></li>
 			
-				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" target="_blank">随笔</a></li>
+				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" >随笔</a></li>
 			
 			</ul>
 		</nav>
@@ -118,18 +118,18 @@
 			<div class="social">
 				
 					
-						<a class="github" href="https://github.com/ai930" 
-												title="GitHub" target="_blank"><i class="icon-github"></i></a>
+						<a class="github" href="https://github.com/jlynet" 
+												title="GitHub" ><i class="icon-github"></i></a>
 					
 				
 					
 						<a class="gitee" href="https://gitee.com/jlynet007" 
-												title="码云" target="_blank"><i class="icon-gitee"></i></a>
+												title="码云" ><i class="icon-gitee"></i></a>
 					
 				
 					
 						<a class="weibo" href="https://weibo.com/u/2650563234" 
-												title="微博" target="_blank"><i class="icon-weibo"></i></a>
+												title="微博" ><i class="icon-weibo"></i></a>
 					
 				
 			</div>
@@ -181,7 +181,7 @@
 					
 						
 						<a class="github" target="_blank" 
-							href="https://github.com/ai930" title="GitHub"><i class="icon-github"></i></a>
+							href="https://github.com/jlynet" title="GitHub"><i class="icon-github"></i></a>
 						
 					
 						
@@ -230,173 +230,6 @@
             
 
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasperfcounter命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/" target="_blank">Arthas perfcounter命令</a>
-  
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#arthas-demo">Arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#perfcounter%E5%91%BD%E4%BB%A4">perfcounter命令</a><ul>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a></li>
-<li><a href="#%E5%A4%87%E6%B3%A8-%E5%AF%B9%E4%BA%8Ejdk9%E4%BB%A5%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8">备注: 对于jdk9以上的应用</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示perfcounter命令。</p>
-<ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="perfcounter命令">perfcounter命令</span></h2><p>查看当前JVM的 Perf Counter信息</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perfcounter -h</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">USAGE:</span><br><span class="line">  perfcounter [-d] [-h]</span><br><span class="line"></span><br><span class="line">SUMMARY:</span><br><span class="line">  Display the perf counter information.</span><br><span class="line"></span><br><span class="line">Examples:</span><br><span class="line">  perfcounter</span><br><span class="line">  perfcounter -d</span><br><span class="line"></span><br><span class="line">WIKI:</span><br><span class="line">  https://arthas.aliyun.com/doc/perfcounter</span><br><span class="line"></span><br><span class="line">OPTIONS:</span><br><span class="line">-d, --details                        print all perf counter details</span><br><span class="line">-h, --help                           this help</span><br></pre></td></tr></table></figure>
-
-<h3><span id="使用参考">使用参考</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perfcounter</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> perfcounter</span></span><br><span class="line"> java.ci.totalTime                            2325637411</span><br><span class="line"> java.cls.loadedClasses                       3403</span><br><span class="line"> java.cls.sharedLoadedClasses                 0</span><br><span class="line"> java.cls.sharedUnloadedClasses               0</span><br><span class="line"> java.cls.unloadedClasses                     0</span><br><span class="line"> java.property.java.version                   11.0.4</span><br><span class="line"> java.property.java.vm.info                   mixed mode</span><br><span class="line"> java.property.java.vm.name                   OpenJDK 64-Bit Server VM</span><br></pre></td></tr></table></figure>
-
-<p>可以用-d参数打印更多信息：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perfcounter -d</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> perfcounter -d</span></span><br><span class="line"> Name                                   Variability   Units        Value</span><br><span class="line">---------------------------------------------------------------------------------</span><br><span class="line"> java.ci.totalTime                      Monotonic     Ticks        3242526906</span><br><span class="line"> java.cls.loadedClasses                 Monotonic     Events       3404</span><br><span class="line"> java.cls.sharedLoadedClasses           Monotonic     Events       0</span><br><span class="line"> java.cls.sharedUnloadedClasses         Monotonic     Events       0</span><br><span class="line"> java.cls.unloadedClasses               Monotonic     Events       0</span><br></pre></td></tr></table></figure>
-
-<h3><span id="备注-对于jdk9以上的应用">备注: 对于jdk9以上的应用</span></h3><p>如果没有打印出信息，应用在启动时，加下面的参数：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--add-opens java.base/jdk.internal.perf=ALL-UNNAMED --add-exports java.base/jdk.internal.perf=ALL-UNNAMED</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“perfcounter”中，我们演示了了Arthas的perfcounter命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
     <article id="post-Java诊断工具Arthas高级命令教程/Arthasognl命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -405,8 +238,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasognl%E5%91%BD%E4%BB%A4/" target="_blank">Arthas ognl</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasognl%E5%91%BD%E4%BB%A4/">Arthas ognl</a>
+	
     </h1>
   
 
@@ -471,13 +304,13 @@
 </ul>
 <p>本教程会以一个普通的Spring Boot应用为例，演示ognl命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasognl%E5%91%BD%E4%BB%A4/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="启动arthas-boothelp命令">启动arthas-boot，help命令</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -522,8 +355,8 @@
 <h4><span id="更多">更多</span></h4><p>在Arthas里<code>ognl</code>表达式是很重要的功能，在很多命令里都可以使用<code>ognl</code>表达式。</p>
 <p>一些更复杂的用法，可以参考：</p>
 <ul>
-<li>OGNL特殊用法请参考：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
-<li>OGNL表达式官方指南：<a target="_blank" rel="noopener" href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
+<li>OGNL特殊用法请参考：<a href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
+<li>OGNL表达式官方指南：<a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
 </ul>
 <h2><span id="案例-动态更新应用logger-level">案例: 动态更新应用Logger Level</span></h2><p>在这个案例里，动态修改应用的Logger Level。</p>
 <h4><span id="查找usercontroller的classloader">查找UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d com.example.demo.arthas.user.UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
@@ -565,11 +398,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“ognl”中，我们演示了了Arthas的ognl命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -593,10 +426,199 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
       <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasognl%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthasperfcounter命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/">Arthas perfcounter命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#arthas-demo">Arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#perfcounter%E5%91%BD%E4%BB%A4">perfcounter命令</a><ul>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a></li>
+<li><a href="#%E5%A4%87%E6%B3%A8-%E5%AF%B9%E4%BA%8Ejdk9%E4%BB%A5%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8">备注: 对于jdk9以上的应用</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示perfcounter命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="perfcounter命令">perfcounter命令</span></h2><p>查看当前JVM的 Perf Counter信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perfcounter -h</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">USAGE:</span><br><span class="line">  perfcounter [-d] [-h]</span><br><span class="line"></span><br><span class="line">SUMMARY:</span><br><span class="line">  Display the perf counter information.</span><br><span class="line"></span><br><span class="line">Examples:</span><br><span class="line">  perfcounter</span><br><span class="line">  perfcounter -d</span><br><span class="line"></span><br><span class="line">WIKI:</span><br><span class="line">  https://arthas.aliyun.com/doc/perfcounter</span><br><span class="line"></span><br><span class="line">OPTIONS:</span><br><span class="line">-d, --details                        print all perf counter details</span><br><span class="line">-h, --help                           this help</span><br></pre></td></tr></table></figure>
+
+<h3><span id="使用参考">使用参考</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perfcounter</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> perfcounter</span></span><br><span class="line"> java.ci.totalTime                            2325637411</span><br><span class="line"> java.cls.loadedClasses                       3403</span><br><span class="line"> java.cls.sharedLoadedClasses                 0</span><br><span class="line"> java.cls.sharedUnloadedClasses               0</span><br><span class="line"> java.cls.unloadedClasses                     0</span><br><span class="line"> java.property.java.version                   11.0.4</span><br><span class="line"> java.property.java.vm.info                   mixed mode</span><br><span class="line"> java.property.java.vm.name                   OpenJDK 64-Bit Server VM</span><br></pre></td></tr></table></figure>
+
+<p>可以用-d参数打印更多信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">perfcounter -d</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> perfcounter -d</span></span><br><span class="line"> Name                                   Variability   Units        Value</span><br><span class="line">---------------------------------------------------------------------------------</span><br><span class="line"> java.ci.totalTime                      Monotonic     Ticks        3242526906</span><br><span class="line"> java.cls.loadedClasses                 Monotonic     Events       3404</span><br><span class="line"> java.cls.sharedLoadedClasses           Monotonic     Events       0</span><br><span class="line"> java.cls.sharedUnloadedClasses         Monotonic     Events       0</span><br><span class="line"> java.cls.unloadedClasses               Monotonic     Events       0</span><br></pre></td></tr></table></figure>
+
+<h3><span id="备注-对于jdk9以上的应用">备注: 对于jdk9以上的应用</span></h3><p>如果没有打印出信息，应用在启动时，加下面的参数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--add-opens java.base/jdk.internal.perf=ALL-UNNAMED --add-exports java.base/jdk.internal.perf=ALL-UNNAMED</span><br></pre></td></tr></table></figure>
+
+<h2><span id="更多信息">更多信息</span></h2><p>在“perfcounter”中，我们演示了了Arthas的perfcounter命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/">展开全文 >></a>
     </p>
     
 
@@ -645,8 +667,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysprop%E5%91%BD%E4%BB%A4/" target="_blank">Arthas sysprop命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysprop%E5%91%BD%E4%BB%A4/">Arthas sysprop命令</a>
+	
     </h1>
   
 
@@ -705,8 +727,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示sysprop命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -763,11 +785,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“sysprop”中，我们演示了了Arthas的sysprop命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -791,6 +813,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -843,8 +876,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/" target="_blank">Arthas sysenv命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/">Arthas sysenv命令</a>
+	
     </h1>
   
 
@@ -896,8 +929,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示sysenv命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -941,11 +974,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“sysenv”中，我们演示了了Arthas的sysenv命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -969,6 +1002,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1021,8 +1065,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/" target="_blank">Arthas thread命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/">Arthas thread命令</a>
+	
     </h1>
   
 
@@ -1084,8 +1128,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示thread命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -1143,7 +1187,7 @@
 </ul>
 <blockquote>
 <p>注意： 这个统计也会产生一定的开销（JDK这个接口本身开销比较大），因此会看到as的线程占用一定的百分比，为了降低统计自身的开销带来的影响，可以把采样间隔拉长一些，比如5000毫秒。</p>
-<p>另外一种查看Java进程的线程cpu使用率方法：可以使用<a target="_blank" rel="noopener" href="https://github.com/oldratlee/useful-scripts/blob/master/docs/java.md#-show-busy-java-threads">show-busy-java-threads</a>这个脚本</p>
+<p>另外一种查看Java进程的线程cpu使用率方法：可以使用<a href="https://github.com/oldratlee/useful-scripts/blob/master/docs/java.md#-show-busy-java-threads">show-busy-java-threads</a>这个脚本</p>
 <h2><span id="thread用法">Thread用法</span></h2></blockquote>
 <h4><span id="支持一键展示当前最忙的前n个线程并打印堆栈">支持一键展示当前最忙的前N个线程并打印堆栈：</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3</span><br></pre></td></tr></table></figure>
 
@@ -1193,11 +1237,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“thread”中，我们演示了了Arthas的thread命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1221,6 +1265,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1273,8 +1328,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasvmoption%E5%91%BD%E4%BB%A4/" target="_blank">Arthas vmoption命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasvmoption%E5%91%BD%E4%BB%A4/">Arthas vmoption命令</a>
+	
     </h1>
   
 
@@ -1327,8 +1382,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示vmoption命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -1371,11 +1426,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“vmoption”中，我们演示了了Arthas的vmoption命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1399,6 +1454,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1451,8 +1517,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8LoggerLevel%E6%A1%88%E4%BE%8B/" target="_blank">Arthas 动态更新应用Logger Level 案例</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8LoggerLevel%E6%A1%88%E4%BE%8B/">Arthas 动态更新应用Logger Level 案例</a>
+	
     </h1>
   
 
@@ -1503,15 +1569,15 @@
 </ul>
 <p>本教程会以一个普通的Spring Boot应用为例，演示动态更新应用Logger Level。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="start-demo">Start demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
 
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8LoggerLevel%E6%A1%88%E4%BE%8B/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -1570,11 +1636,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas动态更新应用Logger Level。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1598,6 +1664,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1650,8 +1727,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasWebConsole%E6%A1%88%E4%BE%8B/" target="_blank">Arthas Web Console 案例</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasWebConsole%E6%A1%88%E4%BE%8B/">Arthas Web Console 案例</a>
+	
     </h1>
   
 
@@ -1699,8 +1776,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示Web Console。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -1726,16 +1803,16 @@
 
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasWebConsole%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
 <h2><span id="web-console">Web Console</span></h2><p>Arthas支持通过Web Socket来连接。</p>
-<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
+<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasWebConsole%E6%A1%88%E4%BE%8B/O1CN01i041kW1lw0FCaSKNn_!!6000000004882-2-tps-1231-284.png" alt="Arthas WebConsole"></p>
-<p>推荐通过“快速入门”来体验： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
+<p>推荐通过“快速入门”来体验： <a href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
 <h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas Web Console。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1759,6 +1836,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1811,8 +1899,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8%E6%A1%88%E4%BE%8B/" target="_blank">Arthas 排查函数调用异常 案例</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8%E6%A1%88%E4%BE%8B/">Arthas 排查函数调用异常 案例</a>
+	
     </h1>
   
 
@@ -1865,15 +1953,15 @@
 </ul>
 <p>本教程会以一个普通的Spring Boot应用为例，演示排查函数调用异常。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="start-demo">Start demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
 
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8%E6%A1%88%E4%BE%8B/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -1893,7 +1981,7 @@
 
 
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="排查函数调用异常">排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<h2><span id="排查函数调用异常">排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 
@@ -1949,7 +2037,7 @@
 
 
 
-<p>更多参考： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
+<p>更多参考： <a href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
 <h4><span id="条件表达式">条件表达式</span></h4><p><code>watch</code>命令支持在第4个参数里写条件表达式，比如：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * returnObj <span class="string">&#x27;params[0] &gt; 100&#x27;</span></span><br></pre></td></tr></table></figure>
 
@@ -1971,11 +2059,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas排查函数调用异常。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1999,6 +2087,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -2051,8 +2150,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/" target="_blank">Arthas 执行结果存日志 案例</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/">Arthas 执行结果存日志 案例</a>
+	
     </h1>
   
 
@@ -2100,8 +2199,8 @@
 </ul>
 <p>本教程会以一个简单的应用为例，演示Arthas执行结果存日志。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -2150,11 +2249,11 @@
 </ul>
 <h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas执行结果存日志。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -2178,6 +2277,17 @@
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -2224,7 +2334,7 @@
   
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/2/">上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页</a>
     </nav>
   
 
@@ -2271,7 +2381,7 @@
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
-		open_in_new: true,
+		open_in_new: false,
 		toc_hide_index: true,
 		root: "/",
 		innerArchive: true,
@@ -2374,43 +2484,43 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">技术笔记</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">php</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">shell</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">随笔</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 入门教程</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 最佳实践</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
               </li>
@@ -2474,7 +2584,7 @@
             </li>
           
             <li class="search-li">
-              <a href="https://github.com/ai930" target="_blank" 
+              <a href="https://github.com/jlynet" target="_blank" 
                 class="search-title" >
                 
                   <i class="icon-link icon"></i>

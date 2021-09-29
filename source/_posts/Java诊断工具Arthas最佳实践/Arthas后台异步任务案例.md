@@ -1,6 +1,7 @@
 ---
 title: Arthas 后台异步任务 案例
 date: 2021-08-07 08:35:31
+categories: [java技术栈]
 tags: ['Java 诊断工具 Arthas 最佳实践']
 ---
 

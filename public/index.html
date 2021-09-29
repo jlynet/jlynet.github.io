@@ -85,17 +85,17 @@
 		<nav class="header-menu">
 			<ul>
 			
-				<li><a href="/" target="_blank">主页</a></li>
+				<li><a href="/" >主页</a></li>
 			
-				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" target="_blank">技术笔记</a></li>
+				<li><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" >技术笔记</a></li>
 			
-				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" target="_blank">个人作品展示</a></li>
+				<li><a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" >个人作品展示</a></li>
 			
-				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" target="_blank">java技术栈</a></li>
+				<li><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" >java技术栈</a></li>
 			
-				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" target="_blank">linux技术</a></li>
+				<li><a href="/categories/linux%E6%8A%80%E6%9C%AF/" >linux技术</a></li>
 			
-				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" target="_blank">随笔</a></li>
+				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" >随笔</a></li>
 			
 			</ul>
 		</nav>
@@ -118,18 +118,18 @@
 			<div class="social">
 				
 					
-						<a class="github" href="https://github.com/ai930" 
-												title="GitHub" target="_blank"><i class="icon-github"></i></a>
+						<a class="github" href="https://github.com/jlynet" 
+												title="GitHub" ><i class="icon-github"></i></a>
 					
 				
 					
 						<a class="gitee" href="https://gitee.com/jlynet007" 
-												title="码云" target="_blank"><i class="icon-gitee"></i></a>
+												title="码云" ><i class="icon-gitee"></i></a>
 					
 				
 					
 						<a class="weibo" href="https://weibo.com/u/2650563234" 
-												title="微博" target="_blank"><i class="icon-weibo"></i></a>
+												title="微博" ><i class="icon-weibo"></i></a>
 					
 				
 			</div>
@@ -181,7 +181,7 @@
 					
 						
 						<a class="github" target="_blank" 
-							href="https://github.com/ai930" title="GitHub"><i class="icon-github"></i></a>
+							href="https://github.com/jlynet" title="GitHub"><i class="icon-github"></i></a>
 						
 					
 						
@@ -238,8 +238,8 @@
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/16/PHP%E5%92%8CJava%E4%B8%AD%E7%9A%84SHA256/" target="_blank">PHP和Java中的SHA256</a>
-  
+	  <a class="article-title" href="/2021/08/16/PHP%E5%92%8CJava%E4%B8%AD%E7%9A%84SHA256/">PHP和Java中的SHA256</a>
+	
     </h1>
   
 
@@ -259,7 +259,7 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>我正在将一些<a target="_blank" rel="noopener" href="https://codeday.me/tag/Java">Java</a>代码移植到<a target="_blank" rel="noopener" href="https://codeday.me/tag/PHP">PHP</a>代码中.在Java中,我有一个哈希SHA256代码,如下所示：</p>
+    <p>我正在将一些<a href="https://codeday.me/tag/Java">Java</a>代码移植到<a href="https://codeday.me/tag/PHP">PHP</a>代码中.在Java中,我有一个哈希SHA256代码,如下所示：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public static String hashSHA256(String input)</span><br><span class="line">        throws NoSuchAlgorithmException &#123;</span><br><span class="line">    MessageDigest mDigest = MessageDigest.getInstance(&quot;SHA-256&quot;);</span><br><span class="line">byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">    StringBuilder hexStrBuilder = new StringBuilder();</span><br><span class="line">    for (int i = 0; i &lt; shaByteArr.length; i++) &#123;</span><br><span class="line">        hexStrBuilder.append(Integer.toHexString(0xFF &amp; shaByteArr[i]));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return hexStrBuilder.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>在PHP中,我哈希如下：</p>
@@ -270,7 +270,7 @@
 
 <p>有人可以向我解释为什么以及如何让它们相互匹配？请注意,我无法修改Java实现代码,只能修改PHP.</p>
 <p>万分感激！</p>
-<p>解决方法:<br>PHP版本是正确的;测试的SHA-256校验和是9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.<br>Java版本返回相同的校验和,其中两个0被剥离.这是因为您将字节转换为十六进制的方式.而不是使用0xFF&amp; ing使用它们,使用String.format(),如<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/2817883/2765666">this answer</a>：</p>
+<p>解决方法:<br>PHP版本是正确的;测试的SHA-256校验和是9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.<br>Java版本返回相同的校验和,其中两个0被剥离.这是因为您将字节转换为十六进制的方式.而不是使用0xFF&amp; ing使用它们,使用String.format(),如<a href="https://stackoverflow.com/a/2817883/2765666">this answer</a>：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexStrBuilder.append(String.format(&quot;%02x&quot;, shaByteArr[i]));</span><br></pre></td></tr></table></figure>
 
 <p>修改方法：</p>
@@ -326,7 +326,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
-			 
+			
         		<li class="article-tag-list-item">
         			<a href="/categories/其他//" class="article-tag-list-link color3">其他</a>
         		</li>
@@ -386,8 +386,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/" target="_blank">Arthas classloader命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/">Arthas classloader命令</a>
+	
     </h1>
   
 
@@ -443,13 +443,13 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个普通的Spring Boot应用为例，演示classloader命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -564,11 +564,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“classloader”中，我们演示了了Arthas的classloader命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -592,6 +592,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -644,8 +655,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/" target="_blank">Arthas dump命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/">Arthas dump命令</a>
+	
     </h1>
   
 
@@ -694,8 +705,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个简单的应用为例，演示dump命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -769,11 +780,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
 <h2><span id="更多信息">更多信息</span></h2><p>在“dump”中，我们演示了了Arthas的dump命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -797,6 +808,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -849,8 +871,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/" target="_blank">Arthas jad命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/">Arthas jad命令</a>
+	
     </h1>
   
 
@@ -905,8 +927,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个简单的应用为例，演示jad命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -980,11 +1002,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
 <h2><span id="更多信息">更多信息</span></h2><p>在“heapdump”中，我们演示了了Arthas的heapdump命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1008,6 +1030,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1060,8 +1093,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/" target="_blank">Arthas mc-redefine命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/">Arthas mc-redefine命令</a>
+	
     </h1>
   
 
@@ -1120,13 +1153,13 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个普通的Spring Boot应用为例，演示mc-redefine命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -1147,7 +1180,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <h2><span id="redefine命令">redefine命令</span></h2><blockquote>
 <p>加载外部的<code>.class</code>文件，redefine jvm已加载的类。</p>
 </blockquote>
-<p>参考：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#redefineClasses-java.lang.instrument.ClassDefinition%E2%80%A6-">Instrumentation#redefineClasses</a></p>
+<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#redefineClasses-java.lang.instrument.ClassDefinition%E2%80%A6-">Instrumentation#redefineClasses</a></p>
 <h4><span id="常见问题">常见问题</span></h4><ul>
 <li>redefine的class不能修改、添加、删除类的field和method，包括方法参数、方法名称及返回值</li>
 <li>如果mc失败，可以在本地开发环境编译好class文件，上传到目标系统，使用redefine热加载class</li>
@@ -1183,7 +1216,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <li>正在跑的函数，没有退出不能生效。</li>
 </ul>
 <h2><span id="热更新代码">热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>redefine</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
@@ -1225,11 +1258,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“mc-redefine”中，我们演示了了Arthas的mc-redefine命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1253,6 +1286,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1305,8 +1349,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassc%E5%91%BD%E4%BB%A4/" target="_blank">Arthas sc命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassc%E5%91%BD%E4%BB%A4/">Arthas sc命令</a>
+	
     </h1>
   
 
@@ -1356,8 +1400,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个简单的应用为例，演示sc命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -1469,11 +1513,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“sc”中，我们演示了了Arthas的sc命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1497,6 +1541,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1549,8 +1604,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassm%E5%91%BD%E4%BB%A4/" target="_blank">Arthas sm命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassm%E5%91%BD%E4%BB%A4/">Arthas sm命令</a>
+	
     </h1>
   
 
@@ -1599,8 +1654,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个简单的应用为例，演示sm命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -1698,11 +1753,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“sm”中，我们演示了了Arthas的sm命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -1726,6 +1781,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -1778,8 +1844,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/" target="_blank">Arthas mc-retransform命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/">Arthas mc-retransform命令</a>
+	
     </h1>
   
 
@@ -1845,13 +1911,13 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个普通的Spring Boot应用为例，演示mc-retransform命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -1872,7 +1938,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <h2><span id="retransform命令">retransform命令</span></h2><blockquote>
 <p>加载外部的<code>.class</code>文件，retransform jvm已加载的类。</p>
 </blockquote>
-<p>参考：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
+<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
 <h4><span id="参数说明">参数说明</span></h4><table>
 <thead>
 <tr>
@@ -1898,7 +1964,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <li>正在跑的函数，没有退出不能生效。</li>
 </ul>
 <h2><span id="热更新代码">热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>retransform</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
@@ -1941,7 +2007,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <h2><span id="retransform命令更多说明">retransform命令更多说明</span></h2><blockquote>
 <p>加载外部的<code>.class</code>文件，retransform jvm已加载的类。</p>
 </blockquote>
-<p>参考：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
+<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
 <h4><span id="查看-retransform-entry">查看 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -l</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> retransform -l</span></span><br><span class="line">Id              ClassName       TransformCount  LoaderHash      LoaderClassName</span><br><span class="line">1               com.example.dem 1               null            null</span><br><span class="line">                o.arthas.user.U</span><br><span class="line">                serController</span><br></pre></td></tr></table></figure>
@@ -1977,11 +2043,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <p>再次访问 user/0 ，会抛出异常。</p>
 <h2><span id="更多信息">更多信息</span></h2><p>在“mc-retransform”中，我们演示了了Arthas的mc-retransform命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -2005,6 +2071,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -2057,8 +2134,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/" target="_blank">Arthas monitor命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/">Arthas monitor命令</a>
+	
     </h1>
   
 
@@ -2108,8 +2185,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个简单的应用为例，演示monitor命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -2207,11 +2284,11 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“monitor”中，我们演示了了Arthas的monitor命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -2235,6 +2312,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -2287,8 +2375,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
     <h1 itemprop="name">
 	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/" target="_blank">Arthas profiler命令</a>
-  
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/">Arthas profiler命令</a>
+	
     </h1>
   
 
@@ -2350,8 +2438,8 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 </ul>
 <p>本教程会以一个简单的应用为例，演示profiler命令。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -2369,7 +2457,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
 <h2><span id="profiler命令">profiler命令</span></h2><blockquote>
-<p>使用<a target="_blank" rel="noopener" href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a>生成火焰图</p>
+<p>使用<a href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a>生成火焰图</p>
 </blockquote>
 <p><code>profiler</code> 命令支持生成应用热点的火焰图。本质上是通过不断的采样，然后把收集到的采样结果生成火焰图。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler` 命令基本运行结构是 `profiler action [actionArg]</span><br></pre></td></tr></table></figure>
@@ -2462,7 +2550,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 <p>在linux下面</p>
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler list</span></span><br><span class="line">Basic events:</span><br><span class="line">  cpu</span><br><span class="line">  alloc</span><br><span class="line">  lock</span><br><span class="line">  wall</span><br><span class="line">  itimer</span><br><span class="line">Perf events:</span><br><span class="line">  page-faults</span><br><span class="line">  context-switches</span><br><span class="line">  cycles</span><br><span class="line">  instructions</span><br><span class="line">  cache-references</span><br><span class="line">  cache-misses</span><br><span class="line">  branches</span><br><span class="line">  branch-misses</span><br><span class="line">  bus-cycles</span><br><span class="line">  L1-dcache-load-misses</span><br><span class="line">  LLC-load-misses</span><br><span class="line">  dTLB-load-misses</span><br><span class="line">  mem:breakpoint</span><br><span class="line">  trace:tracepoint</span><br></pre></td></tr></table></figure>
 
-<p>如果遇到OS本身的权限/配置问题，然后缺少部分event，可以参考<code>async-profiler</code>本身文档：<a target="_blank" rel="noopener" href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a></p>
+<p>如果遇到OS本身的权限/配置问题，然后缺少部分event，可以参考<code>async-profiler</code>本身文档：<a href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a></p>
 <p>可以用<code>--event</code>参数指定要采样的事件，比如对<code>alloc</code>事件进入采样：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler start --event alloc</span><br></pre></td></tr></table></figure>
 
@@ -2484,14 +2572,14 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute &#x27;stop,file=/tmp/result.svg&#x27;</span><br></pre></td></tr></table></figure>
 
-<p>具体的格式参考： <a target="_blank" rel="noopener" href="https://github.com/jvm-profiling-tools/async-profiler/blob/v1.8.1/src/arguments.cpp#L50">arguments.cpp</a></p>
+<p>具体的格式参考： <a href="https://github.com/jvm-profiling-tools/async-profiler/blob/v1.8.1/src/arguments.cpp#L50">arguments.cpp</a></p>
 <h2><span id="更多信息">更多信息</span></h2><p>在“profiler”中，我们演示了了Arthas的profiler命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
 
     
 
@@ -2515,6 +2603,17 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 	</div>
 
     
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
 
     
     <p class="article-more-link">
@@ -2561,7 +2660,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
   
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
     </nav>
   
 
@@ -2608,7 +2707,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
-		open_in_new: true,
+		open_in_new: false,
 		toc_hide_index: true,
 		root: "/",
 		innerArchive: true,
@@ -2711,43 +2810,43 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">技术笔记</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">php</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">shell</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">hexo</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">随笔</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 入门教程</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 最佳实践</a>
               </li>
-             
+            
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
               </li>
@@ -2811,7 +2910,7 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
             </li>
           
             <li class="search-li">
-              <a href="https://github.com/ai930" target="_blank" 
+              <a href="https://github.com/jlynet" target="_blank" 
                 class="search-title" >
                 
                   <i class="icon-link icon"></i>

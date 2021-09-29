@@ -1,6 +1,7 @@
 ---
 title: Arthas monitor命令
 date: 2021-08-07 09:51:39
+categories: [java技术栈]
 tags: ['Java 诊断工具 Arthas 高级命令教程']
 ---
 
