@@ -385,7 +385,7 @@
     
 
     
-    <div class="declare"> 
+    <div class="declare">
       <ul class="post-copyright">
         <li>
           <strong>本文作者：</strong>
@@ -544,6 +544,23 @@
 
   
   
+  <div id="gitalk-container"></div>
+  
+    <link rel="stylesheet" href="/lib/gitment.css">
+    <script src="/lib/gitment.min.js"></script>
+  
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '6b381612a868a478b8ee',
+        clientSecret: '31d062cf7cb194a3c831fc14c05a6df9337c1d62',
+        id: window.location.pathname,
+        repo: 'jlynet.github.io',
+        owner: 'jlynet',
+        admin: 'jlynet'
+    })
+    gitalk.render('gitalk-container')
+</script>
+
 
   
 
@@ -747,11 +764,11 @@
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 最佳实践</a>
+                <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
+                <a href="javascript:void(0)" class="js-tag color2">Java 诊断工具 Arthas 最佳实践</a>
               </li>
             
             <div class="clearfix"></div>
