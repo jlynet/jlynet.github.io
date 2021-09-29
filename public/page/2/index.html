@@ -230,6 +230,297 @@
             
 
   
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthasprofiler命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/">Arthas profiler命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#profiler%E5%91%BD%E4%BB%A4">profiler命令</a><ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E6%94%AF%E6%8C%81%E7%9A%84action">查看所有支持的action</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E7%89%88%E6%9C%AC">查看版本</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8profiler">启动profiler</a></li>
+<li><a href="#%E8%8E%B7%E5%8F%96%E5%B7%B2%E9%87%87%E9%9B%86%E7%9A%84sample%E7%9A%84%E6%95%B0%E9%87%8F">获取已采集的sample的数量</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Bprofiler%E7%8A%B6%E6%80%81">查看profiler状态</a></li>
+<li><a href="#%E5%81%9C%E6%AD%A2profiler">停止profiler</a><ul>
+<li><a href="#%E7%94%9F%E6%88%90svg%E6%A0%BC%E5%BC%8F%E7%BB%93%E6%9E%9C">生成svg格式结果</a></li>
+<li><a href="#%E7%94%9F%E6%88%90html%E6%A0%BC%E5%BC%8F%E7%BB%93%E6%9E%9C">生成html格式结果</a></li>
+</ul>
+</li>
+<li><a href="#%E9%80%9A%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9F%A5%E7%9C%8Barthas-output%E4%B8%8B%E9%9D%A2%E7%9A%84profiler%E7%BB%93%E6%9E%9C">通过浏览器查看arthas-output下面的profiler结果</a></li>
+<li><a href="#profiler%E6%94%AF%E6%8C%81%E7%9A%84events">profiler支持的events</a></li>
+<li><a href="#%E6%81%A2%E5%A4%8D%E9%87%87%E6%A0%B7">恢复采样</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8execute%E6%9D%A5%E6%89%A7%E8%A1%8C%E5%A4%8D%E6%9D%82%E7%9A%84%E5%91%BD%E4%BB%A4">使用<code>execute</code>来执行复杂的命令</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示profiler命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="profiler命令">profiler命令</span></h2><blockquote>
+<p>使用<a href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a>生成火焰图</p>
+</blockquote>
+<p><code>profiler</code> 命令支持生成应用热点的火焰图。本质上是通过不断的采样，然后把收集到的采样结果生成火焰图。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler` 命令基本运行结构是 `profiler action [actionArg]</span><br></pre></td></tr></table></figure>
+
+<h4><span id="参数说明">参数说明</span></h4><table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>action</em></td>
+<td>要执行的操作</td>
+</tr>
+<tr>
+<td><em>actionArg</em></td>
+<td>属性名模式</td>
+</tr>
+<tr>
+<td>[i:]</td>
+<td>采样间隔（单位：ns）（默认值：10’000’000，即10 ms）</td>
+</tr>
+<tr>
+<td>[f:]</td>
+<td>将输出转储到指定路径</td>
+</tr>
+<tr>
+<td>[d:]</td>
+<td>运行评测指定秒</td>
+</tr>
+<tr>
+<td>[e:]</td>
+<td>要跟踪哪个事件（cpu, alloc, lock, cache-misses等），默认是cpu</td>
+</tr>
+</tbody></table>
+<h4><span id="查看所有支持的action">查看所有支持的action</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler actions</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler actions</span></span><br><span class="line">Supported Actions: [resume, dumpCollapsed, getSamples, start, list, execute, version, stop, load, dumpFlat, actions, dumpTraces, status]</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看版本">查看版本</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler version</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler version</span></span><br><span class="line">Async-profiler 1.6 built on Sep  9 2019</span><br><span class="line">Copyright 2019 Andrei Pangin</span><br></pre></td></tr></table></figure>
+
+<h4><span id="启动profiler">启动profiler</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler start -e itimer</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ profiler start -e itimer</span><br><span class="line">Started [itimer] profiling</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>默认情况下，生成的是cpu的火焰图，即event为<code>cpu</code>。可以用<code>--event</code>参数来指定。 因为katacoda环境不支持perf_events，所以这里使用<code>-e itimer</code>参数指定event为itimer</p>
+</blockquote>
+<h4><span id="获取已采集的sample的数量">获取已采集的sample的数量</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler getSamples</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ profiler getSamples</span><br><span class="line">23</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看profiler状态">查看profiler状态</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler status</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler status</span></span><br><span class="line">[itimer] profiling is running for 4 seconds</span><br></pre></td></tr></table></figure>
+
+<p>可以查看当前profiler在采样哪种<code>event</code>和采样时间。</p>
+<h4><span id="停止profiler">停止profiler</span></h4><h5><span id="生成svg格式结果">生成svg格式结果</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ profiler stop</span><br><span class="line">profiler output file: /tmp/demo/arthas-output/20191125-135546.svg</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，生成的结果保存到应用的<code>工作目录</code>下的<code>arthas-output</code>目录。可以通过 <code>--file</code>参数来指定输出结果路径。比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop --file /tmp/output.svg</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler stop --file /tmp/output.svg</span></span><br><span class="line">profiler output file: /tmp/output.svg</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<h5><span id="生成html格式结果">生成html格式结果</span></h5><p>默认情况下，结果文件是<code>svg</code>格式，如果想生成<code>html</code>格式，可以用<code>--format</code>参数指定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop --format html</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler stop --format html</span></span><br><span class="line">profiler output file: /tmp/test/arthas-output/20191125-143329.html</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>或者在<code>--file</code>参数里用文件名指名格式。比如<code>--file /tmp/result.html</code> 。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop --file /tmp/result.html</span><br></pre></td></tr></table></figure>
+
+<h4><span id="通过浏览器查看arthas-output下面的profiler结果">通过浏览器查看arthas-output下面的profiler结果</span></h4><p>默认情况下，arthas使用8563http端口，则可以打开： 目录下面的profiler结果：</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/arthas-output.png" alt="img"></p>
+<p>点击可以查看具体的结果：</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/arthas-output-svg.png" alt="img"></p>
+<blockquote>
+<p>如果是chrome浏览器，可能需要多次刷新。</p>
+</blockquote>
+<h4><span id="profiler支持的events">profiler支持的events</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler list</span><br></pre></td></tr></table></figure>
+
+<p>在不同的平台，不同的OS下面，支持的events各有不同。比如在macos下面：</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler list</span></span><br><span class="line">Basic events:</span><br><span class="line">  cpu</span><br><span class="line">  alloc</span><br><span class="line">  lock</span><br><span class="line">  wall</span><br><span class="line">  itimer</span><br></pre></td></tr></table></figure>
+
+<p>在linux下面</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler list</span></span><br><span class="line">Basic events:</span><br><span class="line">  cpu</span><br><span class="line">  alloc</span><br><span class="line">  lock</span><br><span class="line">  wall</span><br><span class="line">  itimer</span><br><span class="line">Perf events:</span><br><span class="line">  page-faults</span><br><span class="line">  context-switches</span><br><span class="line">  cycles</span><br><span class="line">  instructions</span><br><span class="line">  cache-references</span><br><span class="line">  cache-misses</span><br><span class="line">  branches</span><br><span class="line">  branch-misses</span><br><span class="line">  bus-cycles</span><br><span class="line">  L1-dcache-load-misses</span><br><span class="line">  LLC-load-misses</span><br><span class="line">  dTLB-load-misses</span><br><span class="line">  mem:breakpoint</span><br><span class="line">  trace:tracepoint</span><br></pre></td></tr></table></figure>
+
+<p>如果遇到OS本身的权限/配置问题，然后缺少部分event，可以参考<code>async-profiler</code>本身文档：<a href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a></p>
+<p>可以用<code>--event</code>参数指定要采样的事件，比如对<code>alloc</code>事件进入采样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler start --event alloc</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler start --event alloc</span></span><br></pre></td></tr></table></figure>
+
+<h4><span id="恢复采样">恢复采样</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler resume</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler resume</span></span><br><span class="line">Started [cpu] profiling</span><br></pre></td></tr></table></figure>
+
+<p><code>start</code>和<code>resume</code>的区别是：<code>start</code>是新开始采样，<code>resume</code>会保留上次<code>stop</code>时的数据。</p>
+<p>通过执行<code>profiler getSamples</code>可以查看samples的数量来验证。</p>
+<h4><span id="使用execute来执行复杂的命令">使用<code>execute</code>来执行复杂的命令</span></h4><p>比如开始采样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute <span class="string">&#x27;start,framebuf=5000000&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute &#x27;start,framebuf=5000000&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>停止采样，并保存到指定文件里：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute <span class="string">&#x27;stop,file=/tmp/result.svg&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute &#x27;stop,file=/tmp/result.svg&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>具体的格式参考： <a href="https://github.com/jvm-profiling-tools/async-profiler/blob/v1.8.1/src/arguments.cpp#L50">arguments.cpp</a></p>
+<h2><span id="更多信息">更多信息</span></h2><p>在“profiler”中，我们演示了了Arthas的profiler命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas高级命令教程/Arthasstack命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2335,214 +2626,6 @@
     
     <p class="article-more-link">
       <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthaslogger命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/">Arthas logger命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#logger%E5%91%BD%E4%BB%A4">logger命令</a><ul>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a><ul>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89logger%E4%BF%A1%E6%81%AF">查看所有logger信息</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%8C%87%E5%AE%9A%E5%90%8D%E5%AD%97%E7%9A%84logger%E4%BF%A1%E6%81%AF">查看指定名字的logger信息</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%8C%87%E5%AE%9Aclassloader%E7%9A%84logger%E4%BF%A1%E6%81%AF">查看指定classloader的logger信息</a></li>
-<li><a href="#%E6%9B%B4%E6%96%B0logger-level">更新logger level</a></li>
-<li><a href="#%E6%8C%87%E5%AE%9Aclassloader%E6%9B%B4%E6%96%B0-logger-level">指定classloader更新 logger level</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%B2%A1%E6%9C%89appender%E7%9A%84logger%E7%9A%84%E4%BF%A1%E6%81%AF">查看没有appender的logger的信息</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个普通的Spring Boot应用为例，演示logger命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
-<p>启动之后，可以访问61000端口： 点击查看</p>
-<p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="logger命令">logger命令</span></h2><p>查看logger信息，更新logger level</p>
-<h4><span id="使用参考">使用参考</span></h4><h5><span id="查看所有logger信息">查看所有logger信息</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger</span></span><br><span class="line"> name              ROOT</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             INFO</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        true</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br><span class="line"> appenders         name            CONSOLE</span><br><span class="line">                   class           ch.qos.logback.core.ConsoleAppender</span><br><span class="line">                   classLoader     org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                   classLoaderHash 5674cd4d</span><br><span class="line">                   target          System.out</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h5><span id="查看指定名字的logger信息">查看指定名字的logger信息</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger -n org.springframework.web</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger -n org.springframework.web</span></span><br><span class="line"> name              org.springframework.web</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             null</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        true</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br></pre></td></tr></table></figure>
-
-<p>请记下你的classLoaderHash，后面需要使用它。在这里，它是 <code>5674cd4d</code>。</p>
-<p>注意：请使用你的classLoaderHash值覆盖 <code>&lt;classLoaderHash&gt;</code> ，然后手动执行下面所述命令：</p>
-<h5><span id="查看指定classloader的logger信息">查看指定classloader的logger信息</span></h5><p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> logger -c 5674cd4d</span></span><br></pre></td></tr></table></figure>
-
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span></span><br><span class="line">name              ROOT</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             INFO</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        true</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br><span class="line"> appenders         name            CONSOLE</span><br><span class="line">                   class           ch.qos.logback.core.ConsoleAppender</span><br><span class="line">                   classLoader     org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                   classLoaderHash 5674cd4d</span><br><span class="line">                   target          System.out</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h5><span id="更新logger-level">更新logger level</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --name ROOT --level debug</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --name ROOT --level debug</span></span><br><span class="line">update logger level success.</span><br></pre></td></tr></table></figure>
-
-<p>注意：在教程中执行会提示错误，需要指定classloader</p>
-<h5><span id="指定classloader更新-logger-level">指定classloader更新 logger level</span></h5><p>默认情况下，logger命令会在SystemClassloader下执行，如果应用是传统的<code>war</code>应用，或者spring boot fat jar启动的应用，那么需要指定classloader。</p>
-<p>可以先用 <code>sc -d yourClassName</code> 来查看具体的 classloader hashcode，然后在更新level时指定classloader：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --name ROOT --level debug</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --name ROOT --level debug</span></span><br></pre></td></tr></table></figure>
-
-<h5><span id="查看没有appender的logger的信息">查看没有appender的logger的信息</span></h5><p>默认情况下，<code>logger</code>命令只打印有appender的logger的信息。如果想查看没有<code>appender</code>的logger的信息，可以加上参数<code>--include-no-appender</code>。</p>
-<p>注意，通常输出结果会很长。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --include-no-appender</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --include-no-appender</span></span><br><span class="line"> name              org.thymeleaf</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             null</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        false</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br><span class="line"> appenders         name            DEBUG_LEVEL_REMAPPER</span><br><span class="line">                   class           org.springframework.boot.logging.logback.LevelRemappingAppender</span><br><span class="line">                   classLoader     org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                   classLoaderHash 5674cd4d</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“logger”中，我们演示了了Arthas的logger命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/">展开全文 >></a>
     </p>
     
 

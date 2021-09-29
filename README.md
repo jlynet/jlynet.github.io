@@ -101,6 +101,8 @@ hexo new "Arthasclassloader命令"
 
 hexo new "PHP和Java中的SHA256"
 
+hexo new "各种开源协议介绍"
+
 ```
 
 新建⻚⾯:
