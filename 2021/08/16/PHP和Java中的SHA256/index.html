@@ -273,7 +273,7 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>我正在将一些<a target="_blank" rel="noopener" href="https://codeday.me/tag/Java">Java</a>代码移植到<a target="_blank" rel="noopener" href="https://codeday.me/tag/PHP">PHP</a>代码中.在Java中,我有一个哈希SHA256代码,如下所示：</p>
+    <p>我正在将一些<a href="https://codeday.me/tag/Java">Java</a>代码移植到<a href="https://codeday.me/tag/PHP">PHP</a>代码中.在Java中,我有一个哈希SHA256代码,如下所示：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public static String hashSHA256(String input)</span><br><span class="line">        throws NoSuchAlgorithmException &#123;</span><br><span class="line">    MessageDigest mDigest = MessageDigest.getInstance(&quot;SHA-256&quot;);</span><br><span class="line">byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">    StringBuilder hexStrBuilder = new StringBuilder();</span><br><span class="line">    for (int i = 0; i &lt; shaByteArr.length; i++) &#123;</span><br><span class="line">        hexStrBuilder.append(Integer.toHexString(0xFF &amp; shaByteArr[i]));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return hexStrBuilder.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>在PHP中,我哈希如下：</p>
@@ -284,7 +284,7 @@
 
 <p>有人可以向我解释为什么以及如何让它们相互匹配？请注意,我无法修改Java实现代码,只能修改PHP.</p>
 <p>万分感激！</p>
-<p>解决方法:<br>PHP版本是正确的;测试的SHA-256校验和是9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.<br>Java版本返回相同的校验和,其中两个0被剥离.这是因为您将字节转换为十六进制的方式.而不是使用0xFF&amp; ing使用它们,使用String.format(),如<a target="_blank" rel="noopener" href="https://stackoverflow.com/a/2817883/2765666">this answer</a>：</p>
+<p>解决方法:<br>PHP版本是正确的;测试的SHA-256校验和是9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.<br>Java版本返回相同的校验和,其中两个0被剥离.这是因为您将字节转换为十六进制的方式.而不是使用0xFF&amp; ing使用它们,使用String.format(),如<a href="https://stackoverflow.com/a/2817883/2765666">this answer</a>：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexStrBuilder.append(String.format(&quot;%02x&quot;, shaByteArr[i]));</span><br></pre></td></tr></table></figure>
 
 <p>修改方法：</p>

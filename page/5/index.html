@@ -382,13 +382,13 @@
 <p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。</p>
 <p>本教程会以一个普通的Spring Boot应用为例，演示Arthas命令的详细用法。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
 
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a target="_blank" rel="noopener" href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
 <p>启动之后，可以访问61000端口： 点击查看</p>
 <p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
 <h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
@@ -504,10 +504,10 @@
 <h4><span id="更多">更多</span></h4><p>在Arthas里<code>ognl</code>表达式是很重要的功能，在很多命令里都可以使用<code>ognl</code>表达式。</p>
 <p>一些更复杂的用法，可以参考：</p>
 <ul>
-<li>OGNL特殊用法请参考：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
-<li>OGNL表达式官方指南：<a target="_blank" rel="noopener" href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
+<li>OGNL特殊用法请参考：<a href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
+<li>OGNL表达式官方指南：<a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
 </ul>
-<h2><span id="案例-排查函数调用异常">案例: 排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<h2><span id="案例-排查函数调用异常">案例: 排查函数调用异常</span></h2><h4><span id="现象">现象</span></h4><p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
@@ -547,7 +547,7 @@
 <p>你可以利用这些内置对象来组成不同的表达式。比如返回一个数组：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params[0], target, returnObj&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
 
-<p>更多参考： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
+<p>更多参考： <a href="https://arthas.aliyun.com/doc/advice-class.html">https://arthas.aliyun.com/doc/advice-class.html</a></p>
 <h4><span id="条件表达式">条件表达式</span></h4><p><code>watch</code>命令支持在第4个参数里写条件表达式，比如：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * returnObj <span class="string">&#x27;params[0] &gt; 100&#x27;</span></span><br></pre></td></tr></table></figure>
 
@@ -562,7 +562,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch com.example.demo.arthas.user.UserController * <span class="string">&#x27;&#123;params, returnObj&#125;&#x27;</span> <span class="string">&#x27;#cost&gt;200&#x27;</span></span><br></pre></td></tr></table></figure>
 
 <h2><span id="案例-热更新代码">案例: 热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>redefine</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a target="_blank" rel="noopener" href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
@@ -640,7 +640,7 @@
 <h2><span id="案例-获取spring-context">案例: 获取Spring Context</span></h2><p>在这个案例里，展示获取spring context，再获取bean，然后调用函数。</p>
 <h4><span id="使用tt命令获取到spring-context">使用tt命令获取到spring context</span></h4><p><code>tt</code>即 TimeTunnel，它可以记录下指定方法每次调用的入参和返回信息，并能对这些不同的时间下调用进行观测。</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/tt.html">https://arthas.aliyun.com/doc/tt.html</a></li>
+<li><a href="https://arthas.aliyun.com/doc/tt.html">https://arthas.aliyun.com/doc/tt.html</a></li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tt -t org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter invokeHandlerMethod</span><br></pre></td></tr></table></figure>
 
@@ -751,9 +751,9 @@
 <h4><span id="查找线程是否有阻塞">查找线程是否有阻塞</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -b</span><br></pre></td></tr></table></figure>
 
 <h2><span id="web-console">Web Console</span></h2><p>Arthas支持通过Web Socket来连接。</p>
-<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a target="_blank" rel="noopener" href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
+<h3><span id="本地体验">本地体验</span></h3><p>当在本地启动时，可以访问 <a href="http://127.0.0.1:8563/">http://127.0.0.1:8563/</a> ，通过浏览器来使用Arthas。</p>
 <p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/O1CN01i041kW1lw0FCaSKNn_!!6000000004882-2-tps-1231-284.png" alt="Arthas WebConsole"></p>
-<p>推荐通过“快速入门”来体验： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
+<p>推荐通过“快速入门”来体验： <a href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
 <h2><span id="exitstop">Exit/Stop</span></h2><h3><span id="reset">reset</span></h3><p>Arthas在 watch/trace 等命令时，实际上是修改了应用的字节码，插入增强的代码。显式执行 <code>reset</code> 命令，可以清除掉这些增强代码。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reset</span><br></pre></td></tr></table></figure>
 
@@ -787,11 +787,11 @@
 
 <h2><span id="更多信息">更多信息</span></h2><p>在“进阶教程”，演示了Arthas的大部分高级用法，希望对大家排查问题有帮助。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
 <ul>
-<li>Issues: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
 </ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
 
     
 
@@ -911,8 +911,8 @@
 <p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
 <p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
 <ul>
-<li>Github: <a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
 </ul>
 <h2><span id="启动arthas-demo">启动arthas-demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
@@ -972,11 +972,11 @@
 <p>Ctrl+C</p>
 <h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas的用法。更多高级特性，可以在下面的进阶指南里继续了解。</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&id=arthas-advanced">Arthas进阶</a></li>
-<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/arthas">Arthas Github</a></li>
-<li><a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/">Arthas 文档</a></li>
+<li><a href="https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&id=arthas-advanced">Arthas进阶</a></li>
+<li><a href="https://github.com/alibaba/arthas">Arthas Github</a></li>
+<li><a href="https://arthas.aliyun.com/doc/">Arthas 文档</a></li>
 </ul>
-<p>文章拷贝来源：<a target="_blank" rel="noopener" href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=qDlgqpBT</a></p>
 
     
 
@@ -1073,7 +1073,7 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p><strong><a target="_blank" rel="noopener" href="https://www.oschina.net/action/GoToLink?url=http://en.wikipedia.org/wiki/Awk">awk</a></strong> 是一门非常优秀的文本处理工具，甚至可以上升作为一门程序设计语言。<br>它处理文本的速度是快得惊人的，现在很多基于shell 日志分析工具都可以用它完成。特点是设计简单，速度表现很好，本文将介绍awk内置变量。<br>格式： awk [ -F re] [parameter…] [‘pattern {action}’ ] [-f progfile][in_file…]</p>
+    <p><strong><a href="https://www.oschina.net/action/GoToLink?url=http://en.wikipedia.org/wiki/Awk">awk</a></strong> 是一门非常优秀的文本处理工具，甚至可以上升作为一门程序设计语言。<br>它处理文本的速度是快得惊人的，现在很多基于shell 日志分析工具都可以用它完成。特点是设计简单，速度表现很好，本文将介绍awk内置变量。<br>格式： awk [ -F re] [parameter…] [‘pattern {action}’ ] [-f progfile][in_file…]</p>
 <p><strong>一、内置变量</strong></p>
 <table>
 <thead>
@@ -1740,19 +1740,19 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <h2><span id="quick-start">Quick Start</span></h2><h3><span id="create-a-new-post">Create a new post</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
 <h3><span id="run-server">Run server</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
 <h3><span id="generate-static-files">Generate static files</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
 <h3><span id="deploy-to-remote-sites">Deploy to remote sites</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 
     
 
