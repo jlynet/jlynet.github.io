@@ -828,11 +828,11 @@
 <li>jetcache-starter-redis-springdata：提供pom文件，Spring Boot方式的Starter，基于Spring Data。</li>
 <li>jetcache-test：提供相关测试。</li>
 </ul>
-<h3><span id="常用注解与变量">常用注解与变量</span></h3><p><a href="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/AnnoAPI.png"><img src="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/AnnoAPI.png" alt="AnnoAPI"></a></p>
+<h3><span id="常用注解与变量">常用注解与变量</span></h3><p><a href="AnnoAPI.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/AnnoAPI.png" alt="AnnoAPI"></a></p>
 <p>在jetcache-anno-api模块中定义了需要用的缓存注解与常量，在上述已经详细的讲述过，其中<code>@CacheInvalidateContainer</code>注解定义value为<code>@CacheInvalidate</code>数组，然后通过jdk8新增的<code>@Repeatable</code>注解，在<code>@CacheInvalidate</code>注解上面添加<code>@Repeatable(CacheInvalidateContainer.class)</code>，即可支持同一个地方可以使用多个<code>@CacheInvalidate</code>注解。</p>
 <h3><span id="缓存api">缓存API</span></h3><p>主要查看jetcache-core子模块，提供各种<code>Cache</code>缓存，以支持不同的缓存类型</p>
 <p>Cache接口的子关系，结构如下图：</p>
-<p><a href="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/Cache.png"><img src="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/Cache.png" alt="Cache"></a></p>
+<p><a href="Cache.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/Cache.png" alt="Cache"></a></p>
 <p>主要对象描述：</p>
 <ul>
 <li>Cache：缓存接口，定义基本方法</li>
@@ -952,7 +952,7 @@
 <p><code>com.alicp.jetcache.anno.support.GlobalCacheConfig</code>：全局配置类，保存了一些全局信息</p>
 <h4><span id="初始化构造器">初始化构造器</span></h4><p>通过<code>@Conditional</code>注解将需要使用到的缓存类型对应的构造器初始化类注入到Spring容器并执行初始化过程，也就是创建CacheBuilder构造器</p>
 <p>初始化构造器类的类型结构如下图所示：</p>
-<p><a href="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/AbstractCacheAutoInit.png"><img src="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/AbstractCacheAutoInit.png" alt="AbstractCacheAutoInit"></a></p>
+<p><a href="AbstractCacheAutoInit.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/AbstractCacheAutoInit.png" alt="AbstractCacheAutoInit"></a></p>
 <p>主要对象描述：</p>
 <p>AbstractCacheAutoInit：抽象类，实现Spring的InitializingBean接口，注入至Spring容器时完成初始化</p>
 <p>EmbeddedCacheAutoInit：抽象类，继承AbstractCacheAutoInit，解析本地缓存独有的配置</p>
@@ -1047,7 +1047,7 @@
 </ol>
 <h4><span id="cachebuilder构造器">CacheBuilder构造器</span></h4><p>构造器的作用就是根据配置构建一个对应类型的缓存实例</p>
 <p>CacheBuilder的子类结构如下：</p>
-<p><a href="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/CacheBuilder.png"><img src="https://cdn.jsdelivr.net/gh/liu844869663/cdn@master/jetcache/CacheBuilder.png" alt="CacheBuilder"></a></p>
+<p><a href="CacheBuilder.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/CacheBuilder.png" alt="CacheBuilder"></a></p>
 <p>根据类名就可以知道其作用</p>
 <p>CacheBuilder接口只定义了一个<code>buildCache()</code>方法，用于构建缓存实例，交由不同的实现类</p>
 <p>AbstractCacheBuilder抽象类实现了<code>buildCache()</code>方法，主要代码如下：</p>
