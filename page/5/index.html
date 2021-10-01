@@ -230,6 +230,226 @@
             
 
   
+    <article id="post-Java诊断工具Arthas最佳实践/学习Arthasclassloader案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/">Arthas 理解Spring Boot应用的ClassLoader结构 案例</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/" class="archive-article-date">
+        <time datetime="2021-08-07T00:35:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#start-demo">Start demo</a></li>
+<li><a href="#start-arthas-boot">Start arthas-boot</a></li>
+<li><a href="#%E7%90%86%E8%A7%A3spring-boot%E5%BA%94%E7%94%A8%E7%9A%84classloader%E7%BB%93%E6%9E%84">理解Spring Boot应用的ClassLoader结构</a><ul>
+<li><a href="#%E5%88%97%E5%87%BA%E6%89%80%E6%9C%89classloader">列出所有ClassLoader</a></li>
+<li><a href="#%E5%88%97%E5%87%BAclassloader%E9%87%8C%E5%8A%A0%E8%BD%BD%E7%9A%84%E6%89%80%E6%9C%89%E7%B1%BB">列出ClassLoader里加载的所有类</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E7%B1%BB%E7%9A%84classloader%E5%B1%82%E6%AC%A1">查看类的classloader层次</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Bclassloader%E6%A0%91">查看ClassLoader树</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Burlclassloader%E5%AE%9E%E9%99%85%E7%9A%84urls">查看URLClassLoader实际的urls</a></li>
+<li><a href="#%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9Aclassloader%E9%87%8C%E7%9A%84%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6">加载指定ClassLoader里的资源文件</a></li>
+<li><a href="#%E5%B0%9D%E8%AF%95%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9A%E7%9A%84%E7%B1%BB">尝试加载指定的类</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个普通的Spring Boot应用为例，演示Arthas Spring Boot应用的ClassLoader结构。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="start-demo">Start demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p>启动之后，可以访问61000端口： 点击查看</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
+<h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="理解spring-boot应用的classloader结构">理解Spring Boot应用的ClassLoader结构</span></h2><p>下面介绍<code>classloader</code>命令的功能。</p>
+<p>先访问一个jsp网页，触发jsp的加载： hello</p>
+<h4><span id="列出所有classloader">列出所有ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -l</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -l</span></span><br><span class="line"> name                                                             loadedCount  hash      parent</span><br><span class="line"> BootstrapClassLoader                                             2724         null      null</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@411ce1ab               2009         411ce1ab  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@22ae1234               1253         22ae1234  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> org.apache.jasper.servlet.JasperLoader@65361d9a                  1            65361d9a  TomcatEmbeddedWebappClassLoader</span><br><span class="line">                                                                                           context: ROOT</span><br><span class="line">                                                                                           delegate: true</span><br><span class="line">                                                                                         ----------&gt; Parent Classloader:</span><br><span class="line">                                                                                         org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> TomcatEmbeddedWebappClassLoader                                  0            8546cd5   org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line">   context: ROOT</span><br><span class="line">   delegate: true</span><br><span class="line"><span class="meta"> ----------&gt;</span><span class="bash"> Parent Classloader:</span></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3  5416         1be6f5c3  sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line"> sun.misc.Launcher$AppClassLoader@3d4eac69                        45           3d4eac69  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> sun.misc.Launcher$ExtClassLoader@7494e528                        4            7494e528  null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>TomcatEmbeddedWebappClassLoader 加载的class数量是0，所以在spring boot embedded tomcat里，它只是一个空壳，所有的类加载都是<code>LaunchedURLClassLoader</code>完成的</li>
+</ul>
+<p>请记下你的classLoaderHash，后面需要使用它。在这里，它是 <code>65361d9a</code>。</p>
+<p>注意：请使用你的classLoaderHash值覆盖 <code>&lt;classLoaderHash&gt;</code> ，然后手动执行下面所有所述命令：</p>
+<h4><span id="列出classloader里加载的所有类">列出ClassLoader里加载的所有类</span></h4><p>列出上面的<code>org.apache.jasper.servlet.JasperLoader</code>加载的类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">classloader -a -c &lt;classLoaderHash&gt;</span><br><span class="line">$ classloader -a -c 65361d9a</span><br><span class="line"> hash:1698045338, org.apache.jasper.servlet.JasperLoader@65361d9a</span><br><span class="line"> org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看类的classloader层次">查看类的classloader层次</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看classloader树">查看ClassLoader树</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -t</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ classloader -t+-BootstrapClassLoader+-sun.misc.Launcher$ExtClassLoader@28cbbddd  +-com.taobao.arthas.agent.ArthasClassloader@8c25e55  +-sun.misc.Launcher$AppClassLoader@55f96302    +-org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3      +-TomcatEmbeddedWebappClassLoader          context: ROOT          delegate: true        ----------&gt; Parent Classloader:        org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3        +-org.apache.jasper.servlet.JasperLoader@21ae0fe2</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看urlclassloader实际的urls">查看URLClassLoader实际的urls</span></h4><p>比如上面查看到的spring LaunchedURLClassLoader的 hashcode是<code>1be6f5c3</code>，可以通过<code>-c</code>参数来指定classloader，从而查看URLClassLoader实际的urls：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -c &lt;classLoaderHash&gt;$ classloader -c 1be6f5c3jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/spring-boot-starter-aop-1.5.13.RELEASE.jar!/...</span><br></pre></td></tr></table></figure>
+
+<h4><span id="加载指定classloader里的资源文件">加载指定ClassLoader里的资源文件</span></h4><p>查找指定的资源文件： <code>classloader -c &lt;classLoaderHash&gt; -r logback-spring.xml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ classloader -c 1be6f5c3 -r logback-spring.xml jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/logback-spring.xml</span><br></pre></td></tr></table></figure>
+
+<p>也可以尝试查找类的class文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -c &lt;classLoaderHash&gt; -r java/lang/String.class$ classloader -c 1b6d3586 -r java/lang/String.class jar:file:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/rt.jar!/java/lang/String.class</span><br></pre></td></tr></table></figure>
+
+<h4><span id="尝试加载指定的类">尝试加载指定的类</span></h4><p>比如用上面的spring LaunchedURLClassLoader 尝试加载 <code>ch.qos.logback.classic.spi.StackTraceElementProxy</code> ：</p>
+<p>首先使用<code>sc ch.qos.logback.classic.spi.StackTraceElementProxy</code>查看，可发现未加载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
+
+<p></p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Affect(row-cnt:0) cost in 18 ms.</span><br></pre></td></tr></table></figure>
+
+<p>因而使用spring LaunchedURLClassLoader 尝试加载：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -c &lt;classLoaderHash&gt; --load ch.qos.logback.classic.spi.StackTraceElementProxy$ classloader -c 1be6f5c3 --load ch.qos.logback.classic.spi.StackTraceElementProxyload class success. class-info        ch.qos.logback.classic.spi.StackTraceElementProxy code-source       file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classic-1.                   1.11.jar!/ name              ch.qos.logback.classic.spi.StackTraceElementProxy isInterface       false isAnnotation      false isEnum            false isAnonymousClass  false isArray           false isLocalClass      false isMemberClass     false isPrimitive       false isSynthetic       false simple-name       StackTraceElementProxy modifier          public annotation interfaces        java.io.Serializable super-class       +-java.lang.Object class-loader      +-org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d                     +-sun.misc.Launcher$AppClassLoader@70dea4e                       +-sun.misc.Launcher$ExtClassLoader@56a96482 classLoaderHash   5674cd4d</span><br></pre></td></tr></table></figure>
+
+<p>再次使用<code>sc ch.qos.logback.classic.spi.StackTraceElementProxy</code>查看，发现已经加载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch.qos.logback.classic.spi.StackTraceElementProxyAffect(row-cnt:1) cost in 19 ms.</span><br></pre></td></tr></table></figure>
+
+<h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas Spring Boot应用的ClassLoader结构。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas最佳实践/Arthas后台异步任务案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2037,180 +2257,9 @@
 }
 </style>
   
-    <article id="post-hexo命令说明" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/">hexo命令说明</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/" class="archive-article-date">
-        <time datetime="2021-07-28T04:27:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-28</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <p>安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo npm install -g hexo hexo-cli</span><br></pre></td></tr></table></figure>
-
-<p>创建并初始化</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ~/myappWeb &amp;&amp; <span class="built_in">cd</span> ~/myappWeb</span><br><span class="line">hexo init <span class="comment"># 初始化</span></span><br><span class="line">npm install <span class="comment"># 安装组件</span></span><br><span class="line">npm install hexo-deployer-git --save <span class="comment">#git 部署插件</span></span><br></pre></td></tr></table></figure>
-
-<p>配置SSH key</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/. ssh <span class="comment">#检查本机已存在的ssh密钥</span></span><br><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;GitHub 邮箱&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>进入部署目录设置git递交信息</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> .deploy_git</span><br><span class="line">$ git config user.name <span class="string">&quot;liuxianan&quot;</span>// 你的github⽤户名，⾮昵称</span><br><span class="line">$ git config user.email <span class="string">&quot; xxx@qq.com &quot;</span>// <span class="string">&quot;// 填写你的github注册邮箱</span></span><br></pre></td></tr></table></figure>
-
-<p>测试是否成功</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -T git@github.com <span class="comment"># # 注意邮箱地址不⽤改</span></span><br></pre></td></tr></table></figure>
-
-<p>常见命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;postName&quot;</span> <span class="comment">#新建⽂章</span></span><br><span class="line">$ hexo new page <span class="string">&quot;pageName&quot;</span> <span class="comment">#新建⻚⾯</span></span><br><span class="line">$ hexo generate <span class="comment">#⽣⽣成成静静态态⻚⾯⻚⾯⾄⾄public public⽬⽬录录</span></span><br><span class="line">$ hexo server <span class="comment">#开启预览访问端⼝（默认端⼝4000，，&#x27;ctrl + c&#x27;关闭server）</span></span><br><span class="line">$ hexo deploy <span class="comment">#部署到GitHub</span></span><br><span class="line">$ hexo <span class="built_in">help</span> <span class="comment"># 查看帮助</span></span><br><span class="line">$ hexo version <span class="comment">#查看Hexo的版本</span></span><br><span class="line">$ hexo clean <span class="comment">#清楚</span></span><br></pre></td></tr></table></figure>
-
-<p>缩写：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ hexo n == hexo new</span><br><span class="line">$ hexo g == hexo generate</span><br><span class="line">$ hexo s == hexo server</span><br><span class="line">$ hexo d == hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>组合命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo s -g <span class="comment">#⽣成并本地预览</span></span><br><span class="line">hexo d -g <span class="comment">#⽣成并上传</span></span><br></pre></td></tr></table></figure>
-
-<h1><span id="文字里面添加图片">文字里面添加图片</span></h1><blockquote>
-<p>在<code>_config.yml</code>配置文件中，修改为 <code>post_asset_folder: true</code> 网站切割域名路径前缀位置 <code>post_asset_folder_position_length: 4</code></p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install https://github.com/ai930/hexo-asset-image --save</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>此时再执行命令 <code>hexo n article_name</code> 创建新的文章，在 <code>source/_posts</code> 中会生成文章 <code>post_name.md</code> 和同名文件夹 post_name,我们将文章中所使用到的将图片资源均放在 post_name 中，这时就可以在文章中使用相对路径引用图片资源了<br><code>![img_name](img_name.jpg) #文章中的图片资源路径格式</code></p>
-</blockquote>
-<h1><span id="给文章添加目录">给文章添加目录</span></h1><p>安装</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-toc --save</span><br></pre></td></tr></table></figure>
-<p>使用方法跟显示文章摘要类似，在Markdown中需要显示文章目录的地方添加 `</p>
-<!-- toc -->
-
-<ul>
-<li><a href="#yilia%E4%B8%8A%E4%B8%80%E9%A1%B5%E4%B8%8B%E4%B8%80%E9%A1%B5%E6%98%BE%E7%A4%BA%E7%9A%84%E9%97%AE%E9%A2%98">yilia上一页下一页显示的问题</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><code>在博客根目录下的</code>_config.yml` 中如下配置：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">toc:</span></span><br><span class="line">  <span class="attr">maxDepth:</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
-<p><code>maxDepth</code> 表示目录深度为3，即最多生成三级目录。<br>找到主题下的文章模版，我的是<code>themes\yilia\layout\_partial\article.ejs</code>。<br>在其末尾增加代码：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;% if (!index &amp;&amp; theme.toc)&#123; %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="handlebars"><span class="xml"></span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  var tocEx = function(el)&#123;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    var toc = document.querySelector(el), content = toc.innerHTML;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    content = content.replace(&#x27;<span class="comment">&lt;!-- toc --&gt;</span>&#x27;, &#x27;<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;toc&quot;</span>&gt;</span>&#x27;).replace(&#x27;<span class="comment">&lt;!-- tocstop --&gt;</span>&#x27;, &#x27;<span class="tag">&lt;/<span class="name">div</span>&gt;</span>&#x27;);</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    toc.innerHTML = content;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  &#125;(&#x27;.article-entry&#x27;);</span></span></span><br><span class="line"><span class="xml"><span class="handlebars"></span></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">&lt;% &#125; %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css"><span class="selector-class">.toc</span> &#123;</span></span><br><span class="line"><span class="css">  <span class="attribute">float</span>: right;</span></span><br><span class="line"><span class="css">  <span class="attribute">margin-left</span>: <span class="number">40px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">padding</span>: <span class="number">10px</span> <span class="number">20px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">background</span>: <span class="number">#f1f1f1</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">border-radius</span>: <span class="number">10px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">box-shadow</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">3px</span> <span class="number">#bbb</span>;</span></span><br><span class="line"><span class="css">&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h1><span id="yilia上一页下一页显示的问题">yilia上一页下一页显示的问题</span></h1><p>修改<code>themes/yilia-plus/layout/_partial/archive.ejs</code> 文件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1)&#123; %&gt;</span><br><span class="line">    &lt;nav id=&quot;page-nav&quot;&gt;</span><br><span class="line">      &lt;%- paginator(&#123;</span><br><span class="line">        prev_text: &#x27;上一页&#x27;,</span><br><span class="line">        next_text: &#x27;下一页&#x27;</span><br><span class="line">      &#125;) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% &#125; %&gt;</span><br><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1)&#123; %&gt;</span><br><span class="line">    &lt;nav id=&quot;page-nav&quot;&gt;</span><br><span class="line">      &lt;%- paginator(&#123;</span><br><span class="line">        prev_text: &#x27;上一页&#x27;,</span><br><span class="line">        next_text: &#x27;下一页&#x27;</span><br><span class="line">      &#125;) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% &#125; %&gt;</span><br><span class="line">.......</span><br></pre></td></tr></table></figure>
-<p>修改<code>/Volumes/macData/Documents/jlynet_project/www.jlynet.cn/themes/yilia-plus/source-src/js/fix.js</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector(&#x27;#page-nav&#x27;)</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.prev&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = &#x27;&lt;a class=&quot;extend prev disabled&quot; rel=&quot;prev&quot;&gt;&amp;laquo; Prev&lt;/a&gt;&#x27; + $nav.innerHTML</span><br><span class="line">  &#125;</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.next&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + &#x27;&lt;a class=&quot;extend next disabled&quot; rel=&quot;next&quot;&gt;Next &amp;raquo;&lt;/a&gt;&#x27;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<p>修改成</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector(&#x27;#page-nav&#x27;)</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.prev&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = &#x27;&lt;a class=&quot;extend prev disabled&quot; rel=&quot;prev&quot;&gt;&lt;/a&gt;&#x27; + $nav.innerHTML</span><br><span class="line">  &#125;</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.next&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + &#x27;&lt;a class=&quot;extend next disabled&quot; rel=&quot;next&quot;&gt;&lt;/a&gt;&#x27;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
-        		</li>
-      		
-        		<li class="article-tag-list-item">
-        			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+      <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
     </nav>
   
 
