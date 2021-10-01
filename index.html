@@ -259,7 +259,94 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <h2><span id="一-简介">一、简介</span></h2><p><a href="https://github.com/alibaba/jetcache"><code>JetCache</code></a>是一个基于Java的缓存系统封装，提供统一的API和注解来简化缓存的使用。 JetCache提供了比SpringCache更加强大的注解，可以原生的支持TTL、两级缓存、分布式自动刷新，还提供了<code>Cache</code>接口用于手工缓存操作。 当前有四个实现：<code>RedisCache</code>、<code>RedisLettuceCache</code>、<code>CaffeineCache</code>、<code>LinkedHashMapCache</code>。</p>
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E4%B8%80-%E7%AE%80%E4%BB%8B">一、简介</a><ul>
+<li><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98">为什么使用缓存？</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF">使用场景</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83">使用规范</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BA%8C-%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8">二、如何使用</a><ul>
+<li><a href="#%E5%BC%95%E5%85%A5maven%E4%BE%9D%E8%B5%96">引入maven依赖</a></li>
+<li><a href="#%E6%B7%BB%E5%8A%A0%E9%85%8D%E7%BD%AE">添加配置</a></li>
+<li><a href="#%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E">配置说明</a></li>
+<li><a href="#%E6%B3%A8%E8%A7%A3%E8%AF%B4%E6%98%8E">注解说明</a><ul>
+<li><a href="#enablecreatecacheannotation">@EnableCreateCacheAnnotation</a></li>
+<li><a href="#enablemethodcache">@EnableMethodCache</a></li>
+<li><a href="#cached">@Cached</a></li>
+<li><a href="#cacheinvalidate">@CacheInvalidate</a></li>
+<li><a href="#cacheupdate">@CacheUpdate</a></li>
+<li><a href="#cacherefresh">@CacheRefresh</a></li>
+<li><a href="#cachepenetrationprotect">@CachePenetrationProtect</a></li>
+<li><a href="#createcache">@CreateCache</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B">使用示例</a></li>
+</ul>
+</li>
+<li><a href="#%E4%B8%89-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90">三、源码解析</a><ul>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E7%9A%84%E5%90%84%E4%B8%AA%E5%AD%90%E6%A8%A1%E5%9D%97">项目的各个子模块</a></li>
+<li><a href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3%E4%B8%8E%E5%8F%98%E9%87%8F">常用注解与变量</a></li>
+<li><a href="#%E7%BC%93%E5%AD%98api">缓存API</a><ul>
+<li><a href="#cache%E6%8E%A5%E5%8F%A3">Cache接口</a></li>
+<li><a href="#abstractcache%E6%8A%BD%E8%B1%A1%E7%B1%BB">AbstractCache抽象类</a></li>
+<li><a href="#abstractembeddedcache%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98">AbstractEmbeddedCache本地缓存</a><ul>
+<li><a href="#linkedhashmapcache">LinkedHashMapCache</a></li>
+<li><a href="#cleaner%E6%B8%85%E7%90%86%E5%99%A8">Cleaner清理器</a></li>
+<li><a href="#caffeinecache">CaffeineCache</a></li>
+</ul>
+</li>
+<li><a href="#abstractexternalcache%E8%BF%9C%E7%A8%8B%E7%BC%93%E5%AD%98">AbstractExternalCache远程缓存</a><ul>
+<li><a href="#rediscache">RedisCache</a></li>
+<li><a href="#redislettucecache">RedisLettuceCache</a></li>
+</ul>
+</li>
+<li><a href="#multilevelcache%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98">MultiLevelCache两级缓存</a></li>
+<li><a href="#refreshcache">RefreshCache</a></li>
+</ul>
+</li>
+<li><a href="#%E8%A7%A3%E6%9E%90%E9%85%8D%E7%BD%AE">解析配置</a><ul>
+<li><a href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%9E%84%E9%80%A0%E5%99%A8">初始化构造器</a><ul>
+<li><a href="#abstractcacheautoinit">AbstractCacheAutoInit</a></li>
+<li><a href="#embeddedcacheautoinit">EmbeddedCacheAutoInit</a><ul>
+<li><a href="#linkedhashmapautoconfiguration">LinkedHashMapAutoConfiguration</a></li>
+<li><a href="#caffeineautoconfiguration">CaffeineAutoConfiguration</a></li>
+</ul>
+</li>
+<li><a href="#externalcacheautoinit">ExternalCacheAutoInit</a><ul>
+<li><a href="#redisautoinit">RedisAutoInit</a></li>
+<li><a href="#redislettuceautoinit">RedisLettuceAutoInit</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#jetcacheautoconfiguration%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE">JetCacheAutoConfiguration自动配置</a></li>
+<li><a href="#cachebuilder%E6%9E%84%E9%80%A0%E5%99%A8">CacheBuilder构造器</a></li>
+</ul>
+</li>
+<li><a href="#aop">AOP</a><ul>
+<li><a href="#%E5%90%AF%E7%94%A8jetcache">启用JetCache</a><ul>
+<li><a href="#enablemethodcache-1">@EnableMethodCache</a></li>
+<li><a href="#enablecreatecacheannotation-1">@EnableCreateCacheAnnotation</a></li>
+</ul>
+</li>
+<li><a href="#%E6%8B%A6%E6%88%AA%E5%99%A8">拦截器</a><ul>
+<li><a href="#configprovider">ConfigProvider</a></li>
+<li><a href="#cachecontext">CacheContext</a></li>
+<li><a href="#jetcacheinterceptor">JetCacheInterceptor</a></li>
+<li><a href="#cachehandler">CacheHandler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<h2><span id="一-简介">一、简介</span></h2><p><a href="https://github.com/alibaba/jetcache"><code>JetCache</code></a>是一个基于Java的缓存系统封装，提供统一的API和注解来简化缓存的使用。 JetCache提供了比SpringCache更加强大的注解，可以原生的支持TTL、两级缓存、分布式自动刷新，还提供了<code>Cache</code>接口用于手工缓存操作。 当前有四个实现：<code>RedisCache</code>、<code>RedisLettuceCache</code>、<code>CaffeineCache</code>、<code>LinkedHashMapCache</code>。</p>
 <p>特性：</p>
 <ul>
 <li>通过统一的API访问Cache系统</li>
