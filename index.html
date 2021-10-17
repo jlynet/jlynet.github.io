@@ -1175,6 +1175,7 @@
 <td align="left">log阶段处理，比如记录访问量/统计平均响应时间</td>
 </tr>
 </tbody></table>
+<h2><span id="指令解释">指令解释</span></h2><p>**init_by_lua***：初始化 nginx 和预加载 lua(nginx 启动和 reload 时执行)；<br>**init_worker_by_lua***：每个工作进程(worker_processes)被创建时执行，用于启动一些定时任务，<br>比如心跳检查，后端服务的健康检查，定时拉取服务器配置等；<br>**ssl_certificate_by_lua***：对 https 请求的处理，即将启动下游 SSL（https）连接的 SSL 握手时执行，用例：按照每个请求设置 SSL 证书链和相应的私钥，按照 SSL 协议有选择的拒绝请求等；<br>**set_by_lua***：设置 nginx 变量；<br>**rewrite_by_lua***：重写请求（从原生 nginx 的 rewrite 阶段进入），执行内部 URL 重写或者外部重定向，典型的如伪静态化的 URL 重写；<br>**access_by_lua***：处理请求（和 rewrite_by_lua 可以实现相同的功能，从原生 nginx 的 access阶段进入）；<br>**content_by_lua***：执行业务逻辑并产生响应，类似于 jsp 中的 servlet；<br>**balancer_by_lua***：负载均衡；<br>**header_filter_by_lua***：处理响应头；<br>**body_filter_by_lua***：处理响应体；<br>**log_by_lua***：记录访问日志；</p>
 <p>一般我们在开发过程中常用到的阶段如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set_by_lua、rewrite_by_lua、access_by_lua、content_by_lua、header_filter_by_lua、body_filter_by_lua、log_by_lua、</span><br></pre></td></tr></table></figure>
 
