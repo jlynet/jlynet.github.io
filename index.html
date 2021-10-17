@@ -230,6 +230,1067 @@
             
 
   
+    <article id="post-ngx-lua-模块详细讲解（基于openresty）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/10/17/ngx-lua-%E6%A8%A1%E5%9D%97%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3%EF%BC%88%E5%9F%BA%E4%BA%8Eopenresty%EF%BC%89/">ngx_lua 模块详细讲解（基于openresty）</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/10/17/ngx-lua-%E6%A8%A1%E5%9D%97%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3%EF%BC%88%E5%9F%BA%E4%BA%8Eopenresty%EF%BC%89/" class="archive-article-date">
+        <time datetime="2021-10-17T12:04:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-17</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <p>ngx_lua模块的原理：</p>
+<p>1、每个worker（工作进程）创建一个Lua VM，worker内所有协程共享VM；<br>2、将Nginx I/O原语封装后注入 Lua VM，允许Lua代码直接访问；<br>3、每个外部请求都由一个Lua协程处理，协程之间数据隔离；<br>4、Lua代码调用I/O操作等异步接口时，会挂起当前协程（并保护上下文数据），而不阻塞worker；<br>5、I/O等异步操作完成时还原相关协程上下文数据，并继续运行；</p>
+<p><strong>ngx_lua 模块提供的指令和API等：</strong></p>
+<table>
+<thead>
+<tr>
+<th>指令名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>lua_use_default_type</td>
+<td>是否使用default_type指令定义的Content-Type默认值</td>
+</tr>
+<tr>
+<td>lua_code_cache</td>
+<td>*_by_lua_file文件是否cache</td>
+</tr>
+<tr>
+<td>lua_regex_cache_max_entries</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_regex_match_limit</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_package_path</td>
+<td>用Lua写的lua外部库路径（.lua文件）</td>
+</tr>
+<tr>
+<td>lua_package_cpath</td>
+<td>用C写的lua外部库路径（.so文件）</td>
+</tr>
+<tr>
+<td>init_by_lua</td>
+<td>master进程启动时挂载的lua代码</td>
+</tr>
+<tr>
+<td>init_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>init_worker_by_lua</td>
+<td>worker进程启动时挂载的lua代码，常用来执行一些定时器任务</td>
+</tr>
+<tr>
+<td>init_worker_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>set_by_lua</td>
+<td>设置变量</td>
+</tr>
+<tr>
+<td>set_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>content_by_lua</td>
+<td>handler模块</td>
+</tr>
+<tr>
+<td>content_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>rewrite_by_lua</td>
+<td></td>
+</tr>
+<tr>
+<td>rewrite_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>access_by_lua</td>
+<td></td>
+</tr>
+<tr>
+<td>access_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>header_filter_by_lua</td>
+<td>header filter模块</td>
+</tr>
+<tr>
+<td>header_filter_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>body_filter_by_lua</td>
+<td>body filter模块，ngx.arg[1]代表输入的chunk，ngx.arg[2]代表当前chunk是否为last</td>
+</tr>
+<tr>
+<td>body_filter_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>log_by_lua</td>
+<td></td>
+</tr>
+<tr>
+<td>log_by_lua_file</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_need_request_body</td>
+<td>是否读请求体，跟ngx.req.read_body()函数作用类似</td>
+</tr>
+<tr>
+<td>lua_shared_dict</td>
+<td>创建全局共享的table（多个worker进程共享）</td>
+</tr>
+<tr>
+<td>lua_socket_connect_timeout</td>
+<td>TCP/unix 域socket对象connect方法的超时时间</td>
+</tr>
+<tr>
+<td>lua_socket_send_timeout</td>
+<td>TCP/unix 域socket对象send方法的超时时间</td>
+</tr>
+<tr>
+<td>lua_socket_send_lowat</td>
+<td>设置cosocket send buffer的low water值</td>
+</tr>
+<tr>
+<td>lua_socket_read_timeout</td>
+<td>TCP/unix 域socket对象receive方法的超时时间</td>
+</tr>
+<tr>
+<td>lua_socket_buffer_size</td>
+<td>cosocket读buffer大小</td>
+</tr>
+<tr>
+<td>lua_socket_pool_size</td>
+<td>cosocket连接池大小</td>
+</tr>
+<tr>
+<td>lua_socket_keepalive_timeout</td>
+<td>cosocket长连接超时时间</td>
+</tr>
+<tr>
+<td>lua_socket_log_errors</td>
+<td>是否打开cosocket错误日志</td>
+</tr>
+<tr>
+<td>lua_ssl_ciphers</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_ssl_crl</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_ssl_protocols</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_ssl_trusted_certificate</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_ssl_verify_depth</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_http10_buffering</td>
+<td></td>
+</tr>
+<tr>
+<td>rewrite_by_lua_no_postpone</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_transform_underscores_in_response_headers</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_check_client_abort</td>
+<td>是否监视client提前关闭请求的事件，如果打开监视，会调用ngx.on_abort()注册的回调</td>
+</tr>
+<tr>
+<td>lua_max_pending_timers</td>
+<td></td>
+</tr>
+<tr>
+<td>lua_max_running_timers</td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>table</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ngx.arg</td>
+<td>指令参数，如跟在content_by_lua_file后面的参数</td>
+</tr>
+<tr>
+<td>ngx.var</td>
+<td>变量，ngx.var.VARIABLE引用某个变量</td>
+</tr>
+<tr>
+<td>ngx.ctx</td>
+<td>请求的lua上下文</td>
+</tr>
+<tr>
+<td>ngx.header</td>
+<td>响应头，ngx.header.HEADER引用某个头</td>
+</tr>
+<tr>
+<td>ngx.status</td>
+<td>响应码</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>API</td>
+<td>说明</td>
+</tr>
+<tr>
+<td>ngx.log</td>
+<td>输出到error.log</td>
+</tr>
+<tr>
+<td>print</td>
+<td>等价于 ngx.log(ngx.NOTICE, …)</td>
+</tr>
+<tr>
+<td>ngx.send_headers</td>
+<td>发送响应头</td>
+</tr>
+<tr>
+<td>ngx.headers_sent</td>
+<td>响应头是否已发送</td>
+</tr>
+<tr>
+<td>ngx.resp.get_headers</td>
+<td>获取响应头</td>
+</tr>
+<tr>
+<td>ngx.timer.at</td>
+<td>注册定时器事件</td>
+</tr>
+<tr>
+<td>ngx.is_subrequest</td>
+<td>当前请求是否是子请求</td>
+</tr>
+<tr>
+<td>ngx.location.capture</td>
+<td>发布一个子请求</td>
+</tr>
+<tr>
+<td>ngx.location.capture_multi</td>
+<td>发布多个子请求</td>
+</tr>
+<tr>
+<td>ngx.exec</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.redirect</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.print</td>
+<td>输出响应</td>
+</tr>
+<tr>
+<td>ngx.say</td>
+<td>输出响应，自动添加’\n’</td>
+</tr>
+<tr>
+<td>ngx.flush</td>
+<td>刷新响应</td>
+</tr>
+<tr>
+<td>ngx.exit</td>
+<td>结束请求</td>
+</tr>
+<tr>
+<td>ngx.eof</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.sleep</td>
+<td>无阻塞的休眠（使用定时器实现）</td>
+</tr>
+<tr>
+<td>ngx.get_phase</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.on_abort</td>
+<td>注册client断开请求时的回调函数</td>
+</tr>
+<tr>
+<td>ndk.set_var.DIRECTIVE</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.start_time</td>
+<td>请求的开始时间</td>
+</tr>
+<tr>
+<td>ngx.req.http_version</td>
+<td>请求的HTTP版本号</td>
+</tr>
+<tr>
+<td>ngx.req.raw_header</td>
+<td>请求头（包括请求行）</td>
+</tr>
+<tr>
+<td>ngx.req.get_method</td>
+<td>请求方法</td>
+</tr>
+<tr>
+<td>ngx.req.set_method</td>
+<td>请求方法重载</td>
+</tr>
+<tr>
+<td>ngx.req.set_uri</td>
+<td>请求URL重写</td>
+</tr>
+<tr>
+<td>ngx.req.set_uri_args</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.get_uri_args</td>
+<td>获取请求参数</td>
+</tr>
+<tr>
+<td>ngx.req.get_post_args</td>
+<td>获取请求表单</td>
+</tr>
+<tr>
+<td>ngx.req.get_headers</td>
+<td>获取请求头</td>
+</tr>
+<tr>
+<td>ngx.req.set_header</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.clear_header</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.read_body</td>
+<td>读取请求体</td>
+</tr>
+<tr>
+<td>ngx.req.discard_body</td>
+<td>扔掉请求体</td>
+</tr>
+<tr>
+<td>ngx.req.get_body_data</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.get_body_file</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.set_body_data</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.set_body_file</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.init_body</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.append_body</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.finish_body</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.req.socket</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.escape_uri</td>
+<td>字符串的url编码</td>
+</tr>
+<tr>
+<td>ngx.unescape_uri</td>
+<td>字符串url解码</td>
+</tr>
+<tr>
+<td>ngx.encode_args</td>
+<td>将table编码为一个参数字符串</td>
+</tr>
+<tr>
+<td>ngx.decode_args</td>
+<td>将参数字符串编码为一个table</td>
+</tr>
+<tr>
+<td>ngx.encode_base64</td>
+<td>字符串的base64编码</td>
+</tr>
+<tr>
+<td>ngx.decode_base64</td>
+<td>字符串的base64解码</td>
+</tr>
+<tr>
+<td>ngx.crc32_short</td>
+<td>字符串的crs32_short哈希</td>
+</tr>
+<tr>
+<td>ngx.crc32_long</td>
+<td>字符串的crs32_long哈希</td>
+</tr>
+<tr>
+<td>ngx.hmac_sha1</td>
+<td>字符串的hmac_sha1哈希</td>
+</tr>
+<tr>
+<td>ngx.md5</td>
+<td>返回16进制MD5</td>
+</tr>
+<tr>
+<td>ngx.md5_bin</td>
+<td>返回2进制MD5</td>
+</tr>
+<tr>
+<td>ngx.sha1_bin</td>
+<td>返回2进制sha1哈希值</td>
+</tr>
+<tr>
+<td>ngx.quote_sql_str</td>
+<td>SQL语句转义</td>
+</tr>
+<tr>
+<td>ngx.today</td>
+<td>返回当前日期</td>
+</tr>
+<tr>
+<td>ngx.time</td>
+<td>返回UNIX时间戳</td>
+</tr>
+<tr>
+<td>ngx.now</td>
+<td>返回当前时间</td>
+</tr>
+<tr>
+<td>ngx.update_time</td>
+<td>刷新时间后再返回</td>
+</tr>
+<tr>
+<td>ngx.localtime</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.utctime</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.cookie_time</td>
+<td>返回的时间可用于cookie值</td>
+</tr>
+<tr>
+<td>ngx.http_time</td>
+<td>返回的时间可用于HTTP头</td>
+</tr>
+<tr>
+<td>ngx.parse_http_time</td>
+<td>解析HTTP头的时间</td>
+</tr>
+<tr>
+<td>ngx.re.match</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.re.find</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.re.gmatch</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.re.sub</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.re.gsub</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.get</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.get_stale</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.set</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.safe_set</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.add</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.safe_add</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.replace</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.delete</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.incr</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.flush_all</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.flush_expired</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.shared.DICT.get_keys</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.socket.udp</td>
+<td></td>
+</tr>
+<tr>
+<td>udpsock:setpeername</td>
+<td></td>
+</tr>
+<tr>
+<td>udpsock:send</td>
+<td></td>
+</tr>
+<tr>
+<td>udpsock:receive</td>
+<td></td>
+</tr>
+<tr>
+<td>udpsock:close</td>
+<td></td>
+</tr>
+<tr>
+<td>udpsock:settimeout</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.socket.tcp</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:connect</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:sslhandshake</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:send</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:receive</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:receiveuntil</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:close</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:settimeout</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:setoption</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:setkeepalive</td>
+<td></td>
+</tr>
+<tr>
+<td>tcpsock:getreusedtimes</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.socket.connect</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.thread.spawn</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.thread.wait</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.thread.kill</td>
+<td></td>
+</tr>
+<tr>
+<td>coroutine.create</td>
+<td></td>
+</tr>
+<tr>
+<td>coroutine.resume</td>
+<td></td>
+</tr>
+<tr>
+<td>coroutine.yield</td>
+<td></td>
+</tr>
+<tr>
+<td>coroutine.wrap</td>
+<td></td>
+</tr>
+<tr>
+<td>coroutine.running</td>
+<td></td>
+</tr>
+<tr>
+<td>coroutine.status</td>
+<td></td>
+</tr>
+<tr>
+<td>ngx.config.debug</td>
+<td>编译时是否有 –with-debug选项</td>
+</tr>
+<tr>
+<td>ngx.config.prefix</td>
+<td>编译时的 –prefix选项</td>
+</tr>
+<tr>
+<td>ngx.config.nginx_version</td>
+<td>返回nginx版本号</td>
+</tr>
+<tr>
+<td>ngx.config.nginx_configure</td>
+<td>返回编译时 ./configure的命令行选项</td>
+</tr>
+<tr>
+<td>ngx.config.ngx_lua_version</td>
+<td>返回ngx_lua模块版本号</td>
+</tr>
+<tr>
+<td>ngx.worker.exiting</td>
+<td>当前worker进程是否正在关闭（如reload、shutdown期间）</td>
+</tr>
+<tr>
+<td>ngx.worker.pid</td>
+<td>返回当前worker进程的pid</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>常量</td>
+<td>说明</td>
+</tr>
+<tr>
+<td>Core constants</td>
+<td>ngx.OK (0) ngx.ERROR (-1) ngx.AGAIN (-2) ngx.DONE (-4) ngx.DECLINED (-5) ngx.nil</td>
+</tr>
+<tr>
+<td>HTTP method constants</td>
+<td>ngx.HTTP_GET ngx.HTTP_HEAD ngx.HTTP_PUT ngx.HTTP_POST ngx.HTTP_DELETE ngx.HTTP_OPTIONS  ngx.HTTP_MKCOL   ngx.HTTP_COPY    ngx.HTTP_MOVE    ngx.HTTP_PROPFIND  ngx.HTTP_PROPPATCH  ngx.HTTP_LOCK  ngx.HTTP_UNLOCK   ngx.HTTP_PATCH   ngx.HTTP_TRACE</td>
+</tr>
+<tr>
+<td>HTTP status constants</td>
+<td>ngx.HTTP_OK (200) ngx.HTTP_CREATED (201) ngx.HTTP_SPECIAL_RESPONSE (300) ngx.HTTP_MOVED_PERMANENTLY (301) ngx.HTTP_MOVED_TEMPORARILY (302) ngx.HTTP_SEE_OTHER (303) ngx.HTTP_NOT_MODIFIED (304) ngx.HTTP_BAD_REQUEST (400) ngx.HTTP_UNAUTHORIZED (401) ngx.HTTP_FORBIDDEN (403) ngx.HTTP_NOT_FOUND (404) ngx.HTTP_NOT_ALLOWED (405) ngx.HTTP_GONE (410) ngx.HTTP_INTERNAL_SERVER_ERROR (500) ngx.HTTP_METHOD_NOT_IMPLEMENTED (501) ngx.HTTP_SERVICE_UNAVAILABLE (503) ngx.HTTP_GATEWAY_TIMEOUT (504)</td>
+</tr>
+<tr>
+<td>Nginx log level constants</td>
+<td>ngx.STDERR ngx.EMERG ngx.ALERT ngx.CRIT ngx.ERR ngx.WARN ngx.NOTICE ngx.INFO ngx.DEBUG</td>
+</tr>
+</tbody></table>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">shell</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">nginx</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
+        		</li>
+      		
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/10/17/ngx-lua-%E6%A8%A1%E5%9D%97%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3%EF%BC%88%E5%9F%BA%E4%BA%8Eopenresty%EF%BC%89/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-OpenResty-执行流程阶段" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/">OpenResty 执行流程阶段</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" class="archive-article-date">
+        <time datetime="2021-10-17T12:01:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-17</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <p>nginx有11个处理阶段，如下图所示：</p>
+<p><img src="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/292052-20190628170848889-787127502.png" alt="img"></p>
+<table>
+<thead>
+<tr>
+<th align="center">指令</th>
+<th align="center">所处处理阶段</th>
+<th align="center">使用范围</th>
+<th align="left">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">init_by_lua init_by_lua_file</td>
+<td align="center">loading-config</td>
+<td align="center">http</td>
+<td align="left">nginx Master进程加载配置时执行；通常用于初始化全局配置/预加载Lua模块</td>
+</tr>
+<tr>
+<td align="center">init_worker_by_lua init_worker_by_lua_file</td>
+<td align="center">starting-worker</td>
+<td align="center">http</td>
+<td align="left">每个Nginx Worker进程启动时调用的计时器，如果Master进程不允许则只会在init_by_lua之后调用；通常用于定时拉取配置/数据，或者后端服务的健康检查</td>
+</tr>
+<tr>
+<td align="center">set_by_lua set_by_lua_file</td>
+<td align="center">rewrite</td>
+<td align="center">server,server if,location,location if</td>
+<td align="left">设置nginx变量，可以实现复杂的赋值逻辑；此处是阻塞的，Lua代码要做到非常快；</td>
+</tr>
+<tr>
+<td align="center">rewrite_by_lua rewrite_by_lua_file</td>
+<td align="center">rewrite tail</td>
+<td align="center">http,server,location,location if</td>
+<td align="left">rrewrite阶段处理，可以实现复杂的转发/重定向逻辑；</td>
+</tr>
+<tr>
+<td align="center">access_by_lua access_by_lua_file</td>
+<td align="center">access tail</td>
+<td align="center">http,server,location,location if</td>
+<td align="left">请求访问阶段处理，用于访问控制</td>
+</tr>
+<tr>
+<td align="center">content_by_lua content_by_lua_file</td>
+<td align="center">content</td>
+<td align="center">location，location if</td>
+<td align="left">内容处理器，接收请求处理并输出响应</td>
+</tr>
+<tr>
+<td align="center">header_filter_by_lua header_filter_by_lua_file</td>
+<td align="center">output-header-filter</td>
+<td align="center">http，server，location，location if</td>
+<td align="left">设置header和cookie</td>
+</tr>
+<tr>
+<td align="center">body_filter_by_lua body_filter_by_lua_file</td>
+<td align="center">output-body-filter</td>
+<td align="center">http，server，location，location if</td>
+<td align="left">对响应数据进行过滤，比如截断、替换。</td>
+</tr>
+<tr>
+<td align="center">log_by_lua log_by_lua_file</td>
+<td align="center">log</td>
+<td align="center">http，server，location，location if</td>
+<td align="left">log阶段处理，比如记录访问量/统计平均响应时间</td>
+</tr>
+</tbody></table>
+<p>一般我们在开发过程中常用到的阶段如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set_by_lua、rewrite_by_lua、access_by_lua、content_by_lua、header_filter_by_lua、body_filter_by_lua、log_by_lua、</span><br></pre></td></tr></table></figure>
+
+<p>1.set_by_lua</p>
+<p>  做流程分支判断，判断变量初始化</p>
+<p>2.rewrite_by_lua</p>
+<p>  转发重定向，缓存功能</p>
+<p>3.access_by_lua</p>
+<p>  ip准入，接口合法权限判断，根据iptable做防火墙的功能</p>
+<p>4.content_by_lua</p>
+<p>  内容生产</p>
+<p>5.header_filter_by_lua</p>
+<p>  增加头部信息</p>
+<p>6.body_filter_by_lua</p>
+<p>  内容过滤</p>
+<p>7.log_by_lua</p>
+<p>  记录日志</p>
+<p> 文章转载：<a href="https://www.cnblogs.com/fly-kaka/p/11102849.html">https://www.cnblogs.com/fly-kaka/p/11102849.html</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">shell</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">nginx</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
+        		</li>
+      		
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-从Clover到OpenCore" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2868,484 +3929,6 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasjad命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/">Arthas jad命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#jad%E5%91%BD%E4%BB%A4">jad命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a><ul>
-<li><a href="#%E7%BC%96%E8%AF%91javalangstring">编译<code>java.lang.String</code></a></li>
-<li><a href="#%E5%8F%8D%E7%BC%96%E8%AF%91%E6%97%B6%E5%8F%AA%E6%98%BE%E7%A4%BA%E6%BA%90%E4%BB%A3%E7%A0%81">反编译时只显示源代码</a></li>
-<li><a href="#%E5%8F%8D%E7%BC%96%E8%AF%91%E6%8C%87%E5%AE%9A%E7%9A%84%E5%87%BD%E6%95%B0">反编译指定的函数</a></li>
-<li><a href="#%E5%8F%8D%E7%BC%96%E8%AF%91%E6%97%B6%E6%8C%87%E5%AE%9Aclassloader">反编译时指定ClassLoader</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示jad命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="jad命令">jad命令</span></h2><blockquote>
-<p>反编译指定已加载类的源码</p>
-</blockquote>
-<p><code>jad</code> 命令将 JVM 中实际运行的 class 的 byte code 反编译成 java 代码，便于你理解业务逻辑；</p>
-<ul>
-<li>在 Arthas Console 上，反编译出来的源码是带语法高亮的，阅读更方便</li>
-<li>当然，反编译出来的 java 代码可能会存在语法错误，但不影响你进行阅读理解</li>
-</ul>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><em>class-pattern</em></td>
-<td>类名表达式匹配</td>
-</tr>
-<tr>
-<td><code>[c:]</code></td>
-<td>类所属 ClassLoader 的 hashcode</td>
-</tr>
-<tr>
-<td><code>[classLoaderClass:]</code></td>
-<td>指定执行表达式的 ClassLoader 的 class name</td>
-</tr>
-<tr>
-<td>[E]</td>
-<td>开启正则表达式匹配，默认为通配符匹配</td>
-</tr>
-</tbody></table>
-<h4><span id="使用参考">使用参考</span></h4><h5><span id="编译javalangstring">编译<code>java.lang.String</code></span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad java.lang.String</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">$ jad java.lang.String</span><br><span class="line"></span><br><span class="line">ClassLoader:</span><br><span class="line"></span><br><span class="line">Location:</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* Decompiled with CFR 0_132.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">package</span> java.lang;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.ObjectStreamField;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span></span></span><br><span class="line"><span class="class"><span class="keyword">implements</span> <span class="title">Serializable</span>,</span></span><br><span class="line"><span class="class"><span class="title">Comparable</span>&lt;<span class="title">String</span>&gt;,</span></span><br><span class="line"><span class="class"><span class="title">CharSequence</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span>[] value;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> hash;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">6849794470754667710L</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ObjectStreamField[] serialPersistentFields = <span class="keyword">new</span> ObjectStreamField[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Comparator&lt;String&gt; CASE_INSENSITIVE_ORDER = <span class="keyword">new</span> CaseInsensitiveComparator();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">String</span><span class="params">(<span class="keyword">byte</span>[] arrby, <span class="keyword">int</span> n, <span class="keyword">int</span> n2)</span> </span>&#123;</span><br><span class="line">        String.checkBounds(arrby, n, n2);</span><br><span class="line">        <span class="keyword">this</span>.value = StringCoding.decode(arrby, n, n2);</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h5><span id="反编译时只显示源代码">反编译时只显示源代码</span></h5><p>默认情况下，反编译结果里会带有<code>ClassLoader</code>信息，通过<code>--source-only</code>选项，可以只打印源代码。方便和<code>mc</code>/<code>redefine</code>命令结合使用。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad --source-only java.lang.String</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$ jad --source-only java.lang.String</span><br><span class="line">...</span><br><span class="line">        @Override</span><br><span class="line">        public int compare(String string, String string2) &#123;</span><br><span class="line">            int n = string.length();</span><br><span class="line">            int n2 = string2.length();</span><br><span class="line">            int n3 = Math.min(n, n2);</span><br><span class="line">            for (int i = 0; i &lt; n3; ++i) &#123;</span><br><span class="line">                char c;</span><br><span class="line">                char c2 = string.charAt(i);</span><br><span class="line">                if (c2 == (c = string2.charAt(i)) || (c2 = Character.toUpperCase(c2)) == (c = Character.toUpperCase(c)) || (c2 = Character.toLowerCase(c2)) == (c = Character.toLowerCase(c))) continue;</span><br><span class="line">                return c2 - c;</span><br><span class="line">            &#125;</span><br><span class="line">            return n - n2;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        private Object readResolve() &#123;</span><br><span class="line">            return String.CASE_INSENSITIVE_ORDER;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h5><span id="反编译指定的函数">反编译指定的函数</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad java.lang.String toString</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ jad java.lang.String toString</span><br><span class="line"></span><br><span class="line">ClassLoader:</span><br><span class="line"></span><br><span class="line">Location:</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Affect(row-cnt:<span class="number">2</span>) cost in <span class="number">407</span> ms.</span><br></pre></td></tr></table></figure>
-
-<h5><span id="反编译时指定classloader">反编译时指定ClassLoader</span></h5><blockquote>
-<p>当有多个 <code>ClassLoader</code> 都加载了这个类时，<code>jad</code> 命令会输出对应 <code>ClassLoader</code> 实例的 <code>hashcode</code>，然后你只需要重新执行 <code>jad</code> 命令，并使用参数 <code>-c &lt;hashcode&gt;</code> 就可以反编译指定 ClassLoader 加载的那个类了；</p>
-</blockquote>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ jad org.apache.log4j.Logger</span><br><span class="line"></span><br><span class="line">Found more than one <span class="class"><span class="keyword">class</span> <span class="title">for</span>: <span class="title">org</span>.<span class="title">apache</span>.<span class="title">log4j</span>.<span class="title">Logger</span>, <span class="title">Please</span> <span class="title">use</span> <span class="title">jad</span> -<span class="title">c</span> <span class="title">hashcode</span> <span class="title">org</span>.<span class="title">apache</span>.<span class="title">log4j</span>.<span class="title">Logger</span></span></span><br><span class="line"><span class="class"><span class="title">HASHCODE</span>  <span class="title">CLASSLOADER</span></span></span><br><span class="line"><span class="class">69<span class="title">dcaba4</span>  +-<span class="title">monitor</span>&#x27;<span class="title">s</span> <span class="title">ModuleClassLoader</span></span></span><br><span class="line"><span class="class">6<span class="title">e51ad67</span>  +-<span class="title">java</span>.<span class="title">net</span>.<span class="title">URLClassLoader</span>@6<span class="title">e51ad67</span></span></span><br><span class="line"><span class="class">            +-<span class="title">sun</span>.<span class="title">misc</span>.<span class="title">Launcher</span>$<span class="title">AppClassLoader</span>@6951<span class="title">a712</span></span></span><br><span class="line"><span class="class">            +-<span class="title">sun</span>.<span class="title">misc</span>.<span class="title">Launcher</span>$<span class="title">ExtClassLoader</span>@6<span class="title">fafc4c2</span></span></span><br><span class="line"><span class="class">2<span class="title">bdd9114</span>  +-<span class="title">pandora</span>-<span class="title">qos</span>-<span class="title">service</span>&#x27;<span class="title">s</span> <span class="title">ModuleClassLoader</span></span></span><br><span class="line"><span class="class">4<span class="title">c0df5f8</span>  +-<span class="title">pandora</span>-<span class="title">framework</span>&#x27;<span class="title">s</span> <span class="title">ModuleClassLoader</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">Affect</span>(<span class="title">row</span>-<span class="title">cnt</span>:0) <span class="title">cost</span> <span class="title">in</span> 38 <span class="title">ms</span>.</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ jad org.apache.log4j.Logger -c 69dcaba4</span><br><span class="line"></span><br><span class="line">ClassLoader:</span><br><span class="line">+-monitor<span class="string">&#x27;s ModuleClassLoader</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Location:</span></span><br><span class="line"><span class="string">/Users/admin/app/log4j-1.2.14.jar</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">package org.apache.log4j;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">import org.apache.log4j.spi.*;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">public class Logger extends Category</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">    private static final String FQCN;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    protected Logger(String name)</span></span><br><span class="line"><span class="string">    &#123;</span></span><br><span class="line"><span class="string">        super(name);</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">...</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Affect(row-cnt:1) cost in 190 ms.</span></span><br></pre></td></tr></table></figure>
-
-<p>对于只有唯一实例的ClassLoader还可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h2><span id="更多信息">更多信息</span></h2><p>在“heapdump”中，我们演示了了Arthas的heapdump命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasmc-redefine命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/">Arthas mc-redefine命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#mc%E5%91%BD%E4%BB%A4">mc命令</a></li>
-<li><a href="#redefine%E5%91%BD%E4%BB%A4">redefine命令</a><ul>
-<li><a href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98">常见问题</a></li>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-<li><a href="#redefine%E7%9A%84%E9%99%90%E5%88%B6">redefine的限制</a></li>
-</ul>
-</li>
-<li><a href="#%E7%83%AD%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81">热更新代码</a><ul>
-<li><a href="#jad%E5%8F%8D%E7%BC%96%E8%AF%91usercontroller">jad反编译UserController</a></li>
-<li><a href="#sc%E6%9F%A5%E6%89%BE%E5%8A%A0%E8%BD%BDusercontroller%E7%9A%84classloader">sc查找加载UserController的ClassLoader</a></li>
-<li><a href="#mc">mc</a></li>
-<li><a href="#redefine">redefine</a></li>
-<li><a href="#%E7%83%AD%E4%BF%AE%E6%94%B9%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%9C">热修改代码结果</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个普通的Spring Boot应用为例，演示mc-redefine命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
-<p>启动之后，可以访问61000端口： 点击查看</p>
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="mc命令">mc命令</span></h2><blockquote>
-<p>Memory Compiler/内存编译器，编译<code>.java</code>文件生成<code>.class</code>。 可以通过<code>-c</code>/<code>--classLoaderClass</code>参数指定classloader，<code>-d</code>参数指定输出目录</p>
-</blockquote>
-<p>编译生成<code>.class</code>文件之后，可以结合<code>redefine</code>命令实现热更新代码。</p>
-<h2><span id="redefine命令">redefine命令</span></h2><blockquote>
-<p>加载外部的<code>.class</code>文件，redefine jvm已加载的类。</p>
-</blockquote>
-<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#redefineClasses-java.lang.instrument.ClassDefinition%E2%80%A6-">Instrumentation#redefineClasses</a></p>
-<h4><span id="常见问题">常见问题</span></h4><ul>
-<li>redefine的class不能修改、添加、删除类的field和method，包括方法参数、方法名称及返回值</li>
-<li>如果mc失败，可以在本地开发环境编译好class文件，上传到目标系统，使用redefine热加载class</li>
-<li>目前redefine 和watch/trace/jad/tt等命令冲突，以后重新实现redefine功能会解决此问题</li>
-</ul>
-<blockquote>
-<p>注意， redefine后的原来的类不能恢复，redefine有可能失败（比如增加了新的field），参考jdk本身的文档。</p>
-<p><code>reset</code>命令对<code>redefine</code>的类无效。如果想重置，需要<code>redefine</code>原始的字节码。</p>
-<p><code>redefine</code>命令和<code>jad</code>/<code>watch</code>/<code>trace</code>/<code>monitor</code>/<code>tt</code>等命令会冲突。执行完<code>redefine</code>之后，如果再执行上面提到的命令，则会把<code>redefine</code>的字节码重置。 原因是jdk本身redefine和Retransform是不同的机制，同时使用两种机制来更新字节码，只有最后修改的会生效。</p>
-</blockquote>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[c:]</td>
-<td>ClassLoader的hashcode</td>
-</tr>
-<tr>
-<td><code>[classLoaderClass:]</code></td>
-<td>指定执行表达式的 ClassLoader 的 class name</td>
-</tr>
-<tr>
-<td>[p:]</td>
-<td>外部的<code>.class</code>文件的完整路径，支持多个</td>
-</tr>
-</tbody></table>
-<h4><span id="redefine的限制">redefine的限制</span></h4><ul>
-<li>不允许新增加field/method</li>
-<li>正在跑的函数，没有退出不能生效。</li>
-</ul>
-<h2><span id="热更新代码">热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>redefine</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>下面通过热更新代码，修改这个逻辑。</p>
-<h4><span id="jad反编译usercontroller">jad反编译UserController</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad --source-only com.example.demo.arthas.user.UserController &gt; /tmp/UserController.java</span><br></pre></td></tr></table></figure>
-
-<p>jad反编译的结果保存在 <code>/tmp/UserController.java</code>文件里了。</p>
-<p>再打开一个<code>Terminal 3</code>，然后用vim来编辑<code>/tmp/UserController.java</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /tmp/UserController.java</span><br></pre></td></tr></table></figure>
-
-<p>比如当 user id 小于1时，也正常返回，不抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(value=&#123;&quot;/user/&#123;id&#125;&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> User <span class="title">findUserById</span><span class="params">(<span class="meta">@PathVariable</span> Integer id)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">&quot;id: &#123;&#125;&quot;</span>, (Object)id);</span><br><span class="line">    <span class="keyword">if</span> (id != <span class="keyword">null</span> &amp;&amp; id &lt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> User(id, <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">        <span class="comment">// throw new IllegalArgumentException(&quot;id &lt; 1&quot;);</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> User(id.intValue(), <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4><span id="sc查找加载usercontroller的classloader">sc查找加载UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d *UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sc -d *UserController | grep classLoaderHash</span></span><br><span class="line"> classLoaderHash   1be6f5c3</span><br></pre></td></tr></table></figure>
-
-<p>可以发现是 spring boot <code>LaunchedURLClassLoader@1be6f5c3</code> 加载的。</p>
-<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便.</p>
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h4><span id="mc">mc</span></h4><p>保存好<code>/tmp/UserController.java</code>之后，使用<code>mc</code>(Memory Compiler)命令来编译，并且通过<code>--classLoaderClass</code>参数指定ClassLoader：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span></span><br><span class="line">Memory compiler output:</span><br><span class="line">/tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">Affect(row-cnt:1) cost in 346 ms</span><br></pre></td></tr></table></figure>
-
-<p>也可以通过<code>mc -c &lt;classLoaderHash&gt; /tmp/UserController.java -d /tmp</code>，使用<code>-c</code>参数指定ClassLoaderHash:</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc -c 1be6f5c3 /tmp/UserController.java -d /tmp</span></span><br></pre></td></tr></table></figure>
-
-<h4><span id="redefine">redefine</span></h4><p>再使用<code>redefine</code>命令重新加载新编译好的<code>UserController.class</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redefine /tmp/com/example/demo/arthas/user/UserController.class</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ redefine /tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">redefine success, size: 1</span><br></pre></td></tr></table></figure>
-
-<h4><span id="热修改代码结果">热修改代码结果</span></h4><p><code>redefine</code>成功之后，再次访问 user/0 ，结果是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 0,</span><br><span class="line">  &quot;name&quot;: &quot;name0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“mc-redefine”中，我们演示了了Arthas的mc-redefine命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
@@ -3541,6 +4124,10 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
             
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
             
             <div class="clearfix"></div>

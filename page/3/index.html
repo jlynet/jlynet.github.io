@@ -230,6 +230,542 @@
             
 
   
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthaswatch命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/">Arthas watch命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#watch%E5%91%BD%E4%BB%A4">watch命令</a><ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a><ul>
+<li><a href="#%E8%A7%82%E5%AF%9F%E6%96%B9%E6%B3%95%E5%87%BA%E5%8F%82%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC">观察方法出参和返回值</a></li>
+<li><a href="#%E8%A7%82%E5%AF%9F%E6%96%B9%E6%B3%95%E5%85%A5%E5%8F%82">观察方法入参</a></li>
+<li><a href="#%E5%90%8C%E6%97%B6%E8%A7%82%E5%AF%9F%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8%E5%89%8D%E5%92%8C%E6%96%B9%E6%B3%95%E8%BF%94%E5%9B%9E%E5%90%8E">同时观察方法调用前和方法返回后</a></li>
+<li><a href="#%E8%B0%83%E6%95%B4-x%E7%9A%84%E5%80%BC%E8%A7%82%E5%AF%9F%E5%85%B7%E4%BD%93%E7%9A%84%E6%96%B9%E6%B3%95%E5%8F%82%E6%95%B0%E5%80%BC">调整<code>-x</code>的值，观察具体的方法参数值</a></li>
+<li><a href="#%E6%9D%A1%E4%BB%B6%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%9A%84%E4%BE%8B%E5%AD%90">条件表达式的例子</a></li>
+<li><a href="#%E8%A7%82%E5%AF%9F%E5%BC%82%E5%B8%B8%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BE%8B%E5%AD%90">观察异常信息的例子</a></li>
+<li><a href="#%E6%8C%89%E7%85%A7%E8%80%97%E6%97%B6%E8%BF%9B%E8%A1%8C%E8%BF%87%E6%BB%A4">按照耗时进行过滤</a></li>
+<li><a href="#%E8%A7%82%E5%AF%9F%E5%BD%93%E5%89%8D%E5%AF%B9%E8%B1%A1%E4%B8%AD%E7%9A%84%E5%B1%9E%E6%80%A7">观察当前对象中的属性</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示watch命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="watch命令">watch命令</span></h2><blockquote>
+<p>方法执行数据观测</p>
+</blockquote>
+<p>让你能方便的观察到指定方法的调用情况。能观察到的范围为：<code>返回值</code>、<code>抛出异常</code>、<code>入参</code>，通过编写 OGNL 表达式进行对应变量的查看。</p>
+<h4><span id="参数说明">参数说明</span></h4><p>watch 的参数比较多，主要是因为它能在 4 个不同的场景观察对象</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>class-pattern</em></td>
+<td>类名表达式匹配</td>
+</tr>
+<tr>
+<td><em>method-pattern</em></td>
+<td>方法名表达式匹配</td>
+</tr>
+<tr>
+<td><em>express</em></td>
+<td>观察表达式</td>
+</tr>
+<tr>
+<td><em>condition-express</em></td>
+<td>条件表达式</td>
+</tr>
+<tr>
+<td>[b]</td>
+<td>在<strong>方法调用之前</strong>观察</td>
+</tr>
+<tr>
+<td>[e]</td>
+<td>在<strong>方法异常之后</strong>观察</td>
+</tr>
+<tr>
+<td>[s]</td>
+<td>在<strong>方法返回之后</strong>观察</td>
+</tr>
+<tr>
+<td>[f]</td>
+<td>在<strong>方法结束之后</strong>(正常返回和异常返回)观察</td>
+</tr>
+<tr>
+<td>[E]</td>
+<td>开启正则表达式匹配，默认为通配符匹配</td>
+</tr>
+<tr>
+<td>[x:]</td>
+<td>指定输出结果的属性遍历深度，默认为 1</td>
+</tr>
+</tbody></table>
+<p>这里重点要说明的是观察表达式，观察表达式的构成主要由 ognl 表达式组成，所以你可以这样写<code>&quot;&#123;params,returnObj&#125;&quot;</code>，只要是一个合法的 ognl 表达式，都能被正常支持。</p>
+<p>观察的维度也比较多，主要体现在参数 <code>advice</code> 的数据结构上。<code>Advice</code> 参数最主要是封装了通知节点的所有信息。请参考<a href="https://shell.aliyun.com/tutorial">表达式核心变量</a>中关于该节点的描述。</p>
+<ul>
+<li>特殊用法请参考：<a href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
+<li>OGNL表达式官网：<a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
+</ul>
+<p><strong>特别说明</strong>：</p>
+<ul>
+<li>watch 命令定义了4个观察事件点，即 <code>-b</code> 方法调用前，<code>-e</code> 方法异常后，<code>-s</code> 方法返回后，<code>-f</code> 方法结束后</li>
+<li>4个观察事件点 <code>-b</code>、<code>-e</code>、<code>-s</code> 默认关闭，<code>-f</code> 默认打开，当指定观察点被打开后，在相应事件点会对观察表达式进行求值并输出</li>
+<li>这里要注意<code>方法入参</code>和<code>方法出参</code>的区别，有可能在中间被修改导致前后不一致，除了 <code>-b</code> 事件点 <code>params</code> 代表方法入参外，其余事件都代表方法出参</li>
+<li>当使用 <code>-b</code> 时，由于观察事件点是在方法调用前，此时返回值或异常均不存在</li>
+</ul>
+<h4><span id="使用参考">使用参考</span></h4><h5><span id="观察方法出参和返回值">观察方法出参和返回值</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,returnObj&#125;&quot;</span> -x 2</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,returnObj&#125;&quot;</span> -x 2</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 44 ms.</span><br><span class="line">ts=2018-12-03 19:16:51; [cost=1.280502ms] result=@ArrayList[</span><br><span class="line">    @Object[][</span><br><span class="line">        @Integer[535629513],</span><br><span class="line">    ],</span><br><span class="line">    @ArrayList[</span><br><span class="line">        @Integer[3],</span><br><span class="line">        @Integer[19],</span><br><span class="line">        @Integer[191],</span><br><span class="line">        @Integer[49199],</span><br><span class="line">    ],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h5><span id="观察方法入参">观察方法入参</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,returnObj&#125;&quot;</span> -x 2 -b</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,returnObj&#125;&quot;</span> -x 2 -b</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 50 ms.</span><br><span class="line">ts=2018-12-03 19:23:23; [cost=0.0353ms] result=@ArrayList[</span><br><span class="line">    @Object[][</span><br><span class="line">        @Integer[-1077465243],</span><br><span class="line">    ],</span><br><span class="line">    null,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>对比前一个例子，返回值为空（事件点为方法执行前，因此获取不到返回值）</li>
+</ul>
+<h5><span id="同时观察方法调用前和方法返回后">同时观察方法调用前和方法返回后</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,target,returnObj&#125;&quot;</span> -x 2 -b -s -n 2</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,target,returnObj&#125;&quot;</span> -x 2 -b -s -n 2</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 46 ms.</span><br><span class="line">ts=2018-12-03 19:29:54; [cost=0.01696ms] result=@ArrayList[</span><br><span class="line">    @Object[][</span><br><span class="line">        @Integer[1544665400],</span><br><span class="line">    ],</span><br><span class="line">    @MathGame[</span><br><span class="line">        random=@Random[java.util.Random@522b408a],</span><br><span class="line">        illegalArgumentCount=@Integer[13038],</span><br><span class="line">    ],</span><br><span class="line">    null,</span><br><span class="line">]</span><br><span class="line">ts=2018-12-03 19:29:54; [cost=4.277392ms] result=@ArrayList[</span><br><span class="line">    @Object[][</span><br><span class="line">        @Integer[1544665400],</span><br><span class="line">    ],</span><br><span class="line">    @MathGame[</span><br><span class="line">        random=@Random[java.util.Random@522b408a],</span><br><span class="line">        illegalArgumentCount=@Integer[13038],</span><br><span class="line">    ],</span><br><span class="line">    @ArrayList[</span><br><span class="line">        @Integer[2],</span><br><span class="line">        @Integer[2],</span><br><span class="line">        @Integer[2],</span><br><span class="line">        @Integer[5],</span><br><span class="line">        @Integer[5],</span><br><span class="line">        @Integer[73],</span><br><span class="line">        @Integer[241],</span><br><span class="line">        @Integer[439],</span><br><span class="line">    ],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数里<code>-n 2</code>，表示只执行两次</li>
+<li>这里输出结果中，第一次输出的是方法调用前的观察表达式的结果，第二次输出的是方法返回后的表达式的结果</li>
+<li>结果的输出顺序和事件发生的先后顺序一致，和命令中 <code>-s -b</code> 的顺序无关</li>
+</ul>
+<h5><span id="调整-x的值观察具体的方法参数值">调整<code>-x</code>的值，观察具体的方法参数值</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,target&#125;&quot;</span> -x 3</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&quot;&#123;params,target&#125;&quot;</span> -x 3</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 58 ms.</span><br><span class="line">ts=2018-12-03 19:34:19; [cost=0.587833ms] result=@ArrayList[</span><br><span class="line">    @Object[][</span><br><span class="line">        @Integer[47816758],</span><br><span class="line">    ],</span><br><span class="line">    @MathGame[</span><br><span class="line">        random=@Random[</span><br><span class="line">            serialVersionUID=@Long[3905348978240129619],</span><br><span class="line">            seed=@AtomicLong[3133719055989],</span><br><span class="line">            multiplier=@Long[25214903917],</span><br><span class="line">            addend=@Long[11],</span><br><span class="line">            mask=@Long[281474976710655],</span><br><span class="line">            DOUBLE_UNIT=@Double[1.1102230246251565E-16],</span><br><span class="line">            BadBound=@String[bound must be positive],</span><br><span class="line">            BadRange=@String[bound must be greater than origin],</span><br><span class="line">            BadSize=@String[size must be non-negative],</span><br><span class="line">            seedUniquifier=@AtomicLong[-3282039941672302964],</span><br><span class="line">            nextNextGaussian=@Double[0.0],</span><br><span class="line">            haveNextNextGaussian=@Boolean[false],</span><br><span class="line">            serialPersistentFields=@ObjectStreamField[][isEmpty=false;size=3],</span><br><span class="line">            unsafe=@Unsafe[sun.misc.Unsafe@2eaa1027],</span><br><span class="line">            seedOffset=@Long[24],</span><br><span class="line">        ],</span><br><span class="line">        illegalArgumentCount=@Integer[13159],</span><br><span class="line">    ],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-x</code>表示遍历深度，可以调整来打印具体的参数和结果内容，默认值是1。</li>
+</ul>
+<h5><span id="条件表达式的例子">条件表达式的例子</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&quot;&#123;params[0],target&#125;&quot;</span> <span class="string">&quot;params[0]&lt;0&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&quot;&#123;params[0],target&#125;&quot;</span> <span class="string">&quot;params[0]&lt;0&quot;</span></span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 68 ms.</span><br><span class="line">ts=2018-12-03 19:36:04; [cost=0.530255ms] result=@ArrayList[</span><br><span class="line">    @Integer[-18178089],</span><br><span class="line">    @MathGame[demo.MathGame@41cf53f9],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>只有满足条件的调用，才会有响应。</li>
+<li><code>watch-express</code> 单个值可以不加’{}’，多个值需要加’{a,b,c}’。</li>
+<li><code>condition-express</code> 不能加’{}’，可以使用逗号分隔子表达式，取表达式最后一个值来判断。</li>
+</ul>
+<p>如果watch的方法存在同名的其它重载方法，可以通过下面的办法进行过滤：</p>
+<ul>
+<li><p>根据参数类型进行过滤</p>
+<p><code>watch demo.MathGame primeFactors &#39;&#123;params, params[0].class.name&#125;&#39; &#39;params[0].class.name == &quot;java.lang.Integer&quot;&#39;</code></p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&#x27;&#123;params, params[0].class.name&#125;&#x27;</span> <span class="string">&#x27;params[0].class.name == &quot;java.lang.Integer&quot;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>根据参数个数进行过滤</p>
+<p><code>watch demo.MathGame primeFactors &#39;&#123;params, params.length&#125;&#39; &#39;params.length==1&#39;</code></p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&#x27;&#123;params, params.length&#125;&#x27;</span> <span class="string">&#x27;params.length==1&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<h5><span id="观察异常信息的例子">观察异常信息的例子</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&quot;&#123;params[0],throwExp&#125;&quot;</span> -e -x 2</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&quot;&#123;params[0],throwExp&#125;&quot;</span> -e -x 2</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 62 ms.</span><br><span class="line">ts=2018-12-03 19:38:00; [cost=1.414993ms] result=@ArrayList[</span><br><span class="line">    @Integer[-1120397038],</span><br><span class="line">    java.lang.IllegalArgumentException: number is: -1120397038, need &gt;= 2</span><br><span class="line">    at demo.MathGame.primeFactors(MathGame.java:46)</span><br><span class="line">    at demo.MathGame.run(MathGame.java:24)</span><br><span class="line">    at demo.MathGame.main(MathGame.java:16)</span><br><span class="line">,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-e</code>表示抛出异常时才触发</li>
+<li>express中，表示异常信息的变量是<code>throwExp</code></li>
+</ul>
+<p>根据异常类型或者message进行过滤：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&#x27;&#123;params, throwExp&#125;&#x27;</span> <span class="string">&#x27;#msg=throwExp.toString(), #msg.contains(&quot;IllegalArgumentException&quot;)&#x27;</span> -e -x 2</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<h5><span id="按照耗时进行过滤">按照耗时进行过滤</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&#x27;&#123;params, returnObj&#125;&#x27;</span> <span class="string">&#x27;#cost&gt;200&#x27;</span> -x 2</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&#x27;&#123;params, returnObj&#125;&#x27;</span> <span class="string">&#x27;#cost&gt;200&#x27;</span> -x 2</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 66 ms.</span><br><span class="line">ts=2018-12-03 19:40:28; [cost=2112.168897ms] result=@ArrayList[</span><br><span class="line">    @Object[][</span><br><span class="line">        @Integer[2141897465],</span><br><span class="line">    ],</span><br><span class="line">    @ArrayList[</span><br><span class="line">        @Integer[5],</span><br><span class="line">        @Integer[428379493],</span><br><span class="line">    ],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>#cost&gt;200</code>(单位是<code>ms</code>)表示只有当耗时大于200ms时才会输出，过滤掉执行时间小于200ms的调用</li>
+</ul>
+<h5><span id="观察当前对象中的属性">观察当前对象中的属性</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&#x27;target&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<p>如果想查看方法运行前后，当前对象中的属性，可以使用<code>target</code>关键字，代表当前对象</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&#x27;target&#x27;</span></span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 52 ms.</span><br><span class="line">ts=2018-12-03 19:41:52; [cost=0.477882ms] result=@MathGame[</span><br><span class="line">    random=@Random[java.util.Random@522b408a],</span><br><span class="line">    illegalArgumentCount=@Integer[13355],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>然后使用<code>target.field_name</code>访问当前对象的某个属性</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">watch demo.MathGame primeFactors <span class="string">&#x27;target.illegalArgumentCount&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> watch demo.MathGame primeFactors <span class="string">&#x27;target.illegalArgumentCount&#x27;</span></span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 67 ms.</span><br><span class="line">ts=2018-12-03 20:04:34; [cost=131.303498ms] result=@Integer[8]</span><br><span class="line">ts=2018-12-03 20:04:35; [cost=0.961441ms] result=@Integer[8]</span><br></pre></td></tr></table></figure>
+
+<h2><span id="更多信息">更多信息</span></h2><p>在“watch”中，我们演示了了Arthas的watch命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthasgetstatic命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/">Arthas getstatic命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#getstatic%E5%91%BD%E4%BB%A4">getstatic命令</a></li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示getstatic命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="getstatic命令">getstatic命令</span></h2><ul>
+<li>推荐直接使用<a href="https://arthas.aliyun.com/doc/arthas-tutorials.html?language=cn&id=command-ognl">ognl</a>命令，更加灵活。</li>
+</ul>
+<p>通过getstatic命令可以方便的查看类的静态属性。使用方法为<code>getstatic class_name field_name</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getstatic demo.MathGame random</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> getstatic demo.MathGame random</span></span><br><span class="line">field: random</span><br><span class="line">@Random[</span><br><span class="line">    serialVersionUID=@Long[3905348978240129619],</span><br><span class="line">    seed=@AtomicLong[120955813885284],</span><br><span class="line">    multiplier=@Long[25214903917],</span><br><span class="line">    addend=@Long[11],</span><br><span class="line">    mask=@Long[281474976710655],</span><br><span class="line">    DOUBLE_UNIT=@Double[1.1102230246251565E-16],</span><br><span class="line">    BadBound=@String[bound must be positive],</span><br><span class="line">    BadRange=@String[bound must be greater than origin],</span><br><span class="line">    BadSize=@String[size must be non-negative],</span><br><span class="line">    seedUniquifier=@AtomicLong[-3282039941672302964],</span><br><span class="line">    nextNextGaussian=@Double[0.0],</span><br><span class="line">    haveNextNextGaussian=@Boolean[false],</span><br><span class="line">    serialPersistentFields=@ObjectStreamField[][isEmpty=false;size=3],</span><br><span class="line">    unsafe=@Unsafe[sun.misc.Unsafe@2eaa1027],</span><br><span class="line">    seedOffset=@Long[24],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>指定classLoader</li>
+</ul>
+<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，使用<code>sc -d &lt;ClassName&gt;</code>提取对应ClassLoader的hashcode。</p>
+<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> getstatic -c 3d4eac69 demo.MathGame random</span></span><br></pre></td></tr></table></figure>
+
+<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getstatic --classLoaderClass sun.misc.Launcher<span class="variable">$AppClassLoader</span> demo.MathGame random</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注: 这里classLoaderClass 在 java 8 是 sun.misc.Launcher$AppClassLoader，而java 11的classloader是jdk.internal.loader.ClassLoaders$AppClassLoader，katacoda目前环境是java8。</li>
+</ul>
+<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
+<p>如果该静态属性是一个复杂对象，还可以支持在该属性上通过ognl表示进行遍历，过滤，访问对象的内部属性等操作。</p>
+<ul>
+<li>OGNL特殊用法请参考：<a href="https://github.com/alibaba/arthas/issues/71">https://github.com/alibaba/arthas/issues/71</a></li>
+<li>OGNL表达式官方指南：<a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">https://commons.apache.org/proper/commons-ognl/language-guide.html</a></li>
+</ul>
+<h2><span id="更多信息">更多信息</span></h2><p>在“getstatic”中，我们演示了了Arthas的getstatic命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas高级命令教程/Arthasdashboard命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1881,458 +2417,6 @@
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthassysenv命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/">Arthas sysenv命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#sysenv%E5%91%BD%E4%BB%A4">sysenv命令</a><ul>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F">查看所有环境变量</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E5%8D%95%E4%B8%AA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F">查看单个环境变量</a></li>
-<li><a href="#%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8">自动补全</a></li>
-<li><a href="#%E5%8E%86%E5%8F%B2%E5%91%BD%E4%BB%A4%E7%9A%84%E8%A1%A5%E5%85%A8">历史命令的补全</a></li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示sysenv命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="sysenv命令">sysenv命令</span></h2><p><code>sysenv</code> 命令可以查看当前JVM的环境属性(<code>System Property</code>)，与<code>sysprop</code>类似</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysenv</span><br></pre></td></tr></table></figure>
-
-<h3><span id="使用参考">使用参考</span></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysenv -h</span><br><span class="line">sysenv -h</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">USAGE:</span><br><span class="line">  sysenv [-h] [env-name]</span><br><span class="line"></span><br><span class="line">SUMMARY:</span><br><span class="line">  Display the system env.</span><br><span class="line"></span><br><span class="line">EXAMPLES:</span><br><span class="line">  sysenv</span><br><span class="line">  sysenv USER</span><br><span class="line"></span><br><span class="line">WIKI:</span><br><span class="line">  https://arthas.aliyun.com/doc/sysenv</span><br><span class="line"></span><br><span class="line">OPTIONS:</span><br><span class="line">-h, --help                                                 this help</span><br><span class="line">&lt;env-name&gt;                                                 env name</span><br></pre></td></tr></table></figure>
-
-<h2><span id="查看所有环境变量">查看所有环境变量</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysenv</span><br><span class="line">sysenv</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sysenv</span></span><br><span class="line"> KEY                      VALUE</span><br><span class="line">----------------------------------------------------------------------------------------------------------------------------</span><br><span class="line"> PATH                     /Users/admin/.sdkman/candidates/visualvm/current/bin:/Users/admin/.sdkman/candidates/ja</span><br><span class="line">                          va/current/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Wireshark.app/Contents/</span><br><span class="line">                          MacOS</span><br><span class="line"> SDKMAN_VERSION           5.7.3+337</span><br><span class="line"> JAVA_HOME                /Users/admin/.sdkman/candidates/java/current</span><br><span class="line"> JAVA_MAIN_CLASS_65244    demo.MathGame</span><br><span class="line"> TERM                     xterm-256color</span><br><span class="line"> LANG                     zh_CN.UTF-8</span><br><span class="line"> AUTOJUMP_SOURCED         1</span><br><span class="line"> COLORTERM                truecolor</span><br><span class="line"> LOGNAME                  admin</span><br><span class="line"> XPC_SERVICE_NAME         0</span><br><span class="line"> PWD                      /Users/admin/code/ali/arthas/demo</span><br><span class="line"> TERM_PROGRAM_VERSION     3.2.5</span><br><span class="line"> _                        /Users/admin/.sdkman/candidates/java/current/bin/java</span><br><span class="line"> SHELL                    /bin/bash</span><br><span class="line"> TERM_PROGRAM             iTerm.app</span><br><span class="line"> SDKMAN_PLATFORM          Darwin</span><br><span class="line"> USER                     admin</span><br><span class="line"> ITERM_PROFILE            Default</span><br><span class="line"> TMPDIR                   /var/folders/0r/k561bkk917gg972stqclbz9h0000gn/T/</span><br><span class="line"> XPC_FLAGS                0x0</span><br><span class="line"> TERM_SESSION_ID          w0t4p0:60BC264D-9649-42AC-A7E4-AF85B69F93F8</span><br><span class="line"> __CF_USER_TEXT_ENCODING  0x1F5:0x19:0x34</span><br><span class="line"> Apple_PubSub_Socket_Ren  /private/tmp/com.apple.launchd.DwmmjSQsll/Render</span><br><span class="line"> der</span><br><span class="line"> COLORFGBG                7;0</span><br><span class="line"> HOME                     /Users/admin</span><br><span class="line"> SHLVL                    1</span><br><span class="line"> AUTOJUMP_ERROR_PATH      /Users/admin/Library/autojump/errors.log</span><br></pre></td></tr></table></figure>
-
-<h2><span id="查看单个环境变量">查看单个环境变量</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sysenv USER</span><br><span class="line">sysenv USER</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sysenv USER</span></span><br><span class="line">USER=admin</span><br></pre></td></tr></table></figure>
-
-<h2><span id="自动补全">自动补全</span></h2><p>Arthas支持丰富的自动补全功能，在使用有疑惑时，可以输入<code>Tab</code>来获取更多信息。</p>
-<p>比如输入 <code>sysenv US</code> 之后，再输入<code>Tab</code>，会补全出对应的key：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sysenv US</span><br><span class="line">USER</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h2><span id="历史命令的补全">历史命令的补全</span></h2><p>支持通过<code>TAB</code>键自动补全</p>
-<p>如果想再执行之前的命令，可以在输入一半时，按<code>Up/↑</code> 或者 <code>Ddown/↓</code>，来匹配到之前的命令。</p>
-<p>比如之前执行过<code>sysenv USER</code>，那么在输入<code>sysenv US</code>之后，可以输入<code>Up/↑</code>，就会自动补全为<code>sysenv USER</code>。</p>
-<p>如果想查看所有的历史命令，也可以通过 <code>history</code> 命令查看到。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">history</span></span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“sysenv”中，我们演示了了Arthas的sysenv命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasthread命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/">Arthas thread命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#arthas-demo">Arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#thread%E5%91%BD%E4%BB%A4">Thread命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-</ul>
-</li>
-<li><a href="#cpu%E5%8D%A0%E6%AF%94%E6%98%AF%E5%A6%82%E4%BD%95%E7%BB%9F%E8%AE%A1%E5%87%BA%E6%9D%A5%E7%9A%84">cpu占比是如何统计出来的？</a><ul>
-<li><a href="#cpu%E4%BD%BF%E7%94%A8%E7%8E%87%E6%98%AF%E5%A6%82%E4%BD%95%E7%BB%9F%E8%AE%A1%E5%87%BA%E6%9D%A5%E7%9A%84">cpu使用率是如何统计出来的？</a></li>
-</ul>
-</li>
-<li><a href="#thread%E7%94%A8%E6%B3%95">Thread用法</a><ul>
-<li><a href="#%E6%94%AF%E6%8C%81%E4%B8%80%E9%94%AE%E5%B1%95%E7%A4%BA%E5%BD%93%E5%89%8D%E6%9C%80%E5%BF%99%E7%9A%84%E5%89%8Dn%E4%B8%AA%E7%BA%BF%E7%A8%8B%E5%B9%B6%E6%89%93%E5%8D%B0%E5%A0%86%E6%A0%88">支持一键展示当前最忙的前N个线程并打印堆栈：</a></li>
-<li><a href="#%E5%BD%93%E6%B2%A1%E6%9C%89%E5%8F%82%E6%95%B0%E6%97%B6%E6%98%BE%E7%A4%BA%E7%AC%AC%E4%B8%80%E9%A1%B5%E7%BA%BF%E7%A8%8B%E4%BF%A1%E6%81%AF">当没有参数时，显示第一页线程信息</a></li>
-<li><a href="#thread-all-%E6%98%BE%E7%A4%BA%E6%89%80%E6%9C%89%E5%8C%B9%E9%85%8D%E7%9A%84%E7%BA%BF%E7%A8%8B">thread –all, 显示所有匹配的线程</a></li>
-<li><a href="#thread-id-%E6%98%BE%E7%A4%BA%E6%8C%87%E5%AE%9A%E7%BA%BF%E7%A8%8B%E7%9A%84%E8%BF%90%E8%A1%8C%E5%A0%86%E6%A0%88">thread id， 显示指定线程的运行堆栈</a></li>
-<li><a href="#thread-b-%E6%89%BE%E5%87%BA%E5%BD%93%E5%89%8D%E9%98%BB%E5%A1%9E%E5%85%B6%E4%BB%96%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%BA%BF%E7%A8%8B">thread -b, 找出当前阻塞其他线程的线程</a></li>
-<li><a href="#thread-i-%E6%8C%87%E5%AE%9A%E9%87%87%E6%A0%B7%E6%97%B6%E9%97%B4%E9%97%B4%E9%9A%94">thread -i, 指定采样时间间隔</a></li>
-<li><a href="#thread-state-%E6%9F%A5%E7%9C%8B%E6%8C%87%E5%AE%9A%E7%8A%B6%E6%80%81%E7%9A%84%E7%BA%BF%E7%A8%8B">thread –state ，查看指定状态的线程</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示thread命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="thread命令">Thread命令</span></h2><p>查看当前线程信息，查看线程的堆栈</p>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>id</td>
-<td>线程id</td>
-</tr>
-<tr>
-<td>[n:]</td>
-<td>指定最忙的前N个线程并打印堆栈</td>
-</tr>
-<tr>
-<td>[b]</td>
-<td>找出当前阻塞其他线程的线程</td>
-</tr>
-<tr>
-<td>[i <value>]</value></td>
-<td>指定cpu占比统计的采样间隔，单位为毫秒</td>
-</tr>
-<tr>
-<td>[–all]</td>
-<td>显示所有匹配的线程</td>
-</tr>
-</tbody></table>
-<h2><span id="cpu占比是如何统计出来的">cpu占比是如何统计出来的？</span></h2><h4><span id="cpu使用率是如何统计出来的">cpu使用率是如何统计出来的？</span></h4><p>这里的cpu使用率与linux 命令<code>top -H -p &lt;pid&gt;</code> 的线程<code>%CPU</code>类似，一段采样间隔时间内，当前JVM里各个线程的增量cpu时间与采样间隔时间的比例。</p>
-<blockquote>
-<p>工作原理说明：</p>
-</blockquote>
-<ul>
-<li>首先第一次采样，获取所有线程的CPU时间(调用的是<code>java.lang.management.ThreadMXBean#getThreadCpuTime()</code>及<code>sun.management.HotspotThreadMBean.getInternalThreadCpuTimes()</code>接口)</li>
-<li>然后睡眠等待一个间隔时间（默认为200ms，可以通过<code>-i</code>指定间隔时间）</li>
-<li>再次第二次采样，获取所有线程的CPU时间，对比两次采样数据，计算出每个线程的增量CPU时间</li>
-<li>线程CPU使用率 = 线程增量CPU时间 / 采样间隔时间 * 100%</li>
-</ul>
-<blockquote>
-<p>注意： 这个统计也会产生一定的开销（JDK这个接口本身开销比较大），因此会看到as的线程占用一定的百分比，为了降低统计自身的开销带来的影响，可以把采样间隔拉长一些，比如5000毫秒。</p>
-<p>另外一种查看Java进程的线程cpu使用率方法：可以使用<a href="https://github.com/oldratlee/useful-scripts/blob/master/docs/java.md#-show-busy-java-threads">show-busy-java-threads</a>这个脚本</p>
-<h2><span id="thread用法">Thread用法</span></h2></blockquote>
-<h4><span id="支持一键展示当前最忙的前n个线程并打印堆栈">支持一键展示当前最忙的前N个线程并打印堆栈：</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> thread -n 3</span></span><br><span class="line">&quot;C1 CompilerThread0&quot; [Internal] cpuUsage=1.63% deltaTime=3ms time=1170ms</span><br><span class="line">&quot;arthas-command-execute&quot; Id=23 cpuUsage=0.11% deltaTime=0ms time=401ms RUNNABLE</span><br><span class="line">    at java.management@11.0.7/sun.management.ThreadImpl.dumpThreads0(Native Method)</span><br><span class="line">    at java.management@11.0.7/sun.management.ThreadImpl.getThreadInfo(ThreadImpl.java:466)</span><br><span class="line">    at com.taobao.arthas.core.command.monitor200.ThreadCommand.processTopBusyThreads(ThreadCommand.java:199)</span><br><span class="line">    at com.taobao.arthas.core.command.monitor200.ThreadCommand.process(ThreadCommand.java:122)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl.process(AnnotatedCommandImpl.java:82)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl.access$100(AnnotatedCommandImpl.java:18)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl$ProcessHandler.handle(AnnotatedCommandImpl.java:111)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl$ProcessHandler.handle(AnnotatedCommandImpl.java:108)</span><br><span class="line">    at com.taobao.arthas.core.shell.system.impl.ProcessImpl$CommandProcessTask.run(ProcessImpl.java:385)</span><br><span class="line">    at java.base@11.0.7/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)</span><br><span class="line">    at java.base@11.0.7/java.util.concurrent.FutureTask.run(FutureTask.java:264)</span><br><span class="line">    at java.base@11.0.7/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)</span><br><span class="line">    at java.base@11.0.7/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)</span><br><span class="line">    at java.base@11.0.7/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)</span><br><span class="line">    at java.base@11.0.7/java.lang.Thread.run(Thread.java:834)</span><br><span class="line">&quot;VM Periodic Task Thread&quot; [Internal] cpuUsage=0.07% deltaTime=0ms time=584ms</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>没有线程ID，包含<code>[Internal]</code>表示为JVM内部线程，参考<code>dashboard</code>命令的介绍。</li>
-<li><code>cpuUsage</code>为采样间隔时间内线程的CPU使用率，与<code>dashboard</code>命令的数据一致。</li>
-<li><code>deltaTime</code>为采样间隔时间内线程的增量CPU时间，小于1ms时被取整显示为0ms。</li>
-<li><code>time</code> 线程运行总CPU时间。</li>
-</ul>
-<p>注意：线程栈为第二采样结束时获取，不能表明采样间隔时间内该线程都是在处理相同的任务。建议间隔时间不要太长，可能间隔时间越大越不准确。 可以根据具体情况尝试指定不同的间隔时间，观察输出结果。</p>
-<h4><span id="当没有参数时显示第一页线程信息">当没有参数时，显示第一页线程信息</span></h4><p>默认按照CPU增量时间降序排列，只显示第一页数据，避免滚屏。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> thread</span></span><br><span class="line">Threads Total: 33, NEW: 0, RUNNABLE: 9, BLOCKED: 0, WAITING: 3, TIMED_WAITING: 4, TERMINATED: 0, Internal threads: 17</span><br><span class="line">ID   NAME                           GROUP          PRIORITY  STATE     %CPU      DELTA_TIME TIME      INTERRUPT DAEMON</span><br><span class="line">-1   C2 CompilerThread0             -              -1        -         5.06      0.010      0:0.973   false     true</span><br><span class="line">-1   C1 CompilerThread0             -              -1        -         0.95      0.001      0:0.603   false     true</span><br><span class="line">23   arthas-command-execute         system         5         RUNNABLE  0.17      0.000      0:0.226   false     true</span><br><span class="line">-1   VM Periodic Task Thread        -              -1        -         0.05      0.000      0:0.094   false     true</span><br><span class="line">-1   Sweeper thread                 -              -1        -         0.04      0.000      0:0.011   false     true</span><br><span class="line">-1   G1 Young RemSet Sampling       -              -1        -         0.02      0.000      0:0.025   false     true</span><br><span class="line">12   Attach Listener                system         9         RUNNABLE  0.0       0.000      0:0.022   false     true</span><br><span class="line">11   Common-Cleaner                 InnocuousThrea 8         TIMED_WAI 0.0       0.000      0:0.000   false     true</span><br><span class="line">3    Finalizer                      system         8         WAITING   0.0       0.000      0:0.000   false     true</span><br><span class="line">2    Reference Handler              system         10        RUNNABLE  0.0       0.000      0:0.000   false     true</span><br><span class="line">4    Signal Dispatcher              system         9         RUNNABLE  0.0       0.000      0:0.000   false     true</span><br><span class="line">15   arthas-NettyHttpTelnetBootstra system         5         RUNNABLE  0.0       0.000      0:0.029   false     true</span><br><span class="line">22   arthas-NettyHttpTelnetBootstra system         5         RUNNABLE  0.0       0.000      0:0.196   false     true</span><br><span class="line">24   arthas-NettyHttpTelnetBootstra system         5         RUNNABLE  0.0       0.000      0:0.038   false     true</span><br><span class="line">16   arthas-NettyWebsocketTtyBootst system         5         RUNNABLE  0.0       0.000      0:0.001   false     true</span><br><span class="line">17   arthas-NettyWebsocketTtyBootst system         5         RUNNABLE  0.0       0.000      0:0.001   false     true</span><br></pre></td></tr></table></figure>
-
-<h4><span id="thread-all-显示所有匹配的线程">thread –all, 显示所有匹配的线程</span></h4><p>显示所有匹配线程信息，有时需要获取全部JVM的线程数据进行分析。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread --all</span><br></pre></td></tr></table></figure>
-
-<h4><span id="thread-id-显示指定线程的运行堆栈">thread id， 显示指定线程的运行堆栈</span></h4><p>查看线程ID 16的栈：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread 16</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> thread 1</span></span><br><span class="line">&quot;main&quot; Id=1 WAITING on java.util.concurrent.CountDownLatch$Sync@29fafb28</span><br><span class="line">    at sun.misc.Unsafe.park(Native Method)</span><br><span class="line">    -  waiting on java.util.concurrent.CountDownLatch$Sync@29fafb28</span><br><span class="line">    at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)</span><br><span class="line">    at java.util.concurrent.locks.AbstractQueuedSynchronizer.parkAndCheckInterrupt(AbstractQueuedSynchronizer.java:836)</span><br><span class="line">    at java.util.concurrent.locks.AbstractQueuedSynchronizer.doAcquireSharedInterruptibly(AbstractQueuedSynchronizer.java:997)</span><br><span class="line">    at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1304)</span><br><span class="line">    at java.util.concurrent.CountDownLatch.await(CountDownLatch.java:231)</span><br></pre></td></tr></table></figure>
-
-<h4><span id="thread-b-找出当前阻塞其他线程的线程">thread -b, 找出当前阻塞其他线程的线程</span></h4><p>有时候我们发现应用卡住了， 通常是由于某个线程拿住了某个锁， 并且其他线程都在等待这把锁造成的。 为了排查这类问题， arthas提供了<code>thread -b</code>， 一键找出那个罪魁祸首。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -b</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> thread -b</span></span><br><span class="line">&quot;http-bio-8080-exec-4&quot; Id=27 TIMED_WAITING</span><br><span class="line">    at java.lang.Thread.sleep(Native Method)</span><br><span class="line">    at test.arthas.TestThreadBlocking.doGet(TestThreadBlocking.java:22)</span><br><span class="line">    -  locked java.lang.Object@725be470 &lt;---- but blocks 4 other threads!</span><br><span class="line">    at javax.servlet.http.HttpServlet.service(HttpServlet.java:624)</span><br><span class="line">    at javax.servlet.http.HttpServlet.service(HttpServlet.java:731)</span><br><span class="line">    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)</span><br><span class="line">    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)</span><br><span class="line">    at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)</span><br><span class="line">    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)</span><br><span class="line">    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)</span><br><span class="line">    at test.filter.TestDurexFilter.doFilter(TestDurexFilter.java:46)</span><br><span class="line">    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)</span><br><span class="line">    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)</span><br><span class="line">    at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)</span><br><span class="line">    at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)</span><br><span class="line">    at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:505)</span><br><span class="line">    at com.taobao.tomcat.valves.ContextLoadFilterValve$FilterChainAdapter.doFilter(ContextLoadFilterValve.java:191)</span><br><span class="line">    at com.taobao.eagleeye.EagleEyeFilter.doFilter(EagleEyeFilter.java:81)</span><br><span class="line">    at com.taobao.tomcat.valves.ContextLoadFilterValve.invoke(ContextLoadFilterValve.java:150)</span><br><span class="line">    at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:170)</span><br><span class="line">    at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103)</span><br><span class="line">    at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)</span><br><span class="line">    at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:429)</span><br><span class="line">    at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1085)</span><br><span class="line">    at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:625)</span><br><span class="line">    at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:318)</span><br><span class="line">    -  locked org.apache.tomcat.util.net.SocketWrapper@7127ee12</span><br><span class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</span><br><span class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</span><br><span class="line">    at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)</span><br><span class="line">    at java.lang.Thread.run(Thread.java:745)</span><br><span class="line"></span><br><span class="line">    Number of locked synchronizers = 1</span><br><span class="line">    - java.util.concurrent.ThreadPoolExecutor$Worker@31a6493e</span><br></pre></td></tr></table></figure>
-
-<p><strong>注意</strong>， 目前只支持找出synchronized关键字阻塞住的线程， 如果是<code>java.util.concurrent.Lock</code>， 目前还不支持。</p>
-<h4><span id="thread-i-指定采样时间间隔">thread -i, 指定采样时间间隔</span></h4><ul>
-<li><code>thread -i 1000</code> : 统计最近1000ms内的线程CPU时间。</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -i 1000</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>thread -n 3 -i 1000</code> : 列出1000ms内最忙的3个线程栈</li>
-</ul>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread -n 3 -i 1000</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> thread -n 3 -i 1000</span></span><br><span class="line">&quot;as-command-execute-daemon&quot; Id=4759 cpuUsage=23% RUNNABLE</span><br><span class="line">    at sun.management.ThreadImpl.dumpThreads0(Native Method)</span><br><span class="line">    at sun.management.ThreadImpl.getThreadInfo(ThreadImpl.java:440)</span><br><span class="line">    at com.taobao.arthas.core.command.monitor200.ThreadCommand.processTopBusyThreads(ThreadCommand.java:133)</span><br><span class="line">    at com.taobao.arthas.core.command.monitor200.ThreadCommand.process(ThreadCommand.java:79)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl.process(AnnotatedCommandImpl.java:96)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl.access$100(AnnotatedCommandImpl.java:27)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl$ProcessHandler.handle(AnnotatedCommandImpl.java:125)</span><br><span class="line">    at com.taobao.arthas.core.shell.command.impl.AnnotatedCommandImpl$ProcessHandler.handle(AnnotatedCommandImpl.java:122)</span><br><span class="line">    at com.taobao.arthas.core.shell.system.impl.ProcessImpl$CommandProcessTask.run(ProcessImpl.java:332)</span><br><span class="line">    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)</span><br><span class="line">    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)</span><br><span class="line">    at java.lang.Thread.run(Thread.java:756)</span><br><span class="line"></span><br><span class="line">    Number of locked synchronizers = 1</span><br><span class="line">    - java.util.concurrent.ThreadPoolExecutor$Worker@546aeec1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h4><span id="thread-state-查看指定状态的线程">thread –state ，查看指定状态的线程</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread --state WAITING</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@28114]$</span><span class="bash"> thread --state WAITING</span></span><br><span class="line">Threads Total: 16, NEW: 0, RUNNABLE: 9, BLOCKED: 0, WAITING: 3, TIMED_WAITING: 4, TERMINATED: 0</span><br><span class="line">ID   NAME                           GROUP           PRIORITY   STATE     %CPU      DELTA_TIME TIME      INTERRUPTE DAEMON</span><br><span class="line">3    Finalizer                      system          8          WAITING   0.0       0.000      0:0.000   false      true</span><br><span class="line">20   arthas-UserStat                system          9          WAITING   0.0       0.000      0:0.001   false      true</span><br><span class="line">14   arthas-timer                   system          9          WAITING   0.0       0.000      0:0.000   false      true</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“thread”中，我们演示了了Arthas的thread命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/page/2/">上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/">下一页</a>
@@ -2528,6 +2612,10 @@
             
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
             
             <div class="clearfix"></div>

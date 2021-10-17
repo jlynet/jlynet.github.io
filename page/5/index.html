@@ -230,6 +230,563 @@
             
 
   
+    <article id="post-Java诊断工具Arthas最佳实践/ArthasHttpAPI案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/">Arthas Http API案例</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/" class="archive-article-date">
+        <time datetime="2021-08-07T00:35:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#http-api">Http API</a><ul>
+<li><a href="#%E6%AD%A4%E6%95%99%E7%A8%8B%E6%9A%82%E6%97%B6%E6%97%A0%E6%B3%95%E5%9C%A8handson%E7%8E%AF%E5%A2%83%E4%B8%8B%E8%BF%90%E8%A1%8C%E5%90%8C%E5%AD%A6%E4%BB%AC%E5%8F%AF%E4%BB%A5%E5%9C%A8%E6%9C%AC%E5%9C%B0%E5%B0%9D%E8%AF%95">此教程暂时无法在Handson环境下运行,同学们可以在本地尝试</a><ul>
+<li><a href="#%E6%A6%82%E8%A7%88">概览</a><ul>
+<li><a href="#%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80">访问地址</a></li>
+<li><a href="#%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F">请求数据格式</a></li>
+<li><a href="#%E8%AF%B7%E6%B1%82action">请求Action</a></li>
+<li><a href="#%E5%93%8D%E5%BA%94%E7%8A%B6%E6%80%81">响应状态</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E4%B8%80%E6%AC%A1%E6%80%A7%E5%91%BD%E4%BB%A4">一次性命令</a></li>
+<li><a href="#%E4%BC%9A%E8%AF%9D%E4%BA%A4%E4%BA%92">会话交互</a><pre><code>* [创建会话](#创建会话)
+* [加入会话](#加入会话)
+* [拉取命令结果](#拉取命令结果)
+* [异步执行命令](#异步执行命令)
+* [中断命令执行](#中断命令执行)
+* [关闭会话](#关闭会话)
+</code></pre>
+</li>
+<li><a href="#web-ui">Web UI</a></li>
+<li><a href="#watch%E5%91%BD%E4%BB%A4%E8%BE%93%E5%87%BAmap%E5%AF%B9%E8%B1%A1">watch命令输出map对象</a></li>
+</ul>
+<ul>
+<li><a href="#foo-foo-value-bar-bar-value">{ “foo” : “foo value”, “bar” : “bar value” }</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示http-api案例。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="http-api">Http API</span></h2><h3><span id="此教程暂时无法在handson环境下运行同学们可以在本地尝试">此教程暂时无法在Handson环境下运行,同学们可以在本地尝试</span></h3><h4><span id="概览">概览</span></h4><p>Http API 提供类似RESTful的交互接口，请求和响应均为JSON格式的数据。相对于Telnet/WebConsole的输出非结构化文本数据，Http API可以提供结构化的数据，支持更复杂的交互功能，比如特定应用场景的一系列诊断操作。</p>
+<h5><span id="访问地址">访问地址</span></h5><p>Http API接口地址为：<code>http://ip:port/api</code>，必须使用POST方式提交请求参数。如POST <code>http://127.0.0.1:8563/api</code> 。</p>
+<p>注意：telnet服务的3658端口与Chrome浏览器有兼容性问题，建议使用http端口8563来访问http接口。</p>
+<h5><span id="请求数据格式">请求数据格式</span></h5><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;action&quot;</span>: <span class="string">&quot;exec&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;requestId&quot;</span>: <span class="string">&quot;req112&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;sessionId&quot;</span>: <span class="string">&quot;94766d3c-8b39-42d3-8596-98aee3ccbefb&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;consumerId&quot;</span>: <span class="string">&quot;955dbd1325334a84972b0f3ac19de4f7_2&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;version&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;execTimeout&quot;</span>: <span class="string">&quot;10000&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>请求数据格式说明：</p>
+<ul>
+<li><code>action</code> : 请求的动作/行为，可选值请参考”请求Action”小节。</li>
+<li><code>requestId</code> : 可选请求ID，由客户端生成。</li>
+<li><code>sessionId</code> : Arthas会话ID，一次性命令不需要设置会话ID。</li>
+<li><code>consumerId</code> : Arthas消费者ID，用于多人共享会话。</li>
+<li><code>command</code> : Arthas command line 。</li>
+<li><code>execTimeout</code> : 命令同步执行的超时时间(ms)，默认为30000。</li>
+</ul>
+<p>注意: 不同的action使用到参数不同，根据具体的action来设置参数。</p>
+<h5><span id="请求action">请求Action</span></h5><p>目前支持的请求Action如下：</p>
+<ul>
+<li><code>exec</code> : 同步执行命令，命令正常结束或者超时后中断命令执行后返回命令的执行结果。</li>
+<li><code>async_exec</code> : 异步执行命令，立即返回命令的调度结果，命令执行结果通过<code>pull_results</code>获取。</li>
+<li><code>interrupt_job</code> : 中断会话当前的命令，类似Telnet <code>Ctrl + c</code>的功能。</li>
+<li><code>pull_results</code> : 获取异步执行的命令的结果，以http 长轮询（long-polling）方式重复执行</li>
+<li><code>init_session</code> : 创建会话</li>
+<li><code>join_session</code> : 加入会话，用于支持多人共享同一个Arthas会话</li>
+<li><code>close_session</code> : 关闭会话</li>
+</ul>
+<h5><span id="响应状态">响应状态</span></h5><p>响应中的state属性表示请求处理状态，取值如下：</p>
+<ul>
+<li><code>SCHEDULED</code>：异步执行命令时表示已经创建job并已提交到命令执行队列，命令可能还没开始执行或者执行中；</li>
+<li><code>SUCCEEDED</code>：请求处理成功（完成状态）；</li>
+<li><code>FAILED</code>：请求处理失败（完成状态），通常附带message说明原因；</li>
+<li><code>REFUSED</code>：请求被拒绝（完成状态），通常附带message说明原因；</li>
+</ul>
+<h2><span id="一次性命令">一次性命令</span></h2><p>与执行批处理命令类似，一次性命令以同步方式执行。不需要创建会话，不需要设置<code>sessionId</code>选项。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;action&quot;</span>: <span class="string">&quot;exec&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;command&quot;</span>: <span class="string">&quot;&lt;Arthas command line&gt;&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>比如获取Arthas版本号：</p>
+<p><code>curl -Ss -XPOST http://localhost:8563/api -d &#39;;&#123; &quot;action&quot;:&quot;exec&quot;, &quot;command&quot;:&quot;version&quot; &#125;</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27; | json_pp</span></span><br></pre></td></tr></table></figure>
+
+
+<p>响应内容如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;sessionId&quot;</span> : <span class="string">&quot;ee3bc004-4586-43de-bac0-b69d6db7a869&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;body&quot;</span> : &#123;</span><br><span class="line">      <span class="attr">&quot;results&quot;</span> : [</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;version&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;version&quot;</span> : <span class="string">&quot;3.3.7&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">5</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">5</span>,</span><br><span class="line">            <span class="attr">&quot;statusCode&quot;</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;status&quot;</span></span><br><span class="line">         &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;timeExpired&quot;</span> : <span class="literal">false</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span> : <span class="string">&quot;version&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;jobStatus&quot;</span> : <span class="string">&quot;TERMINATED&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;jobId&quot;</span> : <span class="number">5</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>响应数据解析：</p>
+<ul>
+<li><code>state</code>: 请求处理状态，参考“接口响应状态”说明</li>
+<li><code>sessionId</code>: Arthas会话ID，一次性命令自动创建及销毁临时会话</li>
+<li><code>body.jobId</code>: 命令的任务ID，同一任务输出的所有Result都是相同的jobId</li>
+<li><code>body.jobStatus</code>: 任务状态，同步执行正常结束为<code>TERMINATED</code></li>
+<li><code>body.timeExpired</code>: 任务执行是否超时</li>
+<li><code>body/results</code>: 命令执行的结果列表</li>
+</ul>
+<p><strong>命令结果格式说明</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[&#123;</span><br><span class="line">   <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;version&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;version&quot;</span> : <span class="string">&quot;3.3.7&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;jobId&quot;</span> : <span class="number">5</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;jobId&quot;</span> : <span class="number">5</span>,</span><br><span class="line">   <span class="attr">&quot;statusCode&quot;</span> : <span class="number">0</span>,</span><br><span class="line">   <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;status&quot;</span></span><br><span class="line">&#125;]</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li><code>type</code> : 命令结果类型，除了<code>status</code>等特殊的几个外，其它的保持与Arthas命令名称一致。请参考”特殊命令结果”小节。</li>
+<li><code>jobId</code> : 处理命令的任务ID。</li>
+<li>其它字段为每个不同命令的数据。</li>
+</ul>
+<p>注意：也可以使用一次性命令的方式执行watch/trace等连续输出的命令，但不能中断命令执行，可能出现长时间没有结束的问题。请参考”watch命令输出map对象”小节的示例。</p>
+<p>请尽量按照以下方式处理：</p>
+<ul>
+<li>设置合理的<code>execTimeout</code>，到达超时时间后强制中断命令执行，避免长时间挂起。</li>
+<li>通过<code>-n</code>参数指定较少的执行次数。</li>
+<li>保证命令匹配的方法可以成功命中和condition-express编写正确，如果watch/trace没有命中就算指定<code>-n 1</code>也会挂起等待到执行超时。</li>
+</ul>
+<h2><span id="会话交互">会话交互</span></h2><p>由用户创建及管理Arthas会话，适用于复杂的交互过程。访问流程如下：</p>
+<ul>
+<li>创建会话</li>
+<li>加入会话(可选）</li>
+<li>拉取命令结果</li>
+<li>执行一系列命令</li>
+<li>中断命令执行</li>
+<li>关闭会话</li>
+</ul>
+<h5><span id="创建会话">创建会话</span></h5><p>创建会话, 保存输出到bash环境变量</p>
+<p><code>session*data=$(curl -Ss -XPOST http://localhost:8563/api -d &#39;;&#123; &quot;action&quot;:&quot;init*session&quot; &#125; &#39;)</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$session_data</span> | json_pp</span><br></pre></td></tr></table></figure>
+
+
+<p>注： <code>json_pp</code> 工具将输出内容格式化为pretty json。</p>
+<p>响应结果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;sessionId&quot;</span> : <span class="string">&quot;b09f1353-202c-407b-af24-701b744f971e&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;consumerId&quot;</span> : <span class="string">&quot;5ae4e5fbab8b4e529ac404f260d4e2d1_1&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>提取会话ID和消费者ID。</p>
+<p>当前会话ID为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">session_id=$(<span class="built_in">echo</span> <span class="variable">$session_data</span> | sed <span class="string">&#x27;s/.*&quot;sessionId&quot;:&quot;\([^&quot;]*\)&quot;.*/\1/g&#x27;</span>);<span class="built_in">echo</span> <span class="variable">$session_id</span></span><br></pre></td></tr></table></figure>
+
+
+<p><code>b09f1353-202c-407b-af24-701b744f971e</code>;</p>
+<p>请记下这里的会话ID，在Terminal 4中需要手动输入。</p>
+<p>当前消费者ID为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">consumer_id=$(<span class="built_in">echo</span> <span class="variable">$session_data</span> | sed <span class="string">&#x27;s/.*&quot;consumerId&quot;:&quot;\([^&quot;]*\)&quot;.*/\1/g&#x27;</span>);<span class="built_in">echo</span> <span class="variable">$consumer_id</span></span><br></pre></td></tr></table></figure>
+
+<p><code>5ae4e5fbab8b4e529ac404f260d4e2d1_1</code>。</p>
+<h5><span id="加入会话">加入会话</span></h5><p>指定要加入的会话ID，服务端将分配一个新的消费者ID。多个消费者可以接收到同一个会话的命令结果。本接口用于支持多人共享同一个会话或刷新页面后重新拉取会话历史记录。</p>
+<p>加入会话，保存输出到bash环境变量</p>
+<p><code>session*data=$(curl -Ss -XPOST http://localhost:8563/api -d &#39;;&#123; &quot;action&quot;:&quot;join*session&quot;, &quot;sessionId&quot; : &quot;&#39;&quot;$session_id&quot;&#39;&quot; &#125; &#39;)</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$session_data</span> | json_pp</span><br></pre></td></tr></table></figure>
+
+
+<p>响应结果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;consumerId&quot;</span> : <span class="string">&quot;8f7f6ad7bc2d4cb5aa57a530927a95cc_2&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;sessionId&quot;</span> : <span class="string">&quot;b09f1353-202c-407b-af24-701b744f971e&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>提取消费者ID。</p>
+<p>新的消费者ID为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">consumer_id=$(<span class="built_in">echo</span> <span class="variable">$session_data</span> | sed <span class="string">&#x27;s/.*&quot;consumerId&quot;:&quot;\([^&quot;]*\)&quot;.*/\1/g&#x27;</span>);<span class="built_in">echo</span> <span class="variable">$consumer_id</span></span><br></pre></td></tr></table></figure>
+
+<p><code>8f7f6ad7bc2d4cb5aa57a530927a95cc_2</code> 。</p>
+<p>请记下这里的消费者ID，在Terminal 4中需要手动输入。</p>
+<h5><span id="拉取命令结果">拉取命令结果</span></h5><p>拉取命令结果消息的action为<code>pull_results</code>。请使用Http long-polling方式，定时循环拉取结果消息。 消费者的超时时间为5分钟，超时后需要调用<code>join_session</code>分配新的消费者。每个消费者单独分配一个缓存队列，按顺序拉取命令结果，不会影响到其它消费者。</p>
+<p>请求参数需要指定会话ID及消费者ID:</p>
+<p><code>curl -Ss -XPOST http://localhost:8563/api -d &#39;;&#123; &quot;action&quot;:&quot;pull*results&quot;, &quot;sessionId&quot; : &quot;&#39;&quot;$session*id&quot;&#39;&quot;, &quot;consumerId&quot; : &quot;&#39;&quot;$consumer_id&quot;&#39;&quot; &#125;</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27; | json_pp</span></span><br></pre></td></tr></table></figure>
+
+<p>用Bash脚本定时拉取结果消息:</p>
+<p>请在Terminal 4中输入Terminal 3中的会话ID，这里的例子如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">b09f1353-202c-407b-af24-701b744f971e</span><br><span class="line">echo -n &quot;Enter your sessionId in T3:&quot;;read  session_id</span><br></pre></td></tr></table></figure>
+
+
+<p>同样，接着输入Terminal 3中的消费者ID，这里的例子如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">8f7f6ad7bc2d4cb5aa57a530927a95cc_2</span><br><span class="line">echo -n &quot;Enter your consumerId in T3:&quot;;read  consumer_id</span><br></pre></td></tr></table></figure>
+
+<p><code>while true; do curl -Ss -XPOST http://localhost:8563/api -d &#39;;&#123; &quot;action&quot;:&quot;pull*results&quot;, &quot;sessionId&quot; : &quot;&#39;&quot;$session*id&quot;&#39;&quot;, &quot;consumerId&quot; : &quot;&#39;&quot;$consumer_id&quot;&#39;&quot; &#125;</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27; | json_pp; sleep 2; done</span></span><br></pre></td></tr></table></figure>
+
+<p>响应内容如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;body&quot;</span> : &#123;</span><br><span class="line">      <span class="attr">&quot;results&quot;</span> : [</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;inputStatus&quot;</span> : <span class="string">&quot;DISABLED&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;input_status&quot;</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;message&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">&quot;message&quot;</span> : <span class="string">&quot;Welcome to arthas!&quot;</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;tutorials&quot;</span> : <span class="string">&quot;https://arthas.aliyun.com/doc/arthas-tutorials.html&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;time&quot;</span> : <span class="string">&quot;2020-08-06 15:56:43&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;welcome&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">&quot;pid&quot;</span> : <span class="string">&quot;7909&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;wiki&quot;</span> : <span class="string">&quot;https://arthas.aliyun.com/doc&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;version&quot;</span> : <span class="string">&quot;3.3.7&quot;</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;inputStatus&quot;</span> : <span class="string">&quot;ALLOW_INPUT&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;input_status&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">0</span></span><br><span class="line">         &#125;</span><br><span class="line">      ]</span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="attr">&quot;sessionId&quot;</span> : <span class="string">&quot;b09f1353-202c-407b-af24-701b744f971e&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;consumerId&quot;</span> : <span class="string">&quot;8f7f6ad7bc2d4cb5aa57a530927a95cc_2&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5><span id="异步执行命令">异步执行命令</span></h5><p><code>curl -Ss -XPOST http://localhost:8563/api -d &#39;&#39;&#39;;&#123; &quot;action&quot;:&quot;async*exec&quot;, &quot;command&quot;:&quot;watch demo.MathGame primeFactors \&quot;&#123;params, returnObj, throwExp&#125;\&quot; &quot;, &quot;sessionId&quot; : &quot;&#39;&quot;$session*id&quot;&#39;&quot; &#125;</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span><span class="string">&#x27; | json_pp</span></span><br></pre></td></tr></table></figure>
+
+
+<p><code>async_exec</code> 的结果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;sessionId&quot;</span> : <span class="string">&quot;2b085b5d-883b-4914-ab35-b2c5c1d5aa2a&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SCHEDULED&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;body&quot;</span> : &#123;</span><br><span class="line">      <span class="attr">&quot;jobStatus&quot;</span> : <span class="string">&quot;READY&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;jobId&quot;</span> : <span class="number">3</span>,</span><br><span class="line">      <span class="attr">&quot;command&quot;</span> : <span class="string">&quot;watch demo.MathGame primeFactors \&quot;&#123;params, returnObj, throwExp&#125;\&quot; &quot;</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li><code>state</code> : <code>SCHEDULED</code> 状态表示已经解析命令生成任务，但未开始执行。</li>
+<li><code>body.jobId</code> : 异步执行命令的任务ID，可以根据此任务ID来过滤在<code>pull_results</code>输出的命令结果。</li>
+<li><code>body.jobStatus</code> : 任务状态<code>READY</code>表示未开始执行。 切换到上面自动拉取结果消息脚本的shell（Terminal 4），查看输出：</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;body&quot;</span> : &#123;</span><br><span class="line">      <span class="attr">&quot;results&quot;</span> : [</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;command&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">3</span>,</span><br><span class="line">            <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SCHEDULED&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;command&quot;</span> : <span class="string">&quot;watch demo.MathGame primeFactors \&quot;&#123;params, returnObj, throwExp&#125;\&quot; &quot;</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;inputStatus&quot;</span> : <span class="string">&quot;ALLOW_INTERRUPT&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">0</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;input_status&quot;</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;success&quot;</span> : <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">3</span>,</span><br><span class="line">            <span class="attr">&quot;effect&quot;</span> : &#123;</span><br><span class="line">               <span class="attr">&quot;listenerId&quot;</span> : <span class="number">3</span>,</span><br><span class="line">               <span class="attr">&quot;cost&quot;</span> : <span class="number">24</span>,</span><br><span class="line">               <span class="attr">&quot;classCount&quot;</span> : <span class="number">1</span>,</span><br><span class="line">               <span class="attr">&quot;methodCount&quot;</span> : <span class="number">1</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;enhancer&quot;</span></span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;sizeLimit&quot;</span> : <span class="number">10485760</span>,</span><br><span class="line">            <span class="attr">&quot;expand&quot;</span> : <span class="number">1</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">3</span>,</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;watch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;cost&quot;</span> : <span class="number">0.071499</span>,</span><br><span class="line">            <span class="attr">&quot;ts&quot;</span> : <span class="number">1596703453237</span>,</span><br><span class="line">            <span class="attr">&quot;value&quot;</span> : [</span><br><span class="line">               [</span><br><span class="line">                  <span class="number">-170365</span></span><br><span class="line">               ],</span><br><span class="line">               <span class="literal">null</span>,</span><br><span class="line">               &#123;</span><br><span class="line">                  <span class="attr">&quot;stackTrace&quot;</span> : [</span><br><span class="line">                     &#123;</span><br><span class="line">                        <span class="attr">&quot;className&quot;</span> : <span class="string">&quot;demo.MathGame&quot;</span>,</span><br><span class="line">                        <span class="attr">&quot;classLoaderName&quot;</span> : <span class="string">&quot;app&quot;</span>,</span><br><span class="line">                        <span class="attr">&quot;methodName&quot;</span> : <span class="string">&quot;primeFactors&quot;</span>,</span><br><span class="line">                        <span class="attr">&quot;nativeMethod&quot;</span> : <span class="literal">false</span>,</span><br><span class="line">                        <span class="attr">&quot;lineNumber&quot;</span> : <span class="number">46</span>,</span><br><span class="line">                        <span class="attr">&quot;fileName&quot;</span> : <span class="string">&quot;MathGame.java&quot;</span></span><br><span class="line">                     &#125;,</span><br><span class="line">                     ...</span><br><span class="line">                  ],</span><br><span class="line">                  <span class="attr">&quot;localizedMessage&quot;</span> : <span class="string">&quot;number is: -170365, need &gt;= 2&quot;</span>,</span><br><span class="line">                  <span class="attr">&quot;@type&quot;</span> : <span class="string">&quot;java.lang.IllegalArgumentException&quot;</span>,</span><br><span class="line">                  <span class="attr">&quot;message&quot;</span> : <span class="string">&quot;number is: -170365, need &gt;= 2&quot;</span></span><br><span class="line">               &#125;</span><br><span class="line">            ]</span><br><span class="line">         &#125;,</span><br><span class="line">         &#123;</span><br><span class="line">            <span class="attr">&quot;type&quot;</span> : <span class="string">&quot;watch&quot;</span>,</span><br><span class="line">            <span class="attr">&quot;cost&quot;</span> : <span class="number">0.033375</span>,</span><br><span class="line">            <span class="attr">&quot;jobId&quot;</span> : <span class="number">3</span>,</span><br><span class="line">            <span class="attr">&quot;ts&quot;</span> : <span class="number">1596703454241</span>,</span><br><span class="line">            <span class="attr">&quot;value&quot;</span> : [</span><br><span class="line">               [</span><br><span class="line">                  <span class="number">1</span></span><br><span class="line">               ],</span><br><span class="line">               [</span><br><span class="line">                  <span class="number">2</span>,</span><br><span class="line">                  <span class="number">2</span>,</span><br><span class="line">                  <span class="number">2</span>,</span><br><span class="line">                  <span class="number">2</span>,</span><br><span class="line">                  <span class="number">13</span>,</span><br><span class="line">                  <span class="number">491</span></span><br><span class="line">               ],</span><br><span class="line">               <span class="literal">null</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;sizeLimit&quot;</span> : <span class="number">10485760</span>,</span><br><span class="line">            <span class="attr">&quot;expand&quot;</span> : <span class="number">1</span></span><br><span class="line">         &#125;</span><br><span class="line">      ]</span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="attr">&quot;consumerId&quot;</span> : <span class="string">&quot;8ecb9cb7c7804d5d92e258b23d5245cc_1&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;sessionId&quot;</span> : <span class="string">&quot;2b085b5d-883b-4914-ab35-b2c5c1d5aa2a&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>watch命令结果的<code>value</code>为watch-experss的值，上面命令中为<code>&#123;params, returnObj, throwExp&#125;</code>，所以watch结果的value为一个长度为3的数组，每个元素分别对应相应顺序的表达式。 请参考”watch命令输出map对象”小节。</p>
+<h5><span id="中断命令执行">中断命令执行</span></h5><p>中断会话正在运行的前台Job（前台任务）：</p>
+<p><code>curl -Ss -XPOST http://localhost:8563/api -d &#39;&#39;&#39;;&#123; &quot;action&quot;:&quot;interrupt*job&quot;, &quot;sessionId&quot; : &quot;&#39;&quot;$session*id&quot;&#39;&quot; &#125;</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span><span class="string">&#x27; | json_pp</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span>,</span><br><span class="line">   <span class="attr">&quot;body&quot;</span> : &#123;</span><br><span class="line">      <span class="attr">&quot;jobStatus&quot;</span> : <span class="string">&quot;TERMINATED&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;jobId&quot;</span> : <span class="number">3</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h5><span id="关闭会话">关闭会话</span></h5><p>指定会话ID，关闭会话。</p>
+<p><code>curl -Ss -XPOST http://localhost:8563/api -d &#39;&#39;&#39;;&#123; &quot;action&quot;:&quot;close*session&quot;, &quot;sessionId&quot; : &quot;&#39;&quot;$session*id&quot;&#39;&quot; &#125;</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span><span class="string">&#x27; | json_pp</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   <span class="attr">&quot;state&quot;</span> : <span class="string">&quot;SUCCEEDED&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2><span id="web-ui">Web UI</span></h2><p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/arthas-web-ui.png" alt="arthas web ui"></p>
+<p>一个基于Http API接口实现的Web UI，访问地址为： 。</p>
+<p>已实现功能：</p>
+<ul>
+<li>创建会话</li>
+<li>复制并打开url加入会话，多人共享会话</li>
+<li>周期性拉取会话命令结果消息</li>
+<li>刷新页面或者加入会话拉取会话历史命令消息</li>
+<li>输入命令/中断命令状态控制</li>
+</ul>
+<p>待开发功能：</p>
+<ul>
+<li>改进将命令结果消息可读性</li>
+<li>命令输入支持自动完成及命令模板</li>
+<li>提供命令帮助</li>
+<li>支持个人选项设置</li>
+</ul>
+<h2><span id="watch命令输出map对象">watch命令输出map对象</span></h2><p>watch的结果值由计算<code>watch-express</code> ognl表达式产生，可以通过改变ognl表达式来生成想要的值，请参考<a href="https://commons.apache.org/proper/commons-ognl/language-guide.html">OGNL文档</a>。</p>
+<blockquote>
+<p>Maps can also be created using a special syntax.</p>
+<h1><span id="foo-foo-value-bar-bar-value">{ “foo” : “foo value”, “bar” : “bar value” }</span></h1></blockquote>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-Java诊断工具Arthas最佳实践/Arthas排查HTTP请求返回404案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/">Arthas 排查HTTP请求返回404 案例</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/" class="archive-article-date">
+        <time datetime="2021-08-07T00:35:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#start-demo">Start demo</a></li>
+<li><a href="#start-arthas-boot">Start arthas-boot</a></li>
+<li><a href="#%E6%8E%92%E6%9F%A5http%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404">排查HTTP请求返回404</a><ul>
+<li><a href="#%E8%B7%9F%E8%B8%AA%E6%89%80%E6%9C%89%E7%9A%84servlet%E5%87%BD%E6%95%B0">跟踪所有的Servlet函数</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个普通的Spring Boot应用为例，演示排查HTTP请求返回404。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="start-demo">Start demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p>启动之后，可以访问61000端口： 点击查看</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
+<h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="排查http请求返回404">排查HTTP请求返回404</span></h2><p>在这个案例里，展示排查HTTP 404问题的技巧。</p>
+<p>访问： a.txt</p>
+<p>结果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Something went wrong: 404 Not Found</span><br></pre></td></tr></table></figure>
+
+
+<p>那么到底是哪个Servlet处理了这个请求，返回了404？</p>
+<h4><span id="跟踪所有的servlet函数">跟踪所有的Servlet函数</span></h4><p>开始trace：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace javax.servlet.Servlet * &gt; /tmp/servlet.txt</span><br></pre></td></tr></table></figure>
+
+
+<p>访问： a.txt</p>
+<p>在<code>Terminal 3</code>里，查看<code>/tmp/servlet.txt</code>的内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">less /tmp/servlet.txt</span><br></pre></td></tr></table></figure>
+
+
+<p><code>/tmp/servlet.txt</code>里的内容会比较多，需要耐心找到调用树里最长的地方。</p>
+<p>可以发现请求最终是被<code>freemarker</code>处理的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">`---[13.974188ms] org.springframework.web.servlet.ViewResolver:resolveViewName();    +---[0.045561ms] javax.servlet.GenericServlet:&lt;init&gt;()</span><br><span class="line">    +---[min=0.045545ms,max=0.074342ms,total=0.119887ms,count=2] org.springframework.web.servlet.view.freemarker.FreeMarkerView$GenericServletAdapter:&lt;init&gt;()</span><br><span class="line">    +---[0.170895ms] javax.servlet.GenericServlet:init()</span><br><span class="line">    |   `---[0.068578ms] javax.servlet.GenericServlet:init()</span><br><span class="line">    |       `---[0.021793ms] javax.servlet.GenericServlet:init()</span><br><span class="line">    `---[0.164035ms] javax.servlet.GenericServlet:getServletContext()</span><br></pre></td></tr></table></figure>
+
+
+<h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas排查HTTP请求返回404。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas最佳实践/Arthas排查HTTP请求返回401案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2345,224 +2902,6 @@
 }
 </style>
   
-    <article id="post-Arthas安装使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/">Arthas安装使用</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" class="archive-article-date">
-        <time datetime="2021-07-30T10:12:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-30</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <p>arthas-boot:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-boot.jar -h</span><br><span class="line">java -jar arthas-boot.jar #选择进程号</span><br><span class="line">java -jar arthas-boot.jar 18095 #指定进程号</span><br><span class="line">java -jar arthas-boot.jar $(ps -ef |grep $USER| grep &quot;PortalWebMain&quot;| grep 8001 | grep -v grep | awk &#x27;&#123;print $2&#125;&#x27;)</span><br></pre></td></tr></table></figure>
-
-<p>arthas-client:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -jar arthas-client.jar -h</span><br><span class="line">java -jar arthas-client.jar 127.0.0.1 3658</span><br><span class="line">java -jar arthas-client.jar -c &#x27;dashboard -n 1&#x27;</span><br><span class="line">java -jar arthas-client.jar -f batch.as 127.0.0.1</span><br></pre></td></tr></table></figure>
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-JsonFormatTool" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/07/28/JsonFormatTool/">JsonFormatTool 跨平台json 格式化工具</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/07/28/JsonFormatTool/" class="archive-article-date">
-        <time datetime="2021-07-28T12:30:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-28</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <blockquote>
-<p>基于Qt5 框架开发的 JsonFormatTool，一款跨平台的json格式化工具</p>
-</blockquote>
-<p>依托强大跨平台和高效的qt5框架，简洁明了的UI界面布局，使用便捷的文本按操作功能</p>
-<p><img src="/2021/07/28/JsonFormatTool/JsonFormatTool-01.png" alt="文本操作展示模板"></p>
-<p>支持搜索高亮的json树展示结构</p>
-<p><img src="/2021/07/28/JsonFormatTool/JsonFormatTool-02.png" alt="树状操作展示模板"></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/个人作品展示//" class="article-tag-list-link color2">个人作品展示</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/07/28/JsonFormatTool/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/page/4/">上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/">下一页</a>
@@ -2758,6 +3097,10 @@
             
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
             
             <div class="clearfix"></div>
