@@ -230,6 +230,320 @@
             
 
   
+    <article id="post-解决SpringBoot-2-3-MultipartFile为空的问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/10/21/%E8%A7%A3%E5%86%B3SpringBoot-2-3-MultipartFile%E4%B8%BA%E7%A9%BA%E7%9A%84%E9%97%AE%E9%A2%98/">解决SpringBoot 2.3 MultipartFile为空的问题</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/10/21/%E8%A7%A3%E5%86%B3SpringBoot-2-3-MultipartFile%E4%B8%BA%E7%A9%BA%E7%9A%84%E9%97%AE%E9%A2%98/" class="archive-article-date">
+        <time datetime="2021-10-21T09:22:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-21</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <p>原本用的2.0.x的版本上传文件是没有问题的，后来升级SpringBoot版本为2.3.3就无法上传文件了，我看到MultipartFile是为空的。</p>
+<h3><span id="解决办法">解决办法</span></h3><p>不使用<code>Multipart</code>自动配置，再排除原有的Multipart配置<code>@EnableAutoConfiguration(exclude = &#123;MultipartAutoConfiguration.class&#125;)</code>，然后显示声明<code>CommonsMultipartResolver</code>为<code>mutipartResolver</code>。</p>
+<ol>
+<li><p>排除<code>MultipartAutoConfiguration</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication(exclude = &#123;MultipartAutoConfiguration.class&#125;)</span></span><br></pre></td></tr></table></figure></li>
+<li><p>添加依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-io<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-io<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-fileupload<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-fileupload<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>显示声明<code>CommonsMultipartResolver</code>为<code>mutipartResolver</code>：</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UploadResolverConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 显示声明CommonsMultipartResolver为mutipartResolver</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean(name = &quot;multipartResolver&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> MultipartResolver <span class="title">multipartResolver</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        CommonsMultipartResolver resolver = <span class="keyword">new</span> CommonsMultipartResolver();</span><br><span class="line">        resolver.setDefaultEncoding(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">        <span class="comment">// resolveLazily属性启用是为了推迟文件解析，以在在UploadAction中捕获文件大小异常</span></span><br><span class="line">        resolver.setResolveLazily(<span class="keyword">true</span>);</span><br><span class="line">        <span class="comment">// 设置了文件放入临时文件夹的大小限制</span></span><br><span class="line">        resolver.setMaxInMemorySize(<span class="number">40960</span>);</span><br><span class="line">        <span class="comment">// 设置单个上传数据总大小25M</span></span><br><span class="line">        resolver.setMaxUploadSizePerFile(<span class="number">25</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line">        <span class="comment">// 设置总上传数据总大小50M</span></span><br><span class="line">        resolver.setMaxUploadSize(<span class="number">5</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line">        <span class="keyword">return</span> resolver;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="multipartautoconfiguration源码">MultipartAutoConfiguration源码</span></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> EnableAutoConfiguration Auto-configuration&#125; for multi-part uploads. Adds a</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> StandardServletMultipartResolver&#125; if none is present, and adds a</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> javax.servlet.MultipartConfigElement multipartConfigElement&#125; if none is</span></span><br><span class="line"><span class="comment"> * otherwise defined. The &#123;<span class="doctag">@link</span> ServletWebServerApplicationContext&#125; will associate the</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> MultipartConfigElement&#125; bean to any &#123;<span class="doctag">@link</span> Servlet&#125; beans.</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * The &#123;<span class="doctag">@link</span> javax.servlet.MultipartConfigElement&#125; is a Servlet API that&#x27;s used to</span></span><br><span class="line"><span class="comment"> * configure how the server handles file uploads.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Greg Turnquist</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Josh Long</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Toshiaki Maki</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2.0.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration(proxyBeanMethods = false)</span></span><br><span class="line"><span class="meta">@ConditionalOnClass(&#123; Servlet.class, StandardServletMultipartResolver.class, MultipartConfigElement.class &#125;)</span></span><br><span class="line"><span class="meta">@ConditionalOnProperty(prefix = &quot;spring.servlet.multipart&quot;, name = &quot;enabled&quot;, matchIfMissing = true)</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication(type = Type.SERVLET)</span></span><br><span class="line"><span class="meta">@EnableConfigurationProperties(MultipartProperties.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultipartAutoConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MultipartProperties multipartProperties;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MultipartAutoConfiguration</span><span class="params">(MultipartProperties multipartProperties)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.multipartProperties = multipartProperties;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean(&#123; MultipartConfigElement.class, CommonsMultipartResolver.class &#125;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> MultipartConfigElement <span class="title">multipartConfigElement</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.multipartProperties.createMultipartConfig();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME)</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean(MultipartResolver.class)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> StandardServletMultipartResolver <span class="title">multipartResolver</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        StandardServletMultipartResolver multipartResolver = <span class="keyword">new</span> StandardServletMultipartResolver();</span><br><span class="line">        multipartResolver.setResolveLazily(<span class="keyword">this</span>.multipartProperties.isResolveLazily());</span><br><span class="line">        <span class="keyword">return</span> multipartResolver;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="commonsmultipartresolver源码">CommonsMultipartResolver源码</span></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Servlet-based &#123;<span class="doctag">@link</span> MultipartResolver&#125; implementation for</span></span><br><span class="line"><span class="comment"> * &lt;a href=&quot;https://commons.apache.org/proper/commons-fileupload&quot;&gt;Apache Commons FileUpload&lt;/a&gt;</span></span><br><span class="line"><span class="comment"> * 1.2 or above.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Provides &quot;maxUploadSize&quot;, &quot;maxInMemorySize&quot; and &quot;defaultEncoding&quot; settings as</span></span><br><span class="line"><span class="comment"> * bean properties (inherited from &#123;<span class="doctag">@link</span> CommonsFileUploadSupport&#125;). See corresponding</span></span><br><span class="line"><span class="comment"> * ServletFileUpload / DiskFileItemFactory properties (&quot;sizeMax&quot;, &quot;sizeThreshold&quot;,</span></span><br><span class="line"><span class="comment"> * &quot;headerEncoding&quot;) for details in terms of defaults and accepted values.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;Saves temporary files to the servlet container&#x27;s temporary directory.</span></span><br><span class="line"><span class="comment"> * Needs to be initialized &lt;i&gt;either&lt;/i&gt; by an application context &lt;i&gt;or&lt;/i&gt;</span></span><br><span class="line"><span class="comment"> * via the constructor that takes a ServletContext (for standalone usage).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Trevor D. Cook</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Juergen Hoeller</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 29.09.2003</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #CommonsMultipartResolver(ServletContext)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #setResolveLazily</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> org.apache.commons.fileupload.servlet.ServletFileUpload</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> org.apache.commons.fileupload.disk.DiskFileItemFactory</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommonsMultipartResolver</span> <span class="keyword">extends</span> <span class="title">CommonsFileUploadSupport</span></span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">MultipartResolver</span>, <span class="title">ServletContextAware</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> resolveLazily = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Constructor for use as bean. Determines the servlet container&#x27;s</span></span><br><span class="line"><span class="comment">     * temporary directory via the ServletContext passed in as through the</span></span><br><span class="line"><span class="comment">     * ServletContextAware interface (typically by a WebApplicationContext).</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span> #setServletContext</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span> org.springframework.web.context.ServletContextAware</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span> org.springframework.web.context.WebApplicationContext</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CommonsMultipartResolver</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Constructor for standalone usage. Determines the servlet container&#x27;s</span></span><br><span class="line"><span class="comment">     * temporary directory via the given ServletContext.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> servletContext the ServletContext to use</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CommonsMultipartResolver</span><span class="params">(ServletContext servletContext)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>();</span><br><span class="line">        setServletContext(servletContext);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Set whether to resolve the multipart request lazily at the time of</span></span><br><span class="line"><span class="comment">     * file or parameter access.</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;Default is &quot;false&quot;, resolving the multipart elements immediately, throwing</span></span><br><span class="line"><span class="comment">     * corresponding exceptions at the time of the &#123;<span class="doctag">@link</span> #resolveMultipart&#125; call.</span></span><br><span class="line"><span class="comment">     * Switch this to &quot;true&quot; for lazy multipart parsing, throwing parse exceptions</span></span><br><span class="line"><span class="comment">     * once the application attempts to obtain multipart files or parameters.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setResolveLazily</span><span class="params">(<span class="keyword">boolean</span> resolveLazily)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.resolveLazily = resolveLazily;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Initialize the underlying &#123;<span class="doctag">@code</span> org.apache.commons.fileupload.servlet.ServletFileUpload&#125;</span></span><br><span class="line"><span class="comment">     * instance. Can be overridden to use a custom subclass, e.g. for testing purposes.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> fileItemFactory the Commons FileItemFactory to use</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the new ServletFileUpload instance</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> FileUpload <span class="title">newFileUpload</span><span class="params">(FileItemFactory fileItemFactory)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ServletFileUpload(fileItemFactory);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServletContext</span><span class="params">(ServletContext servletContext)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!isUploadTempDirSpecified()) &#123;</span><br><span class="line">            getFileItemFactory().setRepository(WebUtils.getTempDir(servletContext));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isMultipart</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ServletFileUpload.isMultipartContent(request);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> MultipartHttpServletRequest <span class="title">resolveMultipart</span><span class="params">(<span class="keyword">final</span> HttpServletRequest request)</span> <span class="keyword">throws</span> MultipartException </span>&#123;</span><br><span class="line">        Assert.notNull(request, <span class="string">&quot;Request must not be null&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.resolveLazily) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> DefaultMultipartHttpServletRequest(request) &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initializeMultipart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    MultipartParsingResult parsingResult = parseRequest(request);</span><br><span class="line">                    setMultipartFiles(parsingResult.getMultipartFiles());</span><br><span class="line">                    setMultipartParameters(parsingResult.getMultipartParameters());</span><br><span class="line">                    setMultipartParameterContentTypes(parsingResult.getMultipartParameterContentTypes());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            MultipartParsingResult parsingResult = parseRequest(request);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> DefaultMultipartHttpServletRequest(request, parsingResult.getMultipartFiles(),</span><br><span class="line">                    parsingResult.getMultipartParameters(), parsingResult.getMultipartParameterContentTypes());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Parse the given servlet request, resolving its multipart elements.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> request the request to parse</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the parsing result</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> MultipartException if multipart resolution failed.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> MultipartParsingResult <span class="title">parseRequest</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> MultipartException </span>&#123;</span><br><span class="line">        String encoding = determineEncoding(request);</span><br><span class="line">        FileUpload fileUpload = prepareFileUpload(encoding);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            List&lt;FileItem&gt; fileItems = ((ServletFileUpload) fileUpload).parseRequest(request);</span><br><span class="line">            <span class="keyword">return</span> parseFileItems(fileItems, encoding);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (FileUploadBase.SizeLimitExceededException ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MaxUploadSizeExceededException(fileUpload.getSizeMax(), ex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (FileUploadBase.FileSizeLimitExceededException ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MaxUploadSizeExceededException(fileUpload.getFileSizeMax(), ex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (FileUploadException ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MultipartException(<span class="string">&quot;Failed to parse multipart servlet request&quot;</span>, ex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Determine the encoding for the given request.</span></span><br><span class="line"><span class="comment">     * Can be overridden in subclasses.</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;The default implementation checks the request encoding,</span></span><br><span class="line"><span class="comment">     * falling back to the default encoding specified for this resolver.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> request current HTTP request</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the encoding for the request (never &#123;<span class="doctag">@code</span> null&#125;)</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span> javax.servlet.ServletRequest#getCharacterEncoding</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span> #setDefaultEncoding</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">determineEncoding</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">        String encoding = request.getCharacterEncoding();</span><br><span class="line">        <span class="keyword">if</span> (encoding == <span class="keyword">null</span>) &#123;</span><br><span class="line">            encoding = getDefaultEncoding();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> encoding;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cleanupMultipart</span><span class="params">(MultipartHttpServletRequest request)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!(request <span class="keyword">instanceof</span> AbstractMultipartHttpServletRequest) ||</span><br><span class="line">                ((AbstractMultipartHttpServletRequest) request).isResolved()) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                cleanupFileItems(request.getMultiFileMap());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">                logger.warn(<span class="string">&quot;Failed to perform multipart cleanup for servlet request&quot;</span>, ex);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>控制器使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@PostMapping(&quot;/upload&quot;)</span><br><span class="line">	public void bigStopFile(@RequestParam Map&lt;String, MultipartFile&gt; map,HttpServletRequest request, HttpServletResponse response) throws IOException &#123;</span><br><span class="line">	......</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>注意 <code>MultipartResolver</code> 与 <code>MultipartConfigElement</code> 冲突，如果同时配置也会造成<code>MultipartFile</code>为空的情况，<code>MultipartConfigElement</code>配置方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@Bean</span><br><span class="line">	public MultipartConfigElement multipartConfigElement() &#123;</span><br><span class="line">	    MultipartConfigFactory factory = new MultipartConfigFactory();</span><br><span class="line">	    //factory.setLocation(&quot;/app/sinova/tmp&quot;);</span><br><span class="line">	    //文件最大</span><br><span class="line">	    factory.setMaxFileSize(DataSize.of(50, DataUnit.MEGABYTES));</span><br><span class="line">	    /// 设置总上传数据总大小</span><br><span class="line">	    factory.setMaxRequestSize(DataSize.of(200, DataUnit.MEGABYTES));</span><br><span class="line">	    return factory.createMultipartConfig();</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Spring</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">SpringBoot</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
+        		</li>
+      		
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/10/21/%E8%A7%A3%E5%86%B3SpringBoot-2-3-MultipartFile%E4%B8%BA%E7%A9%BA%E7%9A%84%E9%97%AE%E9%A2%98/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-Linux网络基础，路由的追踪" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/">Linux网络基础，路由的追踪</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/" class="archive-article-date">
+        <time datetime="2021-10-18T07:25:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-18</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h1><span id="一-traceroute">一、 traceroute</span></h1><blockquote>
+<p>Linux traceroute命令用于显示数据包到主机间的路径。<br>traceroute指令让你追踪网络数据包的路由途径，预设数据包大小是40Bytes，用户可另行设置。</p>
+</blockquote>
+<h2><span id="语法">语法</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">traceroute [-46ndFT] [-f&lt;存活数值&gt;] [-g&lt;网关&gt;] [-i(--interface)&lt;device&gt;] [-I(--icmp)] [-m&lt;存活数值&gt;] [-N&lt;数据包数量&gt;] [-p&lt;通信端口&gt;] [-s&lt;来源地址&gt;] [-t&lt;服务类型&gt;] [-w&lt;超时秒数&gt;]</span><br></pre></td></tr></table></figure>
+<h2><span id="参数说明">参数说明</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-4 ===&gt; IPV4</span><br><span class="line">-6 ===&gt; IPV6</span><br><span class="line">-d ===&gt; 使用Socket层级的排错功能</span><br><span class="line">-f ===&gt; 设置第一个检测数据包的存活数值TTL的大小</span><br><span class="line">-g ===&gt; 设置来源路由网关，最多可设置8个</span><br><span class="line">-i ===&gt; 指定traceroute应该通过哪个接口发送数据包；默认情况下，根据路由表选择接口</span><br><span class="line">-I ===&gt; 使用ICMP回应取代UDP资料信息</span><br><span class="line">-m ===&gt; 设置检测数据包的最大存活数值TTL的大小</span><br><span class="line">-p ===&gt; 设置UDP传输协议的通信端口</span><br><span class="line">-s ===&gt; 设置本地主机送出数据包的IP地址</span><br><span class="line">-t ===&gt; 对于IPV4来说是设置服务类型(TOS)和优先值；对于IPV6来说是设置流量控制值</span><br><span class="line">-T ===&gt; 使用TCP进行探测</span><br><span class="line">-w ===&gt; 设置等待远端主机回报的时间</span><br><span class="line">-F ===&gt; 不要分段探测数据包</span><br><span class="line">-n ===&gt; 在显示IP地址时，不要将它们映射到主机名</span><br><span class="line">-N ===&gt; 指定同时发送的探测包的数量;默认值是16</span><br></pre></td></tr></table></figure>
+
+<h1><span id="二-tracepath">二、 tracepath</span></h1><blockquote>
+<p>tracepath命令用来追踪并显示报文到达目的主机所经过的路由信息，能够发现路由中的MTU值。tracepath使用套接字API来实现其所有功能，不需要root权限。</p>
+</blockquote>
+<h2><span id="语法">语法</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tracepath [-n] [-b] [-l pktlen] [-m max_hops] [-p port] [目的地址]</span><br></pre></td></tr></table></figure>
+<h2><span id="参数说明">参数说明</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-n ===&gt; 输出主要的IP地址</span><br><span class="line">-b ===&gt; 同时输出主机名和IP地址</span><br><span class="line">-l ===&gt; 设置数据包大小；默认65535</span><br><span class="line">-m ===&gt; 设置最大跳数；默认30</span><br><span class="line">-p ===&gt; 设置要使用的初始目标端口</span><br></pre></td></tr></table></figure>
+
+<h1><span id="三-mtr">三、 mtr</span></h1><blockquote>
+<p>MTR是一种简单的跨平台命令行网络诊断工具，它将常用的traceroute和ping程序的功能组合到一个工具中。 与traceroute类似， mtr输出关于数据包从运行mtr的主机到用户指定的目标主机的路由信息​​。</p>
+</blockquote>
+<h2><span id="语法">语法</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mtr [-lxu(--udp)T(--tcp)46] [-r (--report)] [-w (--report-wide)] [-c (--report-cycles)] [-l (--raw)] [-x (--xml)] [-a (--addres]  [-i (--interval)] [-m (--max-ttl)] [-f (--first-ttl)] [-B (--bitpattern)] [-Q (--tos)] [-s (--psize)] [-P (--port)] [--timeout] [目的地] [数据包大小]</span><br></pre></td></tr></table></figure>
+<h2><span id="参数说明">参数说明</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-4 ===&gt; IPV4</span><br><span class="line">-6 ===&gt; IPV6</span><br><span class="line">-c ===&gt; 设置发送的ping的数量</span><br><span class="line">-r ===&gt; 进入report模式.此模式下，mtr将运行-c选项指定的周期数，然后输出统计信息并退出</span><br><span class="line">-w ===&gt; 进入wide report模式。在此模式下，mtr将不会删除报告中的主机名</span><br><span class="line">-s ===&gt; 设置探测包大小，字节数包括IP和ICMP头部信息</span><br><span class="line">-l ===&gt; 使用原始输出格式</span><br><span class="line">-x ===&gt; 使用xml输出格式</span><br><span class="line">-a ===&gt; 将发送数据包的插座绑定到特定的接口,这样任何数据包都可以通过这个接口发送</span><br><span class="line">-i ===&gt; 指定ICMP之间的请求间隔</span><br><span class="line">-m ===&gt; 指定最大跳数(最大生存时间值)默认30</span><br><span class="line">-f ===&gt; 指定开始跳数，默认为1</span><br><span class="line">-B ===&gt; 指定在有效负载中使用的位模式(0-255)</span><br><span class="line">-Q ===&gt; 指定IP报头中的服务字段（0-255）</span><br><span class="line">-P ===&gt; 指定TCP跟踪的目标端口号</span><br><span class="line">--timeout ===&gt; 在放弃连接之前，保持TCP套接字打开的秒数连接。这只会影响最后一跳</span><br></pre></td></tr></table></figure>
+<h2><span id="应用举例1-基本展示">应用举例1 基本展示</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">zt-web6:/app/sinova$ mtr -4 -6 -x -c 1 -n --report miniapp.yun.139.com -P 443</span><br><span class="line">Start: Mon Oct 18 15:50:53 2021</span><br><span class="line">HOST: zt-web6                     Loss%   Snt   Last   Avg  Best  Wrst StDev</span><br><span class="line">  1.|-- 2409:805c:5c00::102        0.0%     1    1.6   1.6   1.6   1.6   0.0</span><br><span class="line">  2.|-- 2409:805c:5cff:ffff:ffff:  0.0%     1    0.1   0.1   0.1   0.1   0.0</span><br><span class="line">  3.|-- 2409:805c:0:614c::2        0.0%     1    3.3   3.3   3.3   3.3   0.0</span><br><span class="line">  4.|-- 2409:805c:0:6108::         0.0%     1    4.0   4.0   4.0   4.0   0.0</span><br><span class="line">  5.|-- 2409:805c:0:1003::         0.0%     1    0.6   0.6   0.6   0.6   0.0</span><br><span class="line">  6.|-- 2409:8080:0:2:1903:1971::  0.0%     1    0.9   0.9   0.9   0.9   0.0</span><br><span class="line">  7.|-- 2409:8080:0:1:305:1903::   0.0%     1   12.0  12.0  12.0  12.0   0.0</span><br><span class="line">  8.|-- 2409:8080:0:2:305:362:1f0  0.0%     1   17.0  17.0  17.0  17.0   0.0</span><br><span class="line">  9.|-- 2409:8055:3008:1116::a0    0.0%     1   14.3  14.3  14.3  14.3   0.0</span><br><span class="line"> 10.|-- 2409:8c54:813:5::1:0       0.0%     1   16.1  16.1  16.1  16.1   0.0</span><br><span class="line"> 11.|-- ???                       100.0     1    0.0   0.0   0.0   0.0   0.0</span><br><span class="line"> 12.|-- 2409:8c54:813:3::11        0.0%     1   19.2  19.2  19.2  19.2   0.0</span><br><span class="line"> 13.|-- ???                       100.0     1    0.0   0.0   0.0   0.0   0.0</span><br></pre></td></tr></table></figure>
+<p>第一列：显示的是IP地址和本机域名；<br>第二列 Loss%：是显示的每个对应IP的丢包率；<br>第三列 snt：snt等于1，设置每秒发送数据包的数量，默认值是10 可以通过参数 -c来指定。<br>第四列 Last：显示的最近一次的返回时延。<br>第五列Avg：平均值，这个应该是发送ping包的平均时延。<br>第六列Best：最好或者说时延最短的时间。<br>第七列Wrst：最坏或者说时延最长的时间。<br>第八列StDev：标准偏差。</p>
+<h2><span id="应用举例二设置每秒发送数据包的数量30">应用举例二：设置每秒发送数据包的数量30</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mtr -r -c 30 www.xqblog.com</span><br></pre></td></tr></table></figure>
+
+<h2><span id="应用举例3设置ping包大小为1024个字节">应用举例3：设置ping包大小为1024个字节</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mtr -r -c 30 -s 1024 www.xqblog.com</span><br></pre></td></tr></table></figure>
+
+<h1><span id="四-netstat">四、 netstat</span></h1><blockquote>
+<p>Netstat 命令用于显示各种网络相关信息，如网络连接，路由表，接口状态 (Interface Statistics)，masquerade 连接，多播成员 (Multicast Memberships) 等等。<br>显示网络连接，路由表，接口状态，伪装连接，网络链路信息和组播成员组。</p>
+</blockquote>
+<h2><span id="语法">语法</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">netstat [地址] [-t (--tcp)] [-u (--udp)] [-l (--listening)] [-a (--all)] [-n (--numeric)] [--numeric-hosts] [--numeric-ports] [-p (--program)] [-v (--verbose)] [-c (--continuous)] [delay]</span><br><span class="line"></span><br><span class="line">netstat &#123;-r (--route)&#125; [地址] [-e (--extend)] [-v (--verbose)] [-n (--numeric)]  [--numeric-hosts] [--numeric-ports] [--numeric-ports] [-c (--continuous)] [delay]</span><br><span class="line"></span><br><span class="line">netstat &#123;-i (--interfaces)&#125; [iface] [-a (--all)] [-e (--extend)] [-v (--verbose)] [-p (--program)] [-n (--numeric)] [--numeric-hosts] [--numeric-ports] [--numeric-ports] [-c (--continuous)] [delay]</span><br></pre></td></tr></table></figure>
+<h2><span id="参数说明">参数说明</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">注意：[地址]无选项时,netstat显示打开的套接字.如果不指定任何地址族，那么打印出所有已配置地址族的有效套接字。</span><br><span class="line">-t ===&gt; 仅显示tcp连接</span><br><span class="line">-u ===&gt; 仅显示udp连接</span><br><span class="line">-l ===&gt; 只显示正在侦听的套接字(这是默认的选项)</span><br><span class="line">-a ===&gt; 显示所有正在或不在侦听的套接字。加上 --interfaces 选项将显示没有标记的接口</span><br><span class="line">-n ===&gt; 显示数字形式地址而不是去解析主机、端口或用户名</span><br><span class="line">--numeric-hosts ===&gt; 显示数字形式的主机但是不影响端口或用户名的解析</span><br><span class="line">--numeric-ports ===&gt; 显示数字端口号，但是不影响主机或用户名的解析</span><br><span class="line">-N ===&gt; </span><br><span class="line">delay === &gt; 每隔 delay 秒,循环输出统计信息</span><br><span class="line">-p ===&gt; 显示套接字所属进程的PID和名称</span><br><span class="line">-v ===&gt; 显示详细信息</span><br><span class="line">-c ===&gt; 将使 netstat 不断地每秒输出所选的信息</span><br></pre></td></tr></table></figure>
+
+<h1><span id="五-route">五、 route</span></h1><h2><span id="语法">语法</span></h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">route [-CFvne]</span><br><span class="line"></span><br><span class="line">route [-v] [-A] add [-net|-host] target [netmask] [gw Gw] [metric] [mss] [window] [irtt ] [reject] [mod] [dyn] [reinstate] [[dev] If]</span><br><span class="line"></span><br><span class="line">route [-v] [-A] del [-net|-host] target [gw] [netmask] [metric] [[dev] If]</span><br></pre></td></tr></table></figure>
+<h2><span id="参数说明">参数说明</span></h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">-C ===&gt; 显示内核的路由缓存</span><br><span class="line">-F ===&gt; 显示内核的FIB选路表</span><br><span class="line">-n ===&gt; 以数字形式代替解释主机名形式来显示地址</span><br><span class="line">-e ===&gt; 用net‐stat(8)的格式来显示选路表</span><br><span class="line"></span><br><span class="line">-A ===&gt; 用指定的地址族(如`inet&#x27;，`inet6&#x27;)</span><br><span class="line">-v ===&gt; 选用细节操作模式</span><br><span class="line">-net ===&gt; 路由目标为网络</span><br><span class="line">-host ===&gt; 路由目标为主机</span><br><span class="line">add ===&gt; 添加一条路由</span><br><span class="line">del ===&gt; 删除一条路由</span><br><span class="line">target ===&gt; 指定目标网络或主机</span><br><span class="line">netmask ===&gt;为添加的路由指定网络掩码</span><br><span class="line">gw ===&gt; 为发往目标网络/主机的任何分组指定网关</span><br><span class="line">metric ===&gt; 设置路由值字段</span><br><span class="line">mss ===&gt; 设置基于此路由之上的连接的TCP最大报文段长度</span><br><span class="line">window ===&gt; 设置基于此路由之上的连接的TCP窗口长度</span><br><span class="line">irtt ===&gt; 设置基于此路由之上的TCP连接的初始往返时间</span><br><span class="line">reject ===&gt; 设置一条阻塞路由以使一条路由查找失败</span><br><span class="line">mod,dyn,reinstate ===&gt; 设置一条动态的或更改过的路由</span><br><span class="line">dev If ===&gt; 强制使路由与指定的设备关联</span><br></pre></td></tr></table></figure>
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">shell</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">网络</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
+        		</li>
+      		
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-ngx-lua-模块详细讲解（基于openresty）" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -3445,491 +3759,6 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasclassloader命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/">Arthas classloader命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#classloader%E5%91%BD%E4%BB%A4">classloader命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a></li>
-<li><a href="#%E5%88%97%E5%87%BA%E6%89%80%E6%9C%89classloader">列出所有ClassLoader</a></li>
-<li><a href="#%E5%88%97%E5%87%BAclassloader%E9%87%8C%E5%8A%A0%E8%BD%BD%E7%9A%84%E6%89%80%E6%9C%89%E7%B1%BB">列出ClassLoader里加载的所有类</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E7%B1%BB%E7%9A%84classloader%E5%B1%82%E6%AC%A1">查看类的classloader层次</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Bclassloader%E6%A0%91">查看ClassLoader树</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Burlclassloader%E5%AE%9E%E9%99%85%E7%9A%84urls">查看URLClassLoader实际的urls</a></li>
-<li><a href="#%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9Aclassloader%E9%87%8C%E7%9A%84%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6">加载指定ClassLoader里的资源文件</a></li>
-<li><a href="#%E5%B0%9D%E8%AF%95%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9A%E7%9A%84%E7%B1%BB">尝试加载指定的类</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个普通的Spring Boot应用为例，演示classloader命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
-<p>启动之后，可以访问61000端口： 点击查看</p>
-<p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="classloader命令">classloader命令</span></h2><blockquote>
-<p>查看classloader的继承树，urls，类加载信息</p>
-</blockquote>
-<p><code>classloader</code> 命令将 JVM 中所有的classloader的信息统计出来，并可以展示继承树，urls等。</p>
-<p>可以让指定的classloader去getResources，打印出所有查找到的resources的url。对于<code>ResourceNotFoundException</code>比较有用。</p>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[l]</td>
-<td>按类加载实例进行统计</td>
-</tr>
-<tr>
-<td>[t]</td>
-<td>打印所有ClassLoader的继承树</td>
-</tr>
-<tr>
-<td>[a]</td>
-<td>列出所有ClassLoader加载的类，请谨慎使用</td>
-</tr>
-<tr>
-<td><code>[c:]</code></td>
-<td>ClassLoader的hashcode</td>
-</tr>
-<tr>
-<td><code>[classLoaderClass:]</code></td>
-<td>指定执行表达式的 ClassLoader 的 class name</td>
-</tr>
-<tr>
-<td><code>[c: r:]</code></td>
-<td>用ClassLoader去查找resource</td>
-</tr>
-<tr>
-<td><code>[c: load:]</code></td>
-<td>用ClassLoader去加载指定的类</td>
-</tr>
-</tbody></table>
-<h4><span id="使用参考">使用参考</span></h4><p>先访问一个jsp网页，触发jsp的加载： hello</p>
-<h4><span id="列出所有classloader">列出所有ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -l</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -l</span></span><br><span class="line"> name                                                             loadedCount  hash      parent</span><br><span class="line"> BootstrapClassLoader                                             2724         null      null</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@411ce1ab               2009         411ce1ab  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@22ae1234               1253         22ae1234  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> org.apache.jasper.servlet.JasperLoader@65361d9a                  1            65361d9a  TomcatEmbeddedWebappClassLoader</span><br><span class="line">                                                                                           context: ROOT</span><br><span class="line">                                                                                           delegate: true</span><br><span class="line">                                                                                         ----------&gt; Parent Classloader:</span><br><span class="line">                                                                                         org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> TomcatEmbeddedWebappClassLoader                                  0            8546cd5   org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line">   context: ROOT</span><br><span class="line">   delegate: true</span><br><span class="line"><span class="meta"> ----------&gt;</span><span class="bash"> Parent Classloader:</span></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3  5416         1be6f5c3  sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line"> sun.misc.Launcher$AppClassLoader@3d4eac69                        45           3d4eac69  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> sun.misc.Launcher$ExtClassLoader@7494e528                        4            7494e528  null</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>TomcatEmbeddedWebappClassLoader 加载的class数量是0，所以在spring boot embedded tomcat里，它只是一个空壳，所有的类加载都是<code>LaunchedURLClassLoader</code>完成的</li>
-</ul>
-<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -c 65361d9a</span></span><br></pre></td></tr></table></figure>
-
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader --classLoaderClass org.apache.jasper.servlet.JasperLoader</span></span><br></pre></td></tr></table></figure>
-
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h4><span id="列出classloader里加载的所有类">列出ClassLoader里加载的所有类</span></h4><p>列出上面的<code>org.apache.jasper.servlet.JasperLoader</code>加载的类：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -a --classLoaderClass org.apache.jasper.servlet.JasperLoader</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -a --classLoaderClass org.apache.jasper.servlet.JasperLoader</span></span><br><span class="line"> hash:1698045338, org.apache.jasper.servlet.JasperLoader@65361d9a</span><br><span class="line"> org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看类的classloader层次">查看类的classloader层次</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看classloader树">查看ClassLoader树</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -t</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ classloader -t</span><br><span class="line">+-BootstrapClassLoader</span><br><span class="line">+-sun.misc.Launcher$ExtClassLoader@28cbbddd</span><br><span class="line">  +-com.taobao.arthas.agent.ArthasClassloader@8c25e55</span><br><span class="line">  +-sun.misc.Launcher$AppClassLoader@55f96302</span><br><span class="line">    +-org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line">      +-TomcatEmbeddedWebappClassLoader</span><br><span class="line">          context: ROOT</span><br><span class="line">          delegate: true</span><br><span class="line">        ----------&gt; Parent Classloader:</span><br><span class="line">        org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line">        +-org.apache.jasper.servlet.JasperLoader@21ae0fe2</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看urlclassloader实际的urls">查看URLClassLoader实际的urls</span></h4><p>比如上面查看到的spring LaunchedURLClassLoader的 hashcode是<code>1be6f5c3</code>，可以通过<code>-c</code>参数来指定classloader，或者直接使用<code>--classLoaderClass</code>，从而查看URLClassLoader实际的urls：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span><br><span class="line">jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/</span><br><span class="line">jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/spring-boot-starter-aop-1.5</span><br><span class="line">.13.RELEASE.jar!/</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h4><span id="加载指定classloader里的资源文件">加载指定ClassLoader里的资源文件</span></h4><p>查找指定的资源文件： <code>classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r logback-spring.xml</span><br><span class="line"> jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/logback-spring.xml</span><br></pre></td></tr></table></figure>
-
-<p>也可以尝试查找类的class文件：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r java/lang/String.class</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader -r java/lang/String.class</span></span><br><span class="line"> jar:file:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/rt.jar!/java/lang/String.class</span><br></pre></td></tr></table></figure>
-
-<h4><span id="尝试加载指定的类">尝试加载指定的类</span></h4><p>比如用上面的spring LaunchedURLClassLoader 尝试加载 <code>ch.qos.logback.classic.spi.StackTraceElementProxy</code> ：</p>
-<p>首先使用<code>sc ch.qos.logback.classic.spi.StackTraceElementProxy</code>查看，可发现未加载：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Affect(row-cnt:0) cost in 18 ms.</span><br></pre></td></tr></table></figure>
-
-<p>因而使用spring LaunchedURLClassLoader 尝试加载：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --load ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --load ch.qos.logback.classic.spi.StackTraceElementProxy</span></span><br><span class="line">load class success.</span><br><span class="line"> class-info        ch.qos.logback.classic.spi.StackTraceElementProxy</span><br><span class="line"> code-source       file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classic-1.</span><br><span class="line">                   1.11.jar!/</span><br><span class="line"> name              ch.qos.logback.classic.spi.StackTraceElementProxy</span><br><span class="line"> isInterface       false</span><br><span class="line"> isAnnotation      false</span><br><span class="line"> isEnum            false</span><br><span class="line"> isAnonymousClass  false</span><br><span class="line"> isArray           false</span><br><span class="line"> isLocalClass      false</span><br><span class="line"> isMemberClass     false</span><br><span class="line"> isPrimitive       false</span><br><span class="line"> isSynthetic       false</span><br><span class="line"> simple-name       StackTraceElementProxy</span><br><span class="line"> modifier          public</span><br><span class="line"> annotation</span><br><span class="line"> interfaces        java.io.Serializable</span><br><span class="line"> super-class       +-java.lang.Object</span><br><span class="line"> class-loader      +-org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                     +-sun.misc.Launcher$AppClassLoader@70dea4e</span><br><span class="line">                       +-sun.misc.Launcher$ExtClassLoader@56a96482</span><br><span class="line"> classLoaderHash   5674cd4d</span><br></pre></td></tr></table></figure>
-
-<p>再次使用<code>sc ch.qos.logback.classic.spi.StackTraceElementProxy</code>查看，发现已经加载：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ch.qos.logback.classic.spi.StackTraceElementProxy</span><br><span class="line">Affect(row-cnt:1) cost in 19 ms.</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“classloader”中，我们演示了了Arthas的classloader命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasdump命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/">Arthas dump命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#dump%E5%91%BD%E4%BB%A4">dump命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示dump命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="dump命令">dump命令</span></h2><blockquote>
-<p>dump 已加载类的 bytecode 到特定目录</p>
-</blockquote>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><em>class-pattern</em></td>
-<td>类名表达式匹配</td>
-</tr>
-<tr>
-<td><code>[c:]</code></td>
-<td>类所属 ClassLoader 的 hashcode</td>
-</tr>
-<tr>
-<td><code>[d:]</code></td>
-<td>设置类文件的目标目录</td>
-</tr>
-<tr>
-<td><code>[classLoaderClass:]</code></td>
-<td>指定执行表达式的 ClassLoader 的 class name</td>
-</tr>
-<tr>
-<td>[E]</td>
-<td>开启正则表达式匹配，默认为通配符匹配</td>
-</tr>
-</tbody></table>
-<h4><span id="使用参考">使用参考</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dump java.lang.String</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> dump java.lang.String</span></span><br><span class="line"> HASHCODE  CLASSLOADER  LOCATION</span><br><span class="line"> null                   /Users/admin/logs/arthas/classdump/java/lang/String.class</span><br><span class="line">Affect(row-cnt:1) cost in 119 ms.</span><br><span class="line">dump demo.*</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> dump demo.*</span></span><br><span class="line"> HASHCODE  CLASSLOADER                                    LOCATION</span><br><span class="line"> 3d4eac69  +-sun.misc.Launcher$AppClassLoader@3d4eac69    /Users/admin/logs/arthas/classdump/sun.misc.Launcher$AppClassLoader-3d4eac69/demo/MathGame.class</span><br><span class="line">             +-sun.misc.Launcher$ExtClassLoader@66350f69</span><br><span class="line">Affect(row-cnt:1) cost in 39 ms.</span><br><span class="line">dump -d /tmp/output java.lang.String</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> dump -d /tmp/output java.lang.String</span></span><br><span class="line"> HASHCODE  CLASSLOADER  LOCATION</span><br><span class="line"> null                   /tmp/output/java/lang/String.class</span><br><span class="line">Affect(row-cnt:1) cost in 138 ms.</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>指定classLoader</li>
-</ul>
-<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> dump -c 3d4eac69 demo.*</span></span><br></pre></td></tr></table></figure>
-
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dump --classLoaderClass sun.misc.Launcher<span class="variable">$AppClassLoader</span> demo.*</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> dump --classLoaderClass sun.misc.Launcher<span class="variable">$AppClassLoader</span> demo.*</span></span><br><span class="line"> HASHCODE  CLASSLOADER                                    LOCATION</span><br><span class="line"> 3d4eac69  +-sun.misc.Launcher$AppClassLoader@3d4eac69    /Users/admin/logs/arthas/classdump/sun.misc.Launcher$AppClassLoader-3d4eac69/demo/MathGame.class</span><br><span class="line">             +-sun.misc.Launcher$ExtClassLoader@66350f69</span><br><span class="line">Affect(row-cnt:1) cost in 39 ms.</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>注: 这里classLoaderClass 在 java 8 是 sun.misc.Launcher$AppClassLoader，而java 11的classloader是jdk.internal.loader.ClassLoaders$AppClassLoader，katacoda目前环境是java8。</li>
-</ul>
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h2><span id="更多信息">更多信息</span></h2><p>在“dump”中，我们演示了了Arthas的dump命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">下一页</a>
@@ -4129,6 +3958,18 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
             
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
             
             <div class="clearfix"></div>
