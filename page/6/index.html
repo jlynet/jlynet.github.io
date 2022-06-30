@@ -230,6 +230,226 @@
             
 
   
+    <article id="post-Java诊断工具Arthas最佳实践/学习Arthasclassloader案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/">Arthas 理解Spring Boot应用的ClassLoader结构 案例</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/" class="archive-article-date">
+        <time datetime="2021-08-07T00:35:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#start-demo">Start demo</a></li>
+<li><a href="#start-arthas-boot">Start arthas-boot</a></li>
+<li><a href="#%E7%90%86%E8%A7%A3spring-boot%E5%BA%94%E7%94%A8%E7%9A%84classloader%E7%BB%93%E6%9E%84">理解Spring Boot应用的ClassLoader结构</a><ul>
+<li><a href="#%E5%88%97%E5%87%BA%E6%89%80%E6%9C%89classloader">列出所有ClassLoader</a></li>
+<li><a href="#%E5%88%97%E5%87%BAclassloader%E9%87%8C%E5%8A%A0%E8%BD%BD%E7%9A%84%E6%89%80%E6%9C%89%E7%B1%BB">列出ClassLoader里加载的所有类</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E7%B1%BB%E7%9A%84classloader%E5%B1%82%E6%AC%A1">查看类的classloader层次</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Bclassloader%E6%A0%91">查看ClassLoader树</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Burlclassloader%E5%AE%9E%E9%99%85%E7%9A%84urls">查看URLClassLoader实际的urls</a></li>
+<li><a href="#%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9Aclassloader%E9%87%8C%E7%9A%84%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6">加载指定ClassLoader里的资源文件</a></li>
+<li><a href="#%E5%B0%9D%E8%AF%95%E5%8A%A0%E8%BD%BD%E6%8C%87%E5%AE%9A%E7%9A%84%E7%B1%BB">尝试加载指定的类</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个普通的Spring Boot应用为例，演示Arthas Spring Boot应用的ClassLoader结构。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="start-demo">Start demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p>启动之后，可以访问61000端口： 点击查看</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
+<h2><span id="start-arthas-boot">Start arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="理解spring-boot应用的classloader结构">理解Spring Boot应用的ClassLoader结构</span></h2><p>下面介绍<code>classloader</code>命令的功能。</p>
+<p>先访问一个jsp网页，触发jsp的加载： hello</p>
+<h4><span id="列出所有classloader">列出所有ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -l</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> classloader -l</span></span><br><span class="line"> name                                                             loadedCount  hash      parent</span><br><span class="line"> BootstrapClassLoader                                             2724         null      null</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@411ce1ab               2009         411ce1ab  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> com.taobao.arthas.agent.ArthasClassloader@22ae1234               1253         22ae1234  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> org.apache.jasper.servlet.JasperLoader@65361d9a                  1            65361d9a  TomcatEmbeddedWebappClassLoader</span><br><span class="line">                                                                                           context: ROOT</span><br><span class="line">                                                                                           delegate: true</span><br><span class="line">                                                                                         ----------&gt; Parent Classloader:</span><br><span class="line">                                                                                         org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> TomcatEmbeddedWebappClassLoader                                  0            8546cd5   org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line">   context: ROOT</span><br><span class="line">   delegate: true</span><br><span class="line"><span class="meta"> ----------&gt;</span><span class="bash"> Parent Classloader:</span></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3</span><br><span class="line"></span><br><span class="line"> org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3  5416         1be6f5c3  sun.misc.Launcher$AppClassLoader@3d4eac69</span><br><span class="line"> sun.misc.Launcher$AppClassLoader@3d4eac69                        45           3d4eac69  sun.misc.Launcher$ExtClassLoader@7494e528</span><br><span class="line"> sun.misc.Launcher$ExtClassLoader@7494e528                        4            7494e528  null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>TomcatEmbeddedWebappClassLoader 加载的class数量是0，所以在spring boot embedded tomcat里，它只是一个空壳，所有的类加载都是<code>LaunchedURLClassLoader</code>完成的</li>
+</ul>
+<p>请记下你的classLoaderHash，后面需要使用它。在这里，它是 <code>65361d9a</code>。</p>
+<p>注意：请使用你的classLoaderHash值覆盖 <code>&lt;classLoaderHash&gt;</code> ，然后手动执行下面所有所述命令：</p>
+<h4><span id="列出classloader里加载的所有类">列出ClassLoader里加载的所有类</span></h4><p>列出上面的<code>org.apache.jasper.servlet.JasperLoader</code>加载的类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">classloader -a -c &lt;classLoaderHash&gt;</span><br><span class="line">$ classloader -a -c 65361d9a</span><br><span class="line"> hash:1698045338, org.apache.jasper.servlet.JasperLoader@65361d9a</span><br><span class="line"> org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看类的classloader层次">查看类的classloader层次</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d org.apache.jsp.jsp.hello_jsp</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看classloader树">查看ClassLoader树</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -t</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ classloader -t+-BootstrapClassLoader+-sun.misc.Launcher$ExtClassLoader@28cbbddd  +-com.taobao.arthas.agent.ArthasClassloader@8c25e55  +-sun.misc.Launcher$AppClassLoader@55f96302    +-org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3      +-TomcatEmbeddedWebappClassLoader          context: ROOT          delegate: true        ----------&gt; Parent Classloader:        org.springframework.boot.loader.LaunchedURLClassLoader@1be6f5c3        +-org.apache.jasper.servlet.JasperLoader@21ae0fe2</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看urlclassloader实际的urls">查看URLClassLoader实际的urls</span></h4><p>比如上面查看到的spring LaunchedURLClassLoader的 hashcode是<code>1be6f5c3</code>，可以通过<code>-c</code>参数来指定classloader，从而查看URLClassLoader实际的urls：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -c &lt;classLoaderHash&gt;$ classloader -c 1be6f5c3jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/spring-boot-starter-aop-1.5.13.RELEASE.jar!/...</span><br></pre></td></tr></table></figure>
+
+<h4><span id="加载指定classloader里的资源文件">加载指定ClassLoader里的资源文件</span></h4><p>查找指定的资源文件： <code>classloader -c &lt;classLoaderHash&gt; -r logback-spring.xml</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ classloader -c 1be6f5c3 -r logback-spring.xml jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/classes!/logback-spring.xml</span><br></pre></td></tr></table></figure>
+
+<p>也可以尝试查找类的class文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -c &lt;classLoaderHash&gt; -r java/lang/String.class$ classloader -c 1b6d3586 -r java/lang/String.class jar:file:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/rt.jar!/java/lang/String.class</span><br></pre></td></tr></table></figure>
+
+<h4><span id="尝试加载指定的类">尝试加载指定的类</span></h4><p>比如用上面的spring LaunchedURLClassLoader 尝试加载 <code>ch.qos.logback.classic.spi.StackTraceElementProxy</code> ：</p>
+<p>首先使用<code>sc ch.qos.logback.classic.spi.StackTraceElementProxy</code>查看，可发现未加载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
+
+<p></p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Affect(row-cnt:0) cost in 18 ms.</span><br></pre></td></tr></table></figure>
+
+<p>因而使用spring LaunchedURLClassLoader 尝试加载：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classloader -c &lt;classLoaderHash&gt; --load ch.qos.logback.classic.spi.StackTraceElementProxy$ classloader -c 1be6f5c3 --load ch.qos.logback.classic.spi.StackTraceElementProxyload class success. class-info        ch.qos.logback.classic.spi.StackTraceElementProxy code-source       file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classic-1.                   1.11.jar!/ name              ch.qos.logback.classic.spi.StackTraceElementProxy isInterface       false isAnnotation      false isEnum            false isAnonymousClass  false isArray           false isLocalClass      false isMemberClass     false isPrimitive       false isSynthetic       false simple-name       StackTraceElementProxy modifier          public annotation interfaces        java.io.Serializable super-class       +-java.lang.Object class-loader      +-org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d                     +-sun.misc.Launcher$AppClassLoader@70dea4e                       +-sun.misc.Launcher$ExtClassLoader@56a96482 classLoaderHash   5674cd4d</span><br></pre></td></tr></table></figure>
+
+<p>再次使用<code>sc ch.qos.logback.classic.spi.StackTraceElementProxy</code>查看，发现已经加载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc ch.qos.logback.classic.spi.StackTraceElementProxy</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch.qos.logback.classic.spi.StackTraceElementProxyAffect(row-cnt:1) cost in 19 ms.</span><br></pre></td></tr></table></figure>
+
+<h2><span id="更多信息">更多信息</span></h2><p>通过本教程基本掌握了Arthas Spring Boot应用的ClassLoader结构。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java 诊断工具 Arthas 最佳实践</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas最佳实践/Arthas后台异步任务案例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2290,10 +2510,6 @@
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-            
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">shell</a>
               </li>
             
@@ -2310,11 +2526,15 @@
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
               </li>
             
               <li class="article-tag-list-item">
@@ -2322,7 +2542,7 @@
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
               </li>
             
               <li class="article-tag-list-item">
