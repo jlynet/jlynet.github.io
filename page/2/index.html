@@ -230,6 +230,211 @@
             
 
   
+    <article id="post-Docker-私有仓库搭建" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/">Docker 私有仓库搭建</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" class="archive-article-date">
+        <time datetime="2021-10-09T04:01:07.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-09</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E4%B8%80-%E7%AE%80%E4%BB%8B">一、简介</a></li>
+<li><a href="#%E4%BA%8C-registry-%E7%9A%84%E6%90%AD%E5%BB%BA">二、registry 的搭建</a><ul>
+<li><a href="#1-%E6%90%AD%E5%BB%BA">1. 搭建</a></li>
+<li><a href="#2-%E9%AA%8C%E8%AF%81">2. 验证</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BA%8C-harbor-%E7%9A%84%E6%90%AD%E5%BB%BA">二、harbor 的搭建</a><ul>
+<li><a href="#1%E6%90%AD%E5%BB%BA">1.搭建</a><ul>
+<li><a href="#%E4%B8%8B%E8%BD%BD">下载</a></li>
+<li><a href="#%E9%85%8D%E7%BD%AE">配置</a></li>
+</ul>
+</li>
+<li><a href="#2-%E4%BD%BF%E7%94%A8">2. 使用</a></li>
+<li><a href="#3-%E4%B8%8A%E4%BC%A0%E9%95%9C%E5%83%8F">3. 上传镜像</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<h2><span id="一-简介">一、简介</span></h2><p>在 Docker 中，当我们执行 docker pull xxx 的时候 ，它实际上是从 registry.hub.docker.com 这个地址去查找，这就是Docker公司为我们提供的公共仓库。在工作中，我们不可能把企业项目push到公有仓库进行管理。所以为了更好的管理镜像，Docker不仅提供了一个中央仓库，同时也允许我们搭建本地私有仓库。这一篇介绍registry、harbor两种私有仓库搭建。</p>
+<h2><span id="二-registry-的搭建">二、registry 的搭建</span></h2><h3><span id="1-搭建">1. 搭建</span></h3><p>Docker 官方提供了一个搭建私有仓库的镜像 <strong>registry</strong> ，只需把镜像下载下来，运行容器并暴露5000端口，就可以使用了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull registry:2</span><br><span class="line">docker run -d -v /opt/registry:/var/lib/registry -p 5000:5000 --name myregistry registry:2</span><br></pre></td></tr></table></figure>
+
+<p>Registry服务默认会将上传的镜像保存在容器的/var/lib/registry，我们将主机的/opt/registry目录挂载到该目录，即可实现将镜像保存到主机的/opt/registry目录了。</p>
+<p>浏览器访问<a href="http://127.0.0.1:5000/v2%EF%BC%8C%E5%87%BA%E7%8E%B0%E4%B8%8B%E9%9D%A2%E6%83%85%E5%86%B5%E8%AF%B4%E6%98%8Eregistry%E8%BF%90%E8%A1%8C%E6%AD%A3%E5%B8%B8%E3%80%82">http://127.0.0.1:5000/v2，出现下面情况说明registry运行正常。</a></p>
+<p><img src="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/528977-20190510124454040-1840171525.png" alt="img"></p>
+<h3><span id="2-验证">2. 验证</span></h3><p>现在通过push镜像到registry来验证一下。</p>
+<p>查看本地镜像：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker images</span></span><br><span class="line">REPOSITORY                                             TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">nginx                                                  latest              568c4670fa80        5 weeks ago         109MB</span><br><span class="line">ubuntu                                                 latest              93fd78260bd1        7 weeks ago         86.2MB</span><br><span class="line">elasticsearch                                          6.5.1               32f93c89076d        7 weeks ago         773MB</span><br></pre></td></tr></table></figure>
+
+<p>要通过docker tag将该镜像标志为要推送到私有仓库：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag nginx:latest localhost:5000/nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>通过 docker push 命令将 nginx 镜像 push到私有仓库中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker push localhost:5000/nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>访问 <a href="http://127.0.0.1:5000/v2/_catalog">http://127.0.0.1:5000/v2/_catalog</a> 查看私有仓库目录，可以看到刚上传的镜像了：</p>
+<p><img src="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/528977-20190510124508006-1783029974.png" alt="img"></p>
+<p>下载私有仓库的镜像，使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker pull localhost:5000/镜像名:版本号</span><br><span class="line">例如</span><br><span class="line">docker pull localhost:5000/nginx:latest</span><br></pre></td></tr></table></figure>
+
+<h2><span id="二-harbor-的搭建">二、harbor 的搭建</span></h2><p>docker 官方提供的私有仓库 registry，用起来虽然简单 ，但在管理的功能上存在不足。 Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器，harbor使用的是官方的docker registry(v2命名是distribution)服务去完成。harbor在docker distribution的基础上增加了一些安全、访问控制、管理的功能以满足企业对于镜像仓库的需求。</p>
+<h3><span id="1搭建">1.搭建</span></h3><h4><span id="下载">下载</span></h4><p>地址：<a href="https://github.com/goharbor/harbor/releases">https://github.com/goharbor/harbor/releases</a> 本文是有 v1.2.2</p>
+<h4><span id="配置">配置</span></h4><p>解压下载的安装包 harbor-offline-installer-v1.2.2.tgz</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf harbor-offline-installer-v1.2.2.tgz</span><br></pre></td></tr></table></figure>
+
+<p>修改 harbor.cfg</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">hostname 改为本地ip，非 Mac OS系统 可以不指定端口</span></span><br><span class="line">hostname = 192.168.31.143:9090</span><br><span class="line"><span class="meta">#</span><span class="bash">设置secretkey_path 的路径为 当前目录的data下</span></span><br><span class="line">secretkey_path = ./data</span><br></pre></td></tr></table></figure>
+
+<p><strong>需要注意的是，非 Mac 用户只需要 修改 harbor.cfg 中的 hostname ，就可以直接通过./install.sh 就可以构建镜像，并把服务启动起来。不需要 secretkey_path 和 下面 docker-compose.yml 的修改</strong></p>
+<p>修改 docker-compose.yml</p>
+<p>因为harbor使用了很多目录挂载，Mac有很多目录是不允许挂载的，所以如果是Mac用户，需要修改docker-compose.yml 中的挂载目录，修改后的 docker-compose.yml 如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line">version: &#x27;2&#x27;</span><br><span class="line">services:</span><br><span class="line">  log:</span><br><span class="line">    image: vmware/harbor-log:v1.2.2</span><br><span class="line">    container_name: harbor-log</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./log/:/var/log/docker/:z</span><br><span class="line">    ports:</span><br><span class="line">      - 127.0.0.1:1514:514</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">  registry:</span><br><span class="line">    image: vmware/registry:2.6.2-photon</span><br><span class="line">    container_name: registry</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./data/registry:/storage:z</span><br><span class="line">      - ./common/config/registry/:/etc/registry/:z</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">    environment:</span><br><span class="line">      - GODEBUG=netdns=cgo</span><br><span class="line">    command:</span><br><span class="line">      [&quot;serve&quot;, &quot;/etc/registry/config.yml&quot;]</span><br><span class="line">    depends_on:</span><br><span class="line">      - log</span><br><span class="line">    logging:</span><br><span class="line">      driver: &quot;syslog&quot;</span><br><span class="line">      options:</span><br><span class="line">        syslog-address: &quot;tcp://127.0.0.1:1514&quot;</span><br><span class="line">        tag: &quot;registry&quot;</span><br><span class="line">  mysql:</span><br><span class="line">    image: vmware/harbor-db:v1.2.2</span><br><span class="line">    container_name: harbor-db</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./data/database:/var/lib/mysql:z</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">    env_file:</span><br><span class="line">      - ./common/config/db/env</span><br><span class="line">    depends_on:</span><br><span class="line">      - log</span><br><span class="line">    logging:</span><br><span class="line">      driver: &quot;syslog&quot;</span><br><span class="line">      options:</span><br><span class="line">        syslog-address: &quot;tcp://127.0.0.1:1514&quot;</span><br><span class="line">        tag: &quot;mysql&quot;</span><br><span class="line">  adminserver:</span><br><span class="line">    image: vmware/harbor-adminserver:v1.2.2</span><br><span class="line">    container_name: harbor-adminserver</span><br><span class="line">    env_file:</span><br><span class="line">      - ./common/config/adminserver/env</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./data/config/:/etc/adminserver/config/:z</span><br><span class="line">      - ./data/secretkey:/etc/adminserver/key:z</span><br><span class="line">      - ./data/:/data/:z</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">    depends_on:</span><br><span class="line">      - log</span><br><span class="line">    logging:</span><br><span class="line">      driver: &quot;syslog&quot;</span><br><span class="line">      options:</span><br><span class="line">        syslog-address: &quot;tcp://127.0.0.1:1514&quot;</span><br><span class="line">        tag: &quot;adminserver&quot;</span><br><span class="line">  ui:</span><br><span class="line">    image: vmware/harbor-ui:v1.2.2</span><br><span class="line">    container_name: harbor-ui</span><br><span class="line">    env_file:</span><br><span class="line">      - ./common/config/ui/env</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./common/config/ui/app.conf:/etc/ui/app.conf:z</span><br><span class="line">      - ./common/config/ui/private_key.pem:/etc/ui/private_key.pem:z</span><br><span class="line">      - ./data/secretkey:/etc/ui/key:z</span><br><span class="line">      - ./data/ca_download/:/etc/ui/ca/:z</span><br><span class="line">      - ./data/psc/:/etc/ui/token/:z</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">    depends_on:</span><br><span class="line">      - log</span><br><span class="line">      - adminserver</span><br><span class="line">      - registry</span><br><span class="line">    logging:</span><br><span class="line">      driver: &quot;syslog&quot;</span><br><span class="line">      options:</span><br><span class="line">        syslog-address: &quot;tcp://127.0.0.1:1514&quot;</span><br><span class="line">        tag: &quot;ui&quot;</span><br><span class="line">  jobservice:</span><br><span class="line">    image: vmware/harbor-jobservice:v1.2.2</span><br><span class="line">    container_name: harbor-jobservice</span><br><span class="line">    env_file:</span><br><span class="line">      - ./common/config/jobservice/env</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./data/job_logs:/var/log/jobs:z</span><br><span class="line">      - ./common/config/jobservice/app.conf:/etc/jobservice/app.conf:z</span><br><span class="line">      - ./data/secretkey:/etc/jobservice/key:z</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">    depends_on:</span><br><span class="line">      - ui</span><br><span class="line">      - adminserver</span><br><span class="line">    logging:</span><br><span class="line">      driver: &quot;syslog&quot;</span><br><span class="line">      options:</span><br><span class="line">        syslog-address: &quot;tcp://127.0.0.1:1514&quot;</span><br><span class="line">        tag: &quot;jobservice&quot;</span><br><span class="line">  proxy:</span><br><span class="line">    image: vmware/nginx-photon:1.11.13</span><br><span class="line">    container_name: nginx</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./common/config/nginx:/etc/nginx:z</span><br><span class="line">    networks:</span><br><span class="line">      - harbor</span><br><span class="line">    ports:</span><br><span class="line">      - 9090:80</span><br><span class="line">      - 443:443</span><br><span class="line">      - 4443:4443</span><br><span class="line">    depends_on:</span><br><span class="line">      - mysql</span><br><span class="line">      - registry</span><br><span class="line">      - ui</span><br><span class="line">      - log</span><br><span class="line">    logging:</span><br><span class="line">      driver: &quot;syslog&quot;</span><br><span class="line">      options:</span><br><span class="line">        syslog-address: &quot;tcp://127.0.0.1:1514&quot;</span><br><span class="line">        tag: &quot;proxy&quot;</span><br><span class="line">networks:</span><br><span class="line">  harbor:</span><br><span class="line">    external: false</span><br></pre></td></tr></table></figure>
+
+<p>通过运行 install.sh 构建镜像，并把服务启动起来：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./install.sh</span><br></pre></td></tr></table></figure>
+
+<h3><span id="2-使用">2. 使用</span></h3><p>访问 <a href="http://127.0.0.1:9090/">http://127.0.0.1:9090/</a> 如下：</p>
+<p><img src="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/528977-20190510124522460-1493599159.png" alt="img"></p>
+<p>默认 admin 用户的密码为 Harbor12345 ，可以在 harbor.cfg 进行修改。登录后如下：</p>
+<p><img src="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/528977-20190510124534293-1210147109.png" alt="img"></p>
+<p>图中的项目是之前上传的 ，新部署的 Harbor 登录后项目下是空的。</p>
+<p>可以创建项目，创建用户，给项目分配用户等等，操作都很简单 。</p>
+<h3><span id="3-上传镜像">3. 上传镜像</span></h3><p>首先登录私有仓库，可以使用 admin 用户 ，也可以使用我们自己创建的具有上传权限的用户：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker login -u admin -p Harbor12345 127.0.0.1:9090</span><br></pre></td></tr></table></figure>
+
+<p>要通过docker tag将该镜像标志为要推送到私有仓库，例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag nginx:latest 127.0.0.1:9090/library/nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>上传镜像：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker push 127.0.0.1:9090/library/nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p>访问 <a href="http://127.0.0.1:9090/harbor/projects">http://127.0.0.1:9090/harbor/projects</a> ，在 library 项目下可以看见刚上传的 nginx镜像了：</p>
+<p><img src="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/528977-20190510124545176-1698547303.png" alt="img"></p>
+<p>文章转载： <a href="https://www.cnblogs.com/huanchupkblog/p/10843800.html">https://www.cnblogs.com/huanchupkblog/p/10843800.html</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">shell</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类//" class="article-tag-list-link color5">默认分类</a>
+        		</li>
+      		
+        		<li class="article-tag-list-item">
+        			<a href="/categories/默认分类/技术笔记//" class="article-tag-list-link color5">技术笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-etCache-缓存框架的使用以及源码分析" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -3046,299 +3251,9 @@ byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName(&quot;UTF-8&qu
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasmc-retransform命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/">Arthas mc-retransform命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#mc%E5%91%BD%E4%BB%A4">mc命令</a></li>
-<li><a href="#retransform%E5%91%BD%E4%BB%A4">retransform命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-<li><a href="#retransform%E7%9A%84%E9%99%90%E5%88%B6">retransform的限制</a></li>
-</ul>
-</li>
-<li><a href="#%E7%83%AD%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81">热更新代码</a><ul>
-<li><a href="#jad%E5%8F%8D%E7%BC%96%E8%AF%91usercontroller">jad反编译UserController</a></li>
-<li><a href="#sc%E6%9F%A5%E6%89%BE%E5%8A%A0%E8%BD%BDusercontroller%E7%9A%84classloader">sc查找加载UserController的ClassLoader</a></li>
-<li><a href="#mc">mc</a></li>
-<li><a href="#retransform">retransform</a></li>
-<li><a href="#%E7%83%AD%E4%BF%AE%E6%94%B9%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%9C">热修改代码结果</a></li>
-</ul>
-</li>
-<li><a href="#retransform%E5%91%BD%E4%BB%A4%E6%9B%B4%E5%A4%9A%E8%AF%B4%E6%98%8E">retransform命令更多说明</a><ul>
-<li><a href="#%E6%9F%A5%E7%9C%8B-retransform-entry">查看 retransform entry</a></li>
-<li><a href="#%E5%88%A0%E9%99%A4%E6%8C%87%E5%AE%9A-retransform-entry">删除指定 retransform entry</a></li>
-<li><a href="#%E5%88%A0%E9%99%A4%E6%89%80%E6%9C%89-retransform-entry">删除所有 retransform entry</a></li>
-<li><a href="#%E6%98%BE%E5%BC%8F%E8%A7%A6%E5%8F%91-retransform">显式触发 retransform</a></li>
-<li><a href="#%E6%B6%88%E9%99%A4-retransform-%E7%9A%84%E5%BD%B1%E5%93%8D">消除 retransform 的影响</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个普通的Spring Boot应用为例，演示mc-retransform命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
-<p>启动之后，可以访问61000端口： 点击查看</p>
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="mc命令">mc命令</span></h2><blockquote>
-<p>Memory Compiler/内存编译器，编译<code>.java</code>文件生成<code>.class</code>。 可以通过<code>-c</code>/<code>--classLoaderClass</code>参数指定classloader，<code>-d</code>参数指定输出目录</p>
-</blockquote>
-<p>编译生成<code>.class</code>文件之后，可以结合<code>retransform</code>命令实现热更新代码。</p>
-<h2><span id="retransform命令">retransform命令</span></h2><blockquote>
-<p>加载外部的<code>.class</code>文件，retransform jvm已加载的类。</p>
-</blockquote>
-<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>[c:]</td>
-<td>ClassLoader的hashcode</td>
-</tr>
-<tr>
-<td><code>[classLoaderClass:]</code></td>
-<td>指定执行表达式的 ClassLoader 的 class name</td>
-</tr>
-<tr>
-<td>[p:]</td>
-<td>外部的<code>.class</code>文件的完整路径，支持多个</td>
-</tr>
-</tbody></table>
-<h4><span id="retransform的限制">retransform的限制</span></h4><ul>
-<li>不允许新增加field/method</li>
-<li>正在跑的函数，没有退出不能生效。</li>
-</ul>
-<h2><span id="热更新代码">热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>retransform</code> 命令实现动态更新代码的功能。</p>
-<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>下面通过热更新代码，修改这个逻辑。</p>
-<h4><span id="jad反编译usercontroller">jad反编译UserController</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad --source-only com.example.demo.arthas.user.UserController &gt; /tmp/UserController.java</span><br></pre></td></tr></table></figure>
-
-<p>jad反编译的结果保存在 <code>/tmp/UserController.java</code>文件里了。</p>
-<p>再打开一个<code>Terminal 3</code>，然后用vim来编辑<code>/tmp/UserController.java</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /tmp/UserController.java</span><br></pre></td></tr></table></figure>
-
-<p>比如当 user id 小于1时，也正常返回，不抛出异常：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(value=&#123;&quot;/user/&#123;id&#125;&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> User <span class="title">findUserById</span><span class="params">(<span class="meta">@PathVariable</span> Integer id)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">&quot;id: &#123;&#125;&quot;</span>, (Object)id);</span><br><span class="line">    <span class="keyword">if</span> (id != <span class="keyword">null</span> &amp;&amp; id &lt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> User(id, <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">        <span class="comment">// throw new IllegalArgumentException(&quot;id &lt; 1&quot;);</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> User(id.intValue(), <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4><span id="sc查找加载usercontroller的classloader">sc查找加载UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d *UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sc -d *UserController | grep classLoaderHash</span></span><br><span class="line"> classLoaderHash   1be6f5c3</span><br></pre></td></tr></table></figure>
-
-<p>可以发现是 spring boot <code>LaunchedURLClassLoader@1be6f5c3</code> 加载的。</p>
-<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便.</p>
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h4><span id="mc">mc</span></h4><p>保存好<code>/tmp/UserController.java</code>之后，使用<code>mc</code>(Memory Compiler)命令来编译，并且通过<code>--classLoaderClass</code>参数指定ClassLoader：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span></span><br><span class="line">Memory compiler output:</span><br><span class="line">/tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">Affect(row-cnt:1) cost in 346 ms</span><br></pre></td></tr></table></figure>
-
-<p>也可以通过<code>mc -c &lt;classLoaderHash&gt; /tmp/UserController.java -d /tmp</code>，使用<code>-c</code>参数指定ClassLoaderHash:</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc -c 1be6f5c3 /tmp/UserController.java -d /tmp</span></span><br></pre></td></tr></table></figure>
-
-<h4><span id="retransform">retransform</span></h4><p>再使用<code>retransform</code>命令重新加载新编译好的<code>UserController.class</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform /tmp/com/example/demo/arthas/user/UserController.class</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ retransform /tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">retransform success, size: 1</span><br></pre></td></tr></table></figure>
-
-<h4><span id="热修改代码结果">热修改代码结果</span></h4><p><code>retransform</code>成功之后，再次访问 user/0 ，结果是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 0,</span><br><span class="line">  &quot;name&quot;: &quot;name0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2><span id="retransform命令更多说明">retransform命令更多说明</span></h2><blockquote>
-<p>加载外部的<code>.class</code>文件，retransform jvm已加载的类。</p>
-</blockquote>
-<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
-<h4><span id="查看-retransform-entry">查看 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -l</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> retransform -l</span></span><br><span class="line">Id              ClassName       TransformCount  LoaderHash      LoaderClassName</span><br><span class="line">1               com.example.dem 1               null            null</span><br><span class="line">                o.arthas.user.U</span><br><span class="line">                serController</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>TransformCount 统计在 ClassFileTransformer#transform 函数里尝试返回 entry对应的 .class文件的次数，但并不表明transform一定成功。</li>
-</ul>
-<h4><span id="删除指定-retransform-entry">删除指定 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -d 1</span><br></pre></td></tr></table></figure>
-
-<p>需要指定 id：</p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -d 1</span><br></pre></td></tr></table></figure>
-
-<h4><span id="删除所有-retransform-entry">删除所有 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform --deleteAll</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform --deleteAll</span><br></pre></td></tr></table></figure>
-
-<h4><span id="显式触发-retransform">显式触发 retransform</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform --classPattern com.example.demo.arthas.user.UserController</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> retransform --classPattern com.example.demo.arthas.user.UserController</span></span><br><span class="line">retransform success, size: 1, classes:</span><br><span class="line">com.example.demo.arthas.user.UserController</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>注意：对于同一个类，当存在多个 retransform entry时，如果显式触发 retransform ，则最后添加的entry生效(id最大的)。</p>
-</blockquote>
-<h4><span id="消除-retransform-的影响">消除 retransform 的影响</span></h4><p>如果对某个类执行 retransform 之后，想消除影响，则需要：</p>
-<ul>
-<li>删除这个类对应的 retransform entry</li>
-<li>重新触发 retransform</li>
-</ul>
-<blockquote>
-<p>如果不清除掉所有的 retransform entry，并重新触发 retransform ，则arthas stop时，retransform过的类仍然生效。</p>
-</blockquote>
-<p>在上面删掉 retransform entry，再显式触发 retransform之后，可以用 <code>jad</code>命令来确认之前retransform的结果已经被消除了。</p>
-<p>再次访问 user/0 ，会抛出异常。</p>
-<h2><span id="更多信息">更多信息</span></h2><p>在“mc-retransform”中，我们演示了了Arthas的mc-retransform命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/">上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/">下一页</a>
+      <a class="extend prev" rel="prev" href="/">上一页</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/">下一页</a>
     </nav>
   
 
