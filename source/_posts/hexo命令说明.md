@@ -151,3 +151,42 @@ var $nav = document.querySelector('#page-nav')
     $nav.innerHTML = $nav.innerHTML + '<a class="extend next disabled" rel="next"></a>'
   }
 ```
+
+
+Hexo 字数和阅读时间统计插件
+
+项目地址
+
+链接: hexo-symbols-count-time
+
+安装配置
+
+安装插件：
+```
+npm install hexo-symbols-count-time --save
+```
+
+在站点配置文件_config.yml 中添加以下代码：
+```
+symbols_count_time:
+  symbols: true
+  time: true
+  total_symbols: true
+  total_time: true
+```
+
+然后由于此插件集成在 NexT 中，然后只需修改主题配置文件_config.yml：
+```
+symbols_count_time:
+  separated_meta: true
+  item_text_post: true
+  item_text_total: false
+  awl: 4
+  wpm: 275
+```
+
+最后一步，hexo三步走
+```
+hexo clean && hexo g && hexo d && hexo s
+```
+

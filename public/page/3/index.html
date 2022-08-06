@@ -230,6 +230,828 @@
             
 
   
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthasmc-retransform命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/">Arthas mc-retransform命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#mc%E5%91%BD%E4%BB%A4">mc命令</a></li>
+<li><a href="#retransform%E5%91%BD%E4%BB%A4">retransform命令</a><ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
+<li><a href="#retransform%E7%9A%84%E9%99%90%E5%88%B6">retransform的限制</a></li>
+</ul>
+</li>
+<li><a href="#%E7%83%AD%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81">热更新代码</a><ul>
+<li><a href="#jad%E5%8F%8D%E7%BC%96%E8%AF%91usercontroller">jad反编译UserController</a></li>
+<li><a href="#sc%E6%9F%A5%E6%89%BE%E5%8A%A0%E8%BD%BDusercontroller%E7%9A%84classloader">sc查找加载UserController的ClassLoader</a></li>
+<li><a href="#mc">mc</a></li>
+<li><a href="#retransform">retransform</a></li>
+<li><a href="#%E7%83%AD%E4%BF%AE%E6%94%B9%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%9C">热修改代码结果</a></li>
+</ul>
+</li>
+<li><a href="#retransform%E5%91%BD%E4%BB%A4%E6%9B%B4%E5%A4%9A%E8%AF%B4%E6%98%8E">retransform命令更多说明</a><ul>
+<li><a href="#%E6%9F%A5%E7%9C%8B-retransform-entry">查看 retransform entry</a></li>
+<li><a href="#%E5%88%A0%E9%99%A4%E6%8C%87%E5%AE%9A-retransform-entry">删除指定 retransform entry</a></li>
+<li><a href="#%E5%88%A0%E9%99%A4%E6%89%80%E6%9C%89-retransform-entry">删除所有 retransform entry</a></li>
+<li><a href="#%E6%98%BE%E5%BC%8F%E8%A7%A6%E5%8F%91-retransform">显式触发 retransform</a></li>
+<li><a href="#%E6%B6%88%E9%99%A4-retransform-%E7%9A%84%E5%BD%B1%E5%93%8D">消除 retransform 的影响</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个普通的Spring Boot应用为例，演示mc-retransform命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
+<p>启动之后，可以访问61000端口： 点击查看</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="mc命令">mc命令</span></h2><blockquote>
+<p>Memory Compiler/内存编译器，编译<code>.java</code>文件生成<code>.class</code>。 可以通过<code>-c</code>/<code>--classLoaderClass</code>参数指定classloader，<code>-d</code>参数指定输出目录</p>
+</blockquote>
+<p>编译生成<code>.class</code>文件之后，可以结合<code>retransform</code>命令实现热更新代码。</p>
+<h2><span id="retransform命令">retransform命令</span></h2><blockquote>
+<p>加载外部的<code>.class</code>文件，retransform jvm已加载的类。</p>
+</blockquote>
+<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
+<h4><span id="参数说明">参数说明</span></h4><table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[c:]</td>
+<td>ClassLoader的hashcode</td>
+</tr>
+<tr>
+<td><code>[classLoaderClass:]</code></td>
+<td>指定执行表达式的 ClassLoader 的 class name</td>
+</tr>
+<tr>
+<td>[p:]</td>
+<td>外部的<code>.class</code>文件的完整路径，支持多个</td>
+</tr>
+</tbody></table>
+<h4><span id="retransform的限制">retransform的限制</span></h4><ul>
+<li>不允许新增加field/method</li>
+<li>正在跑的函数，没有退出不能生效。</li>
+</ul>
+<h2><span id="热更新代码">热更新代码</span></h2><p>下面介绍通过<code>jad</code>/<code>mc</code>/<code>retransform</code> 命令实现动态更新代码的功能。</p>
+<p>目前，访问 <a href="http://localhost:61000/user/0">http://localhost:61000/user/0</a> ，会返回500异常：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:61000/user/0</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;timestamp&quot;:1550223186170,&quot;status&quot;:500,&quot;error&quot;:&quot;Internal Server Error&quot;,&quot;exception&quot;:&quot;java.lang.IllegalArgumentException&quot;,&quot;message&quot;:&quot;id &lt; 1&quot;,&quot;path&quot;:&quot;/user/0&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面通过热更新代码，修改这个逻辑。</p>
+<h4><span id="jad反编译usercontroller">jad反编译UserController</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jad --source-only com.example.demo.arthas.user.UserController &gt; /tmp/UserController.java</span><br></pre></td></tr></table></figure>
+
+<p>jad反编译的结果保存在 <code>/tmp/UserController.java</code>文件里了。</p>
+<p>再打开一个<code>Terminal 3</code>，然后用vim来编辑<code>/tmp/UserController.java</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim /tmp/UserController.java</span><br></pre></td></tr></table></figure>
+
+<p>比如当 user id 小于1时，也正常返回，不抛出异常：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GetMapping(value=&#123;&quot;/user/&#123;id&#125;&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> User <span class="title">findUserById</span><span class="params">(<span class="meta">@PathVariable</span> Integer id)</span> </span>&#123;</span><br><span class="line">    logger.info(<span class="string">&quot;id: &#123;&#125;&quot;</span>, (Object)id);</span><br><span class="line">    <span class="keyword">if</span> (id != <span class="keyword">null</span> &amp;&amp; id &lt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> User(id, <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">        <span class="comment">// throw new IllegalArgumentException(&quot;id &lt; 1&quot;);</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> User(id.intValue(), <span class="string">&quot;name&quot;</span> + id);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4><span id="sc查找加载usercontroller的classloader">sc查找加载UserController的ClassLoader</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc -d *UserController | grep classLoaderHash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sc -d *UserController | grep classLoaderHash</span></span><br><span class="line"> classLoaderHash   1be6f5c3</span><br></pre></td></tr></table></figure>
+
+<p>可以发现是 spring boot <code>LaunchedURLClassLoader@1be6f5c3</code> 加载的。</p>
+<p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
+<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
+<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便.</p>
+<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
+<h4><span id="mc">mc</span></h4><p>保存好<code>/tmp/UserController.java</code>之后，使用<code>mc</code>(Memory Compiler)命令来编译，并且通过<code>--classLoaderClass</code>参数指定ClassLoader：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader /tmp/UserController.java -d /tmp</span></span><br><span class="line">Memory compiler output:</span><br><span class="line">/tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">Affect(row-cnt:1) cost in 346 ms</span><br></pre></td></tr></table></figure>
+
+<p>也可以通过<code>mc -c &lt;classLoaderHash&gt; /tmp/UserController.java -d /tmp</code>，使用<code>-c</code>参数指定ClassLoaderHash:</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mc -c 1be6f5c3 /tmp/UserController.java -d /tmp</span></span><br></pre></td></tr></table></figure>
+
+<h4><span id="retransform">retransform</span></h4><p>再使用<code>retransform</code>命令重新加载新编译好的<code>UserController.class</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform /tmp/com/example/demo/arthas/user/UserController.class</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ retransform /tmp/com/example/demo/arthas/user/UserController.class</span><br><span class="line">retransform success, size: 1</span><br></pre></td></tr></table></figure>
+
+<h4><span id="热修改代码结果">热修改代码结果</span></h4><p><code>retransform</code>成功之后，再次访问 user/0 ，结果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;id&quot;: 0,</span><br><span class="line">  &quot;name&quot;: &quot;name0&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2><span id="retransform命令更多说明">retransform命令更多说明</span></h2><blockquote>
+<p>加载外部的<code>.class</code>文件，retransform jvm已加载的类。</p>
+</blockquote>
+<p>参考：<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/instrument/Instrumentation.html#retransformClasses-java.lang.Class%E2%80%A6-">Instrumentation#retransformClasses</a></p>
+<h4><span id="查看-retransform-entry">查看 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -l</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> retransform -l</span></span><br><span class="line">Id              ClassName       TransformCount  LoaderHash      LoaderClassName</span><br><span class="line">1               com.example.dem 1               null            null</span><br><span class="line">                o.arthas.user.U</span><br><span class="line">                serController</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>TransformCount 统计在 ClassFileTransformer#transform 函数里尝试返回 entry对应的 .class文件的次数，但并不表明transform一定成功。</li>
+</ul>
+<h4><span id="删除指定-retransform-entry">删除指定 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -d 1</span><br></pre></td></tr></table></figure>
+
+<p>需要指定 id：</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform -d 1</span><br></pre></td></tr></table></figure>
+
+<h4><span id="删除所有-retransform-entry">删除所有 retransform entry</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform --deleteAll</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform --deleteAll</span><br></pre></td></tr></table></figure>
+
+<h4><span id="显式触发-retransform">显式触发 retransform</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">retransform --classPattern com.example.demo.arthas.user.UserController</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> retransform --classPattern com.example.demo.arthas.user.UserController</span></span><br><span class="line">retransform success, size: 1, classes:</span><br><span class="line">com.example.demo.arthas.user.UserController</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：对于同一个类，当存在多个 retransform entry时，如果显式触发 retransform ，则最后添加的entry生效(id最大的)。</p>
+</blockquote>
+<h4><span id="消除-retransform-的影响">消除 retransform 的影响</span></h4><p>如果对某个类执行 retransform 之后，想消除影响，则需要：</p>
+<ul>
+<li>删除这个类对应的 retransform entry</li>
+<li>重新触发 retransform</li>
+</ul>
+<blockquote>
+<p>如果不清除掉所有的 retransform entry，并重新触发 retransform ，则arthas stop时，retransform过的类仍然生效。</p>
+</blockquote>
+<p>在上面删掉 retransform entry，再显式触发 retransform之后，可以用 <code>jad</code>命令来确认之前retransform的结果已经被消除了。</p>
+<p>再次访问 user/0 ，会抛出异常。</p>
+<h2><span id="更多信息">更多信息</span></h2><p>在“mc-retransform”中，我们演示了了Arthas的mc-retransform命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthasmonitor命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/">Arthas monitor命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#monitor%E5%91%BD%E4%BB%A4">monitor命令</a><ul>
+<li><a href="#%E7%9B%91%E6%8E%A7%E7%9A%84%E7%BB%B4%E5%BA%A6%E8%AF%B4%E6%98%8E">监控的维度说明</a></li>
+<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示monitor命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="monitor命令">monitor命令</span></h2><blockquote>
+<p>方法执行监控</p>
+</blockquote>
+<p>对匹配 <code>class-pattern</code>／<code>method-pattern</code>的类、方法的调用进行监控。</p>
+<p><code>monitor</code> 命令是一个非实时返回命令.</p>
+<p>实时返回命令是输入之后立即返回，而非实时返回的命令，则是不断的等待目标 Java 进程返回信息，直到用户输入 <code>Ctrl+C</code> 为止。</p>
+<p>服务端是以任务的形式在后台跑任务，植入的代码随着任务的中止而不会被执行，所以任务关闭后，不会对原有性能产生太大影响，而且原则上，任何Arthas命令不会引起原有业务逻辑的改变。</p>
+<h4><span id="监控的维度说明">监控的维度说明</span></h4><table>
+<thead>
+<tr>
+<th>监控项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>timestamp</td>
+<td>时间戳</td>
+</tr>
+<tr>
+<td>class</td>
+<td>Java类</td>
+</tr>
+<tr>
+<td>method</td>
+<td>方法（构造方法、普通方法）</td>
+</tr>
+<tr>
+<td>total</td>
+<td>调用次数</td>
+</tr>
+<tr>
+<td>success</td>
+<td>成功次数</td>
+</tr>
+<tr>
+<td>fail</td>
+<td>失败次数</td>
+</tr>
+<tr>
+<td>rt</td>
+<td>平均RT</td>
+</tr>
+<tr>
+<td>fail-rate</td>
+<td>失败率</td>
+</tr>
+</tbody></table>
+<h4><span id="参数说明">参数说明</span></h4><p>方法拥有一个命名参数 <code>[c:]</code>，意思是统计周期（cycle of output），拥有一个整型的参数值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>class-pattern</em></td>
+<td>类名表达式匹配</td>
+</tr>
+<tr>
+<td><em>method-pattern</em></td>
+<td>方法名表达式匹配</td>
+</tr>
+<tr>
+<td>[E]</td>
+<td>开启正则表达式匹配，默认为通配符匹配</td>
+</tr>
+<tr>
+<td><code>[c:]</code></td>
+<td>统计周期，默认值为120秒</td>
+</tr>
+</tbody></table>
+<h4><span id="使用参考">使用参考</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">monitor -c 5 demo.MathGame primeFactors</span><br></pre></td></tr></table></figure>
+
+<p>按<code>q</code>或者<code>Ctrl+c</code>退出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">q</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> monitor -c 5 demo.MathGame primeFactors</span></span><br><span class="line">Press Ctrl+C to abort.</span><br><span class="line">Affect(class-cnt:1 , method-cnt:1) cost in 94 ms.</span><br><span class="line"> timestamp            class          method        total  success  fail  avg-rt(ms)  fail-rate</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"> 2018-12-03 19:06:38  demo.MathGame  primeFactors  5      1        4     1.15        80.00%</span><br><span class="line"></span><br><span class="line"> timestamp            class          method        total  success  fail  avg-rt(ms)  fail-rate</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"> 2018-12-03 19:06:43  demo.MathGame  primeFactors  5      3        2     42.29       40.00%</span><br><span class="line"></span><br><span class="line"> timestamp            class          method        total  success  fail  avg-rt(ms)  fail-rate</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"> 2018-12-03 19:06:48  demo.MathGame  primeFactors  5      3        2     67.92       40.00%</span><br><span class="line"></span><br><span class="line"> timestamp            class          method        total  success  fail  avg-rt(ms)  fail-rate</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"> 2018-12-03 19:06:53  demo.MathGame  primeFactors  5      2        3     0.25        60.00%</span><br><span class="line"></span><br><span class="line"> timestamp            class          method        total  success  fail  avg-rt(ms)  fail-rate</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"> 2018-12-03 19:06:58  demo.MathGame  primeFactors  1      1        0     0.45        0.00%</span><br><span class="line"></span><br><span class="line"> timestamp            class          method        total  success  fail  avg-rt(ms)  fail-rate</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"> 2018-12-03 19:07:03  demo.MathGame  primeFactors  2      2        0     3182.72     0.00%</span><br></pre></td></tr></table></figure>
+
+<h2><span id="更多信息">更多信息</span></h2><p>在“monitor”中，我们演示了了Arthas的monitor命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
+    <article id="post-Java诊断工具Arthas高级命令教程/Arthasprofiler命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/">Arthas profiler命令</a>
+	
+    </h1>
+  
+
+
+  
+  
+<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/" class="archive-article-date">
+        <time datetime="2021-08-07T01:51:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <!-- toc -->
+
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-demo">启动arthas demo</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
+<li><a href="#profiler%E5%91%BD%E4%BB%A4">profiler命令</a><ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E6%94%AF%E6%8C%81%E7%9A%84action">查看所有支持的action</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8B%E7%89%88%E6%9C%AC">查看版本</a></li>
+<li><a href="#%E5%90%AF%E5%8A%A8profiler">启动profiler</a></li>
+<li><a href="#%E8%8E%B7%E5%8F%96%E5%B7%B2%E9%87%87%E9%9B%86%E7%9A%84sample%E7%9A%84%E6%95%B0%E9%87%8F">获取已采集的sample的数量</a></li>
+<li><a href="#%E6%9F%A5%E7%9C%8Bprofiler%E7%8A%B6%E6%80%81">查看profiler状态</a></li>
+<li><a href="#%E5%81%9C%E6%AD%A2profiler">停止profiler</a><ul>
+<li><a href="#%E7%94%9F%E6%88%90svg%E6%A0%BC%E5%BC%8F%E7%BB%93%E6%9E%9C">生成svg格式结果</a></li>
+<li><a href="#%E7%94%9F%E6%88%90html%E6%A0%BC%E5%BC%8F%E7%BB%93%E6%9E%9C">生成html格式结果</a></li>
+</ul>
+</li>
+<li><a href="#%E9%80%9A%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9F%A5%E7%9C%8Barthas-output%E4%B8%8B%E9%9D%A2%E7%9A%84profiler%E7%BB%93%E6%9E%9C">通过浏览器查看arthas-output下面的profiler结果</a></li>
+<li><a href="#profiler%E6%94%AF%E6%8C%81%E7%9A%84events">profiler支持的events</a></li>
+<li><a href="#%E6%81%A2%E5%A4%8D%E9%87%87%E6%A0%B7">恢复采样</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8execute%E6%9D%A5%E6%89%A7%E8%A1%8C%E5%A4%8D%E6%9D%82%E7%9A%84%E5%91%BD%E4%BB%A4">使用<code>execute</code>来执行复杂的命令</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
+</ul>
+<!-- tocstop -->
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
+<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
+<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
+<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+<ul>
+<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
+<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
+<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
+<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
+<li>是否有一个全局视角来查看系统的运行状况？</li>
+<li>有什么办法可以监控到JVM的实时运行状态？</li>
+<li>怎么快速定位应用的热点，生成火焰图？</li>
+</ul>
+<p>本教程会以一个简单的应用为例，演示profiler命令。</p>
+<ul>
+<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
+<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
+</ul>
+<h2><span id="启动arthas-demo">启动arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
+<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
+
+<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
+<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
+<h2><span id="profiler命令">profiler命令</span></h2><blockquote>
+<p>使用<a href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a>生成火焰图</p>
+</blockquote>
+<p><code>profiler</code> 命令支持生成应用热点的火焰图。本质上是通过不断的采样，然后把收集到的采样结果生成火焰图。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler` 命令基本运行结构是 `profiler action [actionArg]</span><br></pre></td></tr></table></figure>
+
+<h4><span id="参数说明">参数说明</span></h4><table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>action</em></td>
+<td>要执行的操作</td>
+</tr>
+<tr>
+<td><em>actionArg</em></td>
+<td>属性名模式</td>
+</tr>
+<tr>
+<td>[i:]</td>
+<td>采样间隔（单位：ns）（默认值：10’000’000，即10 ms）</td>
+</tr>
+<tr>
+<td>[f:]</td>
+<td>将输出转储到指定路径</td>
+</tr>
+<tr>
+<td>[d:]</td>
+<td>运行评测指定秒</td>
+</tr>
+<tr>
+<td>[e:]</td>
+<td>要跟踪哪个事件（cpu, alloc, lock, cache-misses等），默认是cpu</td>
+</tr>
+</tbody></table>
+<h4><span id="查看所有支持的action">查看所有支持的action</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler actions</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler actions</span></span><br><span class="line">Supported Actions: [resume, dumpCollapsed, getSamples, start, list, execute, version, stop, load, dumpFlat, actions, dumpTraces, status]</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看版本">查看版本</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler version</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler version</span></span><br><span class="line">Async-profiler 1.6 built on Sep  9 2019</span><br><span class="line">Copyright 2019 Andrei Pangin</span><br></pre></td></tr></table></figure>
+
+<h4><span id="启动profiler">启动profiler</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler start -e itimer</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ profiler start -e itimer</span><br><span class="line">Started [itimer] profiling</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>默认情况下，生成的是cpu的火焰图，即event为<code>cpu</code>。可以用<code>--event</code>参数来指定。 因为katacoda环境不支持perf_events，所以这里使用<code>-e itimer</code>参数指定event为itimer</p>
+</blockquote>
+<h4><span id="获取已采集的sample的数量">获取已采集的sample的数量</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler getSamples</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ profiler getSamples</span><br><span class="line">23</span><br></pre></td></tr></table></figure>
+
+<h4><span id="查看profiler状态">查看profiler状态</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler status</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler status</span></span><br><span class="line">[itimer] profiling is running for 4 seconds</span><br></pre></td></tr></table></figure>
+
+<p>可以查看当前profiler在采样哪种<code>event</code>和采样时间。</p>
+<h4><span id="停止profiler">停止profiler</span></h4><h5><span id="生成svg格式结果">生成svg格式结果</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ profiler stop</span><br><span class="line">profiler output file: /tmp/demo/arthas-output/20191125-135546.svg</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，生成的结果保存到应用的<code>工作目录</code>下的<code>arthas-output</code>目录。可以通过 <code>--file</code>参数来指定输出结果路径。比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop --file /tmp/output.svg</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler stop --file /tmp/output.svg</span></span><br><span class="line">profiler output file: /tmp/output.svg</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<h5><span id="生成html格式结果">生成html格式结果</span></h5><p>默认情况下，结果文件是<code>svg</code>格式，如果想生成<code>html</code>格式，可以用<code>--format</code>参数指定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop --format html</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler stop --format html</span></span><br><span class="line">profiler output file: /tmp/test/arthas-output/20191125-143329.html</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>或者在<code>--file</code>参数里用文件名指名格式。比如<code>--file /tmp/result.html</code> 。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler stop --file /tmp/result.html</span><br></pre></td></tr></table></figure>
+
+<h4><span id="通过浏览器查看arthas-output下面的profiler结果">通过浏览器查看arthas-output下面的profiler结果</span></h4><p>默认情况下，arthas使用8563http端口，则可以打开： 目录下面的profiler结果：</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/arthas-output.png" alt="img"></p>
+<p>点击可以查看具体的结果：</p>
+<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/arthas-output-svg.png" alt="img"></p>
+<blockquote>
+<p>如果是chrome浏览器，可能需要多次刷新。</p>
+</blockquote>
+<h4><span id="profiler支持的events">profiler支持的events</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler list</span><br></pre></td></tr></table></figure>
+
+<p>在不同的平台，不同的OS下面，支持的events各有不同。比如在macos下面：</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler list</span></span><br><span class="line">Basic events:</span><br><span class="line">  cpu</span><br><span class="line">  alloc</span><br><span class="line">  lock</span><br><span class="line">  wall</span><br><span class="line">  itimer</span><br></pre></td></tr></table></figure>
+
+<p>在linux下面</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler list</span></span><br><span class="line">Basic events:</span><br><span class="line">  cpu</span><br><span class="line">  alloc</span><br><span class="line">  lock</span><br><span class="line">  wall</span><br><span class="line">  itimer</span><br><span class="line">Perf events:</span><br><span class="line">  page-faults</span><br><span class="line">  context-switches</span><br><span class="line">  cycles</span><br><span class="line">  instructions</span><br><span class="line">  cache-references</span><br><span class="line">  cache-misses</span><br><span class="line">  branches</span><br><span class="line">  branch-misses</span><br><span class="line">  bus-cycles</span><br><span class="line">  L1-dcache-load-misses</span><br><span class="line">  LLC-load-misses</span><br><span class="line">  dTLB-load-misses</span><br><span class="line">  mem:breakpoint</span><br><span class="line">  trace:tracepoint</span><br></pre></td></tr></table></figure>
+
+<p>如果遇到OS本身的权限/配置问题，然后缺少部分event，可以参考<code>async-profiler</code>本身文档：<a href="https://github.com/jvm-profiling-tools/async-profiler">async-profiler</a></p>
+<p>可以用<code>--event</code>参数指定要采样的事件，比如对<code>alloc</code>事件进入采样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler start --event alloc</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler start --event alloc</span></span><br></pre></td></tr></table></figure>
+
+<h4><span id="恢复采样">恢复采样</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler resume</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> profiler resume</span></span><br><span class="line">Started [cpu] profiling</span><br></pre></td></tr></table></figure>
+
+<p><code>start</code>和<code>resume</code>的区别是：<code>start</code>是新开始采样，<code>resume</code>会保留上次<code>stop</code>时的数据。</p>
+<p>通过执行<code>profiler getSamples</code>可以查看samples的数量来验证。</p>
+<h4><span id="使用execute来执行复杂的命令">使用<code>execute</code>来执行复杂的命令</span></h4><p>比如开始采样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute <span class="string">&#x27;start,framebuf=5000000&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute &#x27;start,framebuf=5000000&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>停止采样，并保存到指定文件里：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute <span class="string">&#x27;stop,file=/tmp/result.svg&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">profiler execute &#x27;stop,file=/tmp/result.svg&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>具体的格式参考： <a href="https://github.com/jvm-profiling-tools/async-profiler/blob/v1.8.1/src/arguments.cpp#L50">arguments.cpp</a></p>
+<h2><span id="更多信息">更多信息</span></h2><p>在“profiler”中，我们演示了了Arthas的profiler命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
+<ul>
+<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
+<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
+</ul>
+<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
+<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
+
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			
+        		<li class="article-tag-list-item">
+        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<style>
+.toc {
+  float: right;
+  margin-left: 40px;
+  padding: 10px 20px;
+  background: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 3px #bbb;
+}
+</style>
+  
     <article id="post-Java诊断工具Arthas高级命令教程/Arthasstack命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1961,631 +2783,9 @@
 }
 </style>
   
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasjvm命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/">Arthas jvm命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#arthas-demo">Arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#jvm%E5%91%BD%E4%BB%A4">jvm命令</a><ul>
-<li><a href="#%E6%9F%A5%E6%89%BEjava%E5%BA%94%E7%94%A8%E7%9A%84classpath">查找Java应用的classpath</a></li>
-</ul>
-</li>
-<li><a href="#jvm%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">jvm使用参考</a></li>
-<li><a href="#jvm%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83-1">jvm使用参考</a><ul>
-<li><a href="#thread%E7%9B%B8%E5%85%B3">THREAD相关</a></li>
-<li><a href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E7%9B%B8%E5%85%B3">文件描述符相关</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示jvm命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="jvm命令">jvm命令</span></h2><p><code>jvm</code> 命令可以查看当前JVM信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jvm</span><br></pre></td></tr></table></figure>
-
-<h3><span id="查找java应用的classpath">查找Java应用的classpath</span></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jvm | grep PATH</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@41064]$</span><span class="bash"> jvm | grep PATH</span></span><br><span class="line"> CLASS-PATH                             packaging/target/arthas-bin/arthas-demo.jar</span><br><span class="line"> BOOT-CLASS-PATH                        /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home/jre/lib/resources.jar:/Librar</span><br><span class="line"> LIBRARY-PATH                           /Users/gongdewei/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extens</span><br></pre></td></tr></table></figure>
-
-<h2><span id="jvm使用参考">jvm使用参考</span></h2><figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> jvm</span></span><br><span class="line">RUNTIME</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> MACHINE-NAME                   37@ff267334bb65</span><br><span class="line"> JVM-START-TIME                 2020-07-23 07:50:36</span><br><span class="line"> MANAGEMENT-SPEC-VERSION        1.2</span><br><span class="line"> SPEC-NAME                      Java Virtual Machine Specification</span><br><span class="line"> SPEC-VENDOR                    Oracle Corporation</span><br><span class="line"> SPEC-VERSION                   1.8</span><br><span class="line"> VM-NAME                        Java HotSpot(TM) 64-Bit Server VM</span><br><span class="line"> VM-VENDOR                      Oracle Corporation</span><br><span class="line"> VM-VERSION                     25.201-b09</span><br><span class="line"> INPUT-ARGUMENTS                []</span><br><span class="line"> CLASS-PATH                     demo-arthas-spring-boot.jar</span><br><span class="line"> BOOT-CLASS-PATH                /usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/j</span><br><span class="line">                                re/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/</span><br><span class="line">                                java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/us</span><br><span class="line">                                r/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/l</span><br><span class="line">                                ib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes</span><br><span class="line"> LIBRARY-PATH                   /usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> CLASS-LOADING</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> LOADED-CLASS-COUNT             7529</span><br><span class="line"> TOTAL-LOADED-CLASS-COUNT       7529</span><br><span class="line"> UNLOADED-CLASS-COUNT           0</span><br><span class="line"> IS-VERBOSE                     false</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> COMPILATION</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> NAME                           HotSpot 64-Bit Tiered Compilers</span><br><span class="line"> TOTAL-COMPILE-TIME             14921(ms)</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> GARBAGE-COLLECTORS</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> PS Scavenge                            name : PS Scavenge                                                                             </span><br><span class="line"> [count/time (ms)]                      collectionCount : 7                                                                            </span><br><span class="line">                                        collectionTime : 68                                                                            </span><br><span class="line"></span><br><span class="line"> PS MarkSweep                           name : PS MarkSweep                                                                            </span><br><span class="line"> [count/time (ms)]                      collectionCount : 1                                                                            </span><br><span class="line">                                        collectionTime : 47 </span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> MEMORY-MANAGERS</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> CodeCacheManager               Code Cache</span><br><span class="line"></span><br><span class="line"> Metaspace Manager              Metaspace</span><br><span class="line">                                Compressed Class Space</span><br><span class="line"></span><br><span class="line"> Copy                           Eden Space</span><br><span class="line">                                Survivor Space</span><br><span class="line"></span><br><span class="line"> MarkSweepCompact               Eden Space</span><br><span class="line">                                Survivor Space</span><br><span class="line">                                Tenured Gen</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> MEMORY</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> HEAP-MEMORY-USAGE                      init : 268435456(256.0 MiB)                                                                    </span><br><span class="line"> [memory in bytes]                      used : 18039504(17.2 MiB)                                                                      </span><br><span class="line">                                        committed : 181403648(173.0 MiB)                                                               </span><br><span class="line">                                        max : 3817865216(3.6 GiB)                                                                      </span><br><span class="line"></span><br><span class="line"> NO-HEAP-MEMORY-USAGE                   init : 2555904(2.4 MiB)                                                                        </span><br><span class="line"> [memory in bytes]                      used : 33926216(32.4 MiB)                                                                      </span><br><span class="line">                                        committed : 35176448(33.5 MiB)                                                                 </span><br><span class="line">                                        max : -1(-1 B)  </span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> OPERATING-SYSTEM</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> OS                             Linux</span><br><span class="line"> ARCH                           amd64</span><br><span class="line"> PROCESSORS-COUNT               3</span><br><span class="line"> LOAD-AVERAGE                   29.53</span><br><span class="line"> VERSION                        4.15.0-52-generic</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> THREAD</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> COUNT                          30</span><br><span class="line"> DAEMON-COUNT                   24</span><br><span class="line"> PEAK-COUNT                     31</span><br><span class="line"> STARTED-COUNT                  36</span><br><span class="line"> DEADLOCK-COUNT                 0</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> FILE-DESCRIPTOR</span><br><span class="line">--------------------------------------------------------------------------------------------------------------</span><br><span class="line"> MAX-FILE-DESCRIPTOR-COUNT      1048576</span><br><span class="line"> OPEN-FILE-DESCRIPTOR-COUNT     100</span><br><span class="line">Affect(row-cnt:0) cost in 88 ms.</span><br></pre></td></tr></table></figure>
-
-<h2><span id="jvm使用参考">jvm使用参考</span></h2><h4><span id="thread相关">THREAD相关</span></h4><ul>
-<li><code>COUNT</code>: JVM当前活跃的线程数</li>
-<li><code>DAEMON-COUNT</code>: JVM当前活跃的守护线程数</li>
-<li><code>PEAK-COUNT</code>: 从JVM启动开始曾经活着的最大线程数</li>
-<li><code>STARTED-COUNT</code>: 从JVM启动开始总共启动过的线程次数</li>
-<li><code>DEADLOCK-COUNT</code>: JVM当前死锁的线程数</li>
-</ul>
-<h4><span id="文件描述符相关">文件描述符相关</span></h4><ul>
-<li><code>MAX-FILE-DESCRIPTOR-COUNT</code>：JVM进程最大可以打开的文件描述符数</li>
-<li><code>OPEN-FILE-DESCRIPTOR-COUNT</code>：JVM当前打开的文件描述符数</li>
-</ul>
-<h2><span id="更多信息">更多信息</span></h2><p>在“jvm”中，我们演示了了Arthas的jvm命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthasmbean命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/">Arthas mbean命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#arthas-demo">Arthas demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#mbean%E5%91%BD%E4%BB%A4">mbean命令</a><ul>
-<li><a href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E">参数说明</a></li>
-</ul>
-<ul>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a><ul>
-<li><a href="#%E5%88%97%E5%87%BA%E6%89%80%E6%9C%89-mbean-%E7%9A%84%E5%90%8D%E7%A7%B0">列出所有 Mbean 的名称</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B-mbean-%E7%9A%84%E5%85%83%E4%BF%A1%E6%81%AF">查看 Mbean 的元信息</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8Bmbean%E5%B1%9E%E6%80%A7%E4%BF%A1%E6%81%AF">查看mbean属性信息</a></li>
-<li><a href="#mbean%E7%9A%84name%E6%94%AF%E6%8C%81%E9%80%9A%E9%85%8D%E7%AC%A6%E5%8C%B9%E9%85%8D">mbean的name支持通配符匹配</a></li>
-<li><a href="#%E5%A4%9A%E5%B1%9E%E6%80%A7%E5%90%8D%E7%A7%B0%E7%9A%84%E5%8C%B9%E9%85%8D">多属性名称的匹配</a></li>
-<li><a href="#%E9%80%9A%E9%85%8D%E7%AC%A6%E5%8C%B9%E9%85%8D%E7%89%B9%E5%AE%9A%E7%9A%84%E5%B1%9E%E6%80%A7%E5%AD%97%E6%AE%B5">通配符匹配特定的属性字段</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8-e%E5%91%BD%E4%BB%A4%E5%88%87%E6%8D%A2%E4%B8%BA%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D">使用<code>-E</code>命令切换为正则匹配</a></li>
-<li><a href="#%E4%BD%BF%E7%94%A8-i%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%97%B6%E7%9B%91%E6%8E%A7">使用<code>-i</code>命令实时监控</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个简单的应用为例，演示mbean命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="arthas-demo">Arthas demo</span></h2><p>下载<code>arthas-demo.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-demo.jar;java -jar arthas-demo.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-demo</code>是一个很简单的程序，它随机生成整数，再执行因式分解，把结果打印出来。如果生成的随机数是负数，则会打印提示信息。</p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="mbean命令">mbean命令</span></h2><p>查看 Mbean 的信息</p>
-<p>这个命令可以便捷的查看或监控 Mbean 的属性信息。</p>
-<h4><span id="参数说明">参数说明</span></h4><table>
-<thead>
-<tr>
-<th>参数名称</th>
-<th>参数说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>name-pattern</td>
-<td>名称表达式匹配</td>
-</tr>
-<tr>
-<td>attribute-pattern</td>
-<td>属性名表达式匹配</td>
-</tr>
-<tr>
-<td>[m]</td>
-<td>查看元信息</td>
-</tr>
-<tr>
-<td>[i:]</td>
-<td>刷新属性值的时间间隔 (ms)</td>
-</tr>
-<tr>
-<td>[n:]</td>
-<td>刷新属性值的次数</td>
-</tr>
-<tr>
-<td>[E]</td>
-<td>开启正则表达式匹配，默认为通配符匹配。仅对属性名有效</td>
-</tr>
-</tbody></table>
-<h3><span id="使用参考">使用参考</span></h3><h4><span id="列出所有-mbean-的名称">列出所有 Mbean 的名称</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看-mbean-的元信息">查看 Mbean 的元信息</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean -m java.lang:<span class="built_in">type</span>=Threading</span><br></pre></td></tr></table></figure>
-
-<h4><span id="查看mbean属性信息">查看mbean属性信息</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean java.lang:<span class="built_in">type</span>=Threading </span><br></pre></td></tr></table></figure>
-
-<h4><span id="mbean的name支持通配符匹配">mbean的name支持通配符匹配</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean java.lang:<span class="built_in">type</span>=Th*</span><br></pre></td></tr></table></figure>
-
-<p>注意：ObjectName 的匹配规则与正常的通配符存在差异，详细参见：<a href="https://docs.oracle.com/javase/8/docs/api/javax/management/ObjectName.html?is-external=true">javax.management.ObjectName</a></p>
-<h4><span id="多属性名称的匹配">多属性名称的匹配</span></h4><p>查看内存池：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean java.lang:name=*,<span class="built_in">type</span>=MemoryPool</span><br></pre></td></tr></table></figure>
-
-<h4><span id="通配符匹配特定的属性字段">通配符匹配特定的属性字段</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean java.lang:<span class="built_in">type</span>=Threading *Count</span><br></pre></td></tr></table></figure>
-
-<h4><span id="使用-e命令切换为正则匹配">使用<code>-E</code>命令切换为正则匹配</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean -E java.lang:<span class="built_in">type</span>=Threading PeakThreadCount|ThreadCount|DaemonThreadCount</span><br></pre></td></tr></table></figure>
-
-<p>查看内存池：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean -E java.lang:name=*,<span class="built_in">type</span>=MemoryPool Name|Usage|Type | grep <span class="string">&quot; HEAP&quot;</span> -A3 -B1</span><br></pre></td></tr></table></figure>
-
-<h4><span id="使用-i命令实时监控">使用<code>-i</code>命令实时监控</span></h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mbean -i 1000 java.lang:<span class="built_in">type</span>=Threading *Count</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“mbean”中，我们演示了了Arthas的mbean命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
-    <article id="post-Java诊断工具Arthas高级命令教程/Arthaslogger命令" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/">Arthas logger命令</a>
-	
-    </h1>
-  
-
-
-  
-  
-<a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/" class="archive-article-date">
-        <time datetime="2021-08-07T01:51:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <!-- toc -->
-
-<ul>
-<li><a href="#%E5%90%AF%E5%8A%A8demo">启动demo</a></li>
-<li><a href="#%E5%90%AF%E5%8A%A8arthas-boot">启动arthas-boot</a></li>
-<li><a href="#logger%E5%91%BD%E4%BB%A4">logger命令</a><ul>
-<li><a href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E8%80%83">使用参考</a><ul>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89logger%E4%BF%A1%E6%81%AF">查看所有logger信息</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%8C%87%E5%AE%9A%E5%90%8D%E5%AD%97%E7%9A%84logger%E4%BF%A1%E6%81%AF">查看指定名字的logger信息</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%8C%87%E5%AE%9Aclassloader%E7%9A%84logger%E4%BF%A1%E6%81%AF">查看指定classloader的logger信息</a></li>
-<li><a href="#%E6%9B%B4%E6%96%B0logger-level">更新logger level</a></li>
-<li><a href="#%E6%8C%87%E5%AE%9Aclassloader%E6%9B%B4%E6%96%B0-logger-level">指定classloader更新 logger level</a></li>
-<li><a href="#%E6%9F%A5%E7%9C%8B%E6%B2%A1%E6%9C%89appender%E7%9A%84logger%E7%9A%84%E4%BF%A1%E6%81%AF">查看没有appender的logger的信息</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#%E6%9B%B4%E5%A4%9A%E4%BF%A1%E6%81%AF">更多信息</a></li>
-</ul>
-<!-- tocstop -->
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/arthas.png" alt="Arthas"></p>
-<p><code>Arthas</code> 是Alibaba开源的Java诊断工具，深受开发者喜爱。在线排查问题，无需重启；动态跟踪Java代码；实时监控JVM状态。</p>
-<p><code>Arthas</code> 支持JDK 6+，支持Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 <code>Tab</code> 自动补全功能，进一步方便进行问题的定位和诊断。</p>
-<p>当你遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
-<ul>
-<li>这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？</li>
-<li>我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？</li>
-<li>遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？</li>
-<li>线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！</li>
-<li>是否有一个全局视角来查看系统的运行状况？</li>
-<li>有什么办法可以监控到JVM的实时运行状态？</li>
-<li>怎么快速定位应用的热点，生成火焰图？</li>
-</ul>
-<p>本教程会以一个普通的Spring Boot应用为例，演示logger命令。</p>
-<ul>
-<li>Github: <a href="https://github.com/alibaba/arthas">https://github.com/alibaba/arthas</a></li>
-<li>文档: <a href="https://arthas.aliyun.com/doc/">https://arthas.aliyun.com/doc/</a></li>
-</ul>
-<h2><span id="启动demo">启动demo</span></h2><p>下载<code>demo-arthas-spring-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://code.aliyun.com/middleware-container/handsonLabExternedFiles/raw/master/demo-arthas-spring-boot.jar;java -jar demo-arthas-spring-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>demo-arthas-spring-boot</code>是一个很简单的spring boot应用，源代码：<a href="https://github.com/hengyunabc/spring-boot-inside/tree/master/demo-arthas-spring-boot">查看</a></p>
-<p>启动之后，可以访问61000端口： 点击查看</p>
-<p><img src="https://img.alicdn.com/imgextra/i2/O1CN010Qbzcz1ctPSWSZI6L_!!6000000003658-2-tps-333-182.png" alt="Demo Web"></p>
-<h2><span id="启动arthas-boot">启动arthas-boot</span></h2><p>在新的<code>Terminal 2</code>里，下载<code>arthas-boot.jar</code>，再用<code>java -jar</code>命令启动：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://arthas.aliyun.com/arthas-boot.jar;java -jar arthas-boot.jar</span><br></pre></td></tr></table></figure>
-
-<p><code>arthas-boot</code>是<code>Arthas</code>的启动程序，它启动后，会列出所有的Java进程，用户可以选择需要诊断的目标进程。</p>
-<p>选择第一个进程，输入 <code>1</code> ，再<code>Enter/回车</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1</span><br></pre></td></tr></table></figure>
-
-<p>Attach成功之后，会打印Arthas LOGO。输入 <code>help</code> 可以获取到更多的帮助信息。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">help</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/O1CN01HzatXZ1RgccrlT90M_!!6000000002141-2-tps-529-244.png" alt="Arthas Boot"></p>
-<h2><span id="logger命令">logger命令</span></h2><p>查看logger信息，更新logger level</p>
-<h4><span id="使用参考">使用参考</span></h4><h5><span id="查看所有logger信息">查看所有logger信息</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger</span></span><br><span class="line"> name              ROOT</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             INFO</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        true</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br><span class="line"> appenders         name            CONSOLE</span><br><span class="line">                   class           ch.qos.logback.core.ConsoleAppender</span><br><span class="line">                   classLoader     org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                   classLoaderHash 5674cd4d</span><br><span class="line">                   target          System.out</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h5><span id="查看指定名字的logger信息">查看指定名字的logger信息</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger -n org.springframework.web</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger -n org.springframework.web</span></span><br><span class="line"> name              org.springframework.web</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             null</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        true</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br></pre></td></tr></table></figure>
-
-<p>请记下你的classLoaderHash，后面需要使用它。在这里，它是 <code>5674cd4d</code>。</p>
-<p>注意：请使用你的classLoaderHash值覆盖 <code>&lt;classLoaderHash&gt;</code> ，然后手动执行下面所述命令：</p>
-<h5><span id="查看指定classloader的logger信息">查看指定classloader的logger信息</span></h5><p>注意hashcode是变化的，需要先查看当前的ClassLoader信息，提取对应ClassLoader的hashcode。</p>
-<p>如果你使用<code>-c</code>，你需要手动输入hashcode：<code>-c &lt;hashcode&gt;</code></p>
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> logger -c 5674cd4d</span></span><br></pre></td></tr></table></figure>
-
-<p>对于只有唯一实例的ClassLoader可以通过<code>--classLoaderClass</code>指定class name，使用起来更加方便：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader</span></span><br><span class="line">name              ROOT</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             INFO</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        true</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br><span class="line"> appenders         name            CONSOLE</span><br><span class="line">                   class           ch.qos.logback.core.ConsoleAppender</span><br><span class="line">                   classLoader     org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                   classLoaderHash 5674cd4d</span><br><span class="line">                   target          System.out</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<p><code>--classLoaderClass</code> 的值是ClassLoader的类名，只有匹配到唯一的ClassLoader实例时才能工作，目的是方便输入通用命令，而<code>-c &lt;hashcode&gt;</code>是动态变化的。</p>
-<h5><span id="更新logger-level">更新logger level</span></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --name ROOT --level debug</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --name ROOT --level debug</span></span><br><span class="line">update logger level success.</span><br></pre></td></tr></table></figure>
-
-<p>注意：在教程中执行会提示错误，需要指定classloader</p>
-<h5><span id="指定classloader更新-logger-level">指定classloader更新 logger level</span></h5><p>默认情况下，logger命令会在SystemClassloader下执行，如果应用是传统的<code>war</code>应用，或者spring boot fat jar启动的应用，那么需要指定classloader。</p>
-<p>可以先用 <code>sc -d yourClassName</code> 来查看具体的 classloader hashcode，然后在更新level时指定classloader：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --name ROOT --level debug</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --classLoaderClass org.springframework.boot.loader.LaunchedURLClassLoader --name ROOT --level debug</span></span><br></pre></td></tr></table></figure>
-
-<h5><span id="查看没有appender的logger的信息">查看没有appender的logger的信息</span></h5><p>默认情况下，<code>logger</code>命令只打印有appender的logger的信息。如果想查看没有<code>appender</code>的logger的信息，可以加上参数<code>--include-no-appender</code>。</p>
-<p>注意，通常输出结果会很长。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger --include-no-appender</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">[arthas@2062]$</span><span class="bash"> logger --include-no-appender</span></span><br><span class="line"> name              org.thymeleaf</span><br><span class="line"> class             ch.qos.logback.classic.Logger</span><br><span class="line"> classLoader       org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line"> classLoaderHash   5674cd4d</span><br><span class="line"> level             null</span><br><span class="line"> effectiveLevel    INFO</span><br><span class="line"> additivity        false</span><br><span class="line"> codeSource        jar:file:/home/scrapbook/tutorial/demo-arthas-spring-boot.jar!/BOOT-INF/lib/logback-classi</span><br><span class="line">                   c-1.1.11.jar!/</span><br><span class="line"> appenders         name            DEBUG_LEVEL_REMAPPER</span><br><span class="line">                   class           org.springframework.boot.logging.logback.LevelRemappingAppender</span><br><span class="line">                   classLoader     org.springframework.boot.loader.LaunchedURLClassLoader@5674cd4d</span><br><span class="line">                   classLoaderHash 5674cd4d</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h2><span id="更多信息">更多信息</span></h2><p>在“logger”中，我们演示了了Arthas的logger命令。如果有更多的技巧或者使用疑问，欢迎在Issue里提出。</p>
-<ul>
-<li>Issues: <a href="https://github.com/alibaba/arthas/issues">https://github.com/alibaba/arthas/issues</a></li>
-<li>文档： <a href="https://arthas.aliyun.com/doc">https://arthas.aliyun.com/doc</a></li>
-</ul>
-<p>如果您在使用Arthas，请让我们知道。您的使用对我们非常重要：<a href="https://github.com/alibaba/arthas/issues/111">查看</a></p>
-<p>文章拷贝来源：<a href="https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM">https://start.aliyun.com/course?spm=a2ck6.17690074.0.0.28bc2e7dHTphXs&amp;id=PaiFAkJM</a></p>
-
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java 诊断工具 Arthas 高级命令教程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			
-        		<li class="article-tag-list-item">
-        			<a href="/categories/java技术栈//" class="article-tag-list-link color3">java技术栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<style>
-.toc {
-  float: right;
-  margin-left: 40px;
-  padding: 10px 20px;
-  background: #f1f1f1;
-  border-radius: 10px;
-  box-shadow: 0 0 3px #bbb;
-}
-</style>
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/">下一页</a>
+      <a class="extend prev" rel="prev" href="/page/2/">上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/">下一页</a>
     </nav>
   
 
@@ -2597,7 +2797,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2021 <a href="https://jlynet.github.io/" target="_blank">jlynet</a>
+    		&copy; 2021-2022 <a href="https://jlynet.github.io/" target="_blank">jlynet</a>
     	</div>
       	<div class="footer-right">
 	      	
@@ -2745,10 +2945,6 @@
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">php</a>
-              </li>
-            
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">shell</a>
               </li>
             
@@ -2757,11 +2953,39 @@
               </li>
             
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+                <a href="javascript:void(0)" class="js-tag color2">docker</a>
               </li>
             
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">随笔</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">网络</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">php</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">ssh</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
+              </li>
+            
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
             
               <li class="article-tag-list-item">
@@ -2774,30 +2998,6 @@
             
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Java 诊断工具 Arthas 高级命令教程</a>
-              </li>
-            
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">docker</a>
-              </li>
-            
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">nginx</a>
-              </li>
-            
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">网络</a>
-              </li>
-            
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
-              </li>
-            
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
-              </li>
-            
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">ssh</a>
               </li>
             
             <div class="clearfix"></div>
