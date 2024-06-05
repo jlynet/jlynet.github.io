@@ -8,7 +8,7 @@ description: hexo 搭建博客命令收集备忘
 
 安装：
 ```bash
-sudo npm install -g hexo hexo-cli
+sudo npm install -g hexo hexo-cli --registry=https://registry.npmmirror.com
 ```
 
 创建并初始化

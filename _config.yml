@@ -4,8 +4,8 @@
 
 
 # Site
-title: 爱上猫的小鱼儿个人博客
-subtitle: '小鱼儿个人博客'
+title: 生活科技馆
+subtitle: '--个人博客'
 description: '技术决定未来....'
 keywords: [java,php,linux,win,jlynet,jlynet.cn,jlynet.com,爱上猫的小鱼儿]
 author: jlynet
@@ -129,7 +129,7 @@ pjax: true
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # git clone --depth=1 https://github.com/JoeyBling/hexo-theme-yilia-plus.git themes/yilia-plus
-theme: yilia-plus
+theme:  anzhiyu # shoka anzhiyu yilia-plus
 
 
 # Deployment
@@ -142,24 +142,24 @@ deploy:
 
 
 # yilia 主题展示所有文章功能
-jsonContent:
-    meta: false
-    pages: false
-    posts:
-      title: true
-      date: true
-      path: true
-      text: false
-      raw: false
-      content: false
-      slug: false
-      updated: false
-      comments: true
-      link: false
-      permalink: false
-      excerpt: false
-      categories: false
-      tags: true
+#jsonContent:
+#    meta: false
+#    pages: false
+#    posts:
+#      title: true
+#      date: true
+#      path: true
+#      text: false
+#      raw: false
+#      content: false
+#      slug: false
+#      updated: false
+#      comments: true
+#      link: false
+#      permalink: false
+#      excerpt: false
+#      categories: false
+#      tags: true
 
 
 # npm install hexo-toc --save
