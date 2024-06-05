@@ -1,161 +1,210 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>etCache 缓存框架的使用以及源码分析 | 生活科技馆</title><meta name="keywords" content="技术笔记,java"><meta name="author" content="jlynet"><meta name="copyright" content="jlynet"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7f9fe"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-touch-fullscreen" content="yes"><meta name="apple-mobile-web-app-title" content="etCache 缓存框架的使用以及源码分析"><meta name="application-name" content="etCache 缓存框架的使用以及源码分析"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="#f7f9fe"><meta property="og:type" content="article"><meta property="og:title" content="etCache 缓存框架的使用以及源码分析"><meta property="og:url" content="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.html"><meta property="og:site_name" content="生活科技馆"><meta property="og:description" content="一、简介 为什么使用缓存？ 使用场景 使用规范   二、如何使用 引入maven依赖 添加配置 配置说明 注解说明 @EnableCreateCacheAnnotation @EnableMethodCache @Cached @CacheInvalidate @CacheUpdate @Ca"><meta property="og:locale" content="zh-CN"><meta property="og:image" content="https://jlynet.github.io/img/64496e511b09c.jpg"><meta property="article:author" content="jlynet"><meta property="article:tag" content="[&quot;java&quot;,&quot;php&quot;,&quot;linux&quot;,&quot;win&quot;,&quot;jlynet&quot;,&quot;jlynet.cn&quot;,&quot;jlynet.com&quot;,&quot;爱上猫的小鱼儿&quot;]"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://jlynet.github.io/img/64496e511b09c.jpg"><meta name="description" content="一、简介 为什么使用缓存？ 使用场景 使用规范   二、如何使用 引入maven依赖 添加配置 配置说明 注解说明 @EnableCreateCacheAnnotation @EnableMethodCache @Cached @CacheInvalidate @CacheUpdate @Ca"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"><link rel="preconnect" href="//cdn.cbd.int"/><meta name="google-site-verification" content="xxx"/><meta name="baidu-site-verification" content="code-xxx"/><meta name="msvalidate.01" content="xxx"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/@fancyapps/ui@5.0.28/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  linkPageTop: undefined,
+  peoplecanvas: {"enable":true,"img":"https://upload-bbs.miyoushe.com/upload/2023/09/03/125766904/ee23df8517f3c3e3efc4145658269c06_5714860933110284659.png"},
+  postHeadAiDescription: {"enable":true,"gptName":"AnZhiYu","mode":"local","switchBtn":false,"btnLink":"https://afdian.net/item/886a79d4db6711eda42a52540025c377","randomNum":3,"basicWordCount":1000,"key":"xxxx","Referer":"https://xx.xx/"},
+  diytitle: {"enable":true,"leaveTitle":"w(ﾟДﾟ)w 不要走！再看看嘛！","backTitle":"♪(^∇^*)欢迎肥来！"},
+  LA51: undefined,
+  greetingBox: undefined,
+  twikooEnvId: '',
+  commentBarrageConfig:undefined,
+  root: '/',
+  preloader: {"source":3},
+  friends_vue_info: undefined,
+  navMusic: true,
+  mainTone: undefined,
+  authorStatus: undefined,
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简","rightMenuMsgToTraditionalChinese":"转为繁体","rightMenuMsgToSimplifiedChinese":"转为简体"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":330},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    simplehomepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"copy":true,"copyrightEbable":false,"limitCount":50,"languages":{"author":"作者: jlynet","link":"链接: ","source":"来源: 生活科技馆","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。","copySuccess":"复制成功，复制和转载请标注本文地址"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#425AEF","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.cbd.int/flickr-justified-gallery@2.1.2/dist/fjGallery.min.js',
+      css: 'https://cdn.cbd.int/flickr-justified-gallery@2.1.2/dist/fjGallery.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  shortcutKey: undefined,
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  configTitle: '生活科技馆',
+  title: 'etCache 缓存框架的使用以及源码分析',
+  postAI: '',
+  pageFillDescription: '一、简介, 为什么使用缓存？, 使用场景, 使用规范, 二、如何使用, 引入maven依赖, 添加配置, 配置说明, 注解说明, @EnableCreateCacheAnnotation, @EnableMethodCache, @Cached, @CacheInvalidate, @CacheUpdate, @CacheRefresh, @CachePenetrationProtect, @CreateCache, 使用示例, 三、源码解析, 项目的各个子模块, 常用注解与变量, 缓存API, Cache接口, AbstractCache抽象类, AbstractEmbeddedCache本地缓存, LinkedHashMapCache, Cleaner清理器, CaffeineCache, AbstractExternalCache远程缓存, RedisCache, RedisLettuceCache, MultiLevelCache两级缓存, RefreshCache, 解析配置, 初始化构造器, AbstractCacheAutoInit, EmbeddedCacheAutoInit, LinkedHashMapAutoConfiguration, CaffeineAutoConfiguration, ExternalCacheAutoInit, RedisAutoInit, RedisLettuceAutoInit, JetCacheAutoConfiguration自动配置, CacheBuilder构造器, AOP, 启用JetCache, @EnableMethodCache, @EnableCreateCacheAnnotation, 拦截器, ConfigProvider, CacheContext, JetCacheInterceptor, CacheHandler一简介为什么使用缓存使用场景使用规范二如何使用引入依赖添加配置配置说明注解说明使用示例三源码解析项目的各个子模块常用注解与变量缓存接口抽象类本地缓存清理器远程缓存两级缓存解析配置初始化构造器自动配置构造器启用拦截器一简介是一个基于的缓存系统封装提供统一的和注解来简化缓存的使用提供了比更加强大的注解可以原生的支持两级缓存分布式自动刷新还提供了接口用于手工缓存操作当前有四个实现特性通过统一的访问系统通过注解实现声明式的方法缓存支持和两级缓存通过注解创建并配置实例针对所有实例和方法缓存的自动统计的生成策略和的序列化策略支持自定义配置分布式缓存自动刷新分布式锁异步使用的客户端时缓存类型本地使用做方式淘汰基于开发的提供了近乎最佳命中率的高性能的缓存库远程访问的客户端使用客户端官方首选的客户端使用访问官网未作介绍使用客户端一个高性能基于的驱动框架支持线程安全的同步异步操作底层集成了提供反应式编程参考高级客户端详解为什么使用缓存在高并发大流量等场景下降低系统延迟缓解数据库压力提高系统整体的性能让用户有更好的体验使用场景读多写少不追求强一致性请求入参不易变化使用规范选择了远程缓存请设置保证存放至的缓存规范化避免与其他系统出现冲突例如这样设计系统简称所属名字这样存储到的缓存为系统简称所属名字缓存选择了本地缓存请设置全局默认设置了本地缓存的数据存放于内存减轻内存的损耗如果使用了缓存的过多可能导致内存溢出请勿滥用缓存注解对于非必要添加缓存的方法我们尽量不使用缓存二如何使用说明以下使用方式是基于引入缓存框架的如果不是工程请参考官网使用引入依赖使用客户端添加以下依赖使用客户端添加以下依赖添加配置支持的类型支持的类型可自定义转换器函数支持的类型系统简称所属名字支持的类型可自定义编码器支持的类型可自定义解码器优先从节点中读取哨兵模式单节点模式设置为主从模式集群模式系统简称所属名字连接密码连接的超时时间读取数据的超时时间连接的数据库客户端名称是否使用哨兵模式配置说明的全局配置属性默认值说明用于统计缓存调用相关信息的统计间隔分钟表示不统计缓存实例名称会作为缓存的前缀以前的版本总是把加在中因此也出现在前缀中我们一般设置为当缓存访问未命中的情况下对并发进行的加载行为进行保护当前版本实现的是单内的保护即同一个中同一个只有一个线程去加载其它线程等待结果这是全局配置如果缓存实例没有指定则使用全局配置是否使用缓存无自动生成缓存实例名称时为了不让名称太长指定的包名前缀会被截掉多个包名使用逗号分隔我们一般会指定每个缓存实例的名称本地缓存的全局配置属性默认值说明无本地缓存类型支持每个缓存实例存储的缓存数量的全局配置仅本地缓存需要配置如果缓存实例没有指定则使用全局配置请结合实例的业务场景进行配置该参数无缓存转换器的全局配置支持的类型仅当使用且缓存类型为时可以指定为此时通过方法来识别方法缓存必须指定支持自定义转换器函数可设置为然后会从容器中获取该无穷大本地缓存超时时间的全局配置毫秒多长时间没访问就让缓存失效的全局配置毫秒仅支持本地缓存表示不使用这个功能远程缓存的全局配置属性默认值说明无连接的客户端类型支持无保存至远程缓存的前缀请规范使用无参考上述说明保存至远程缓存的编码函数支持支持自定义编码函数可设置为然后会从容器中获取该保存至远程缓存的解码函数支持支持自定义解码函数可设置为然后会从容器中获取该无穷大远程缓存超时时间的全局配置毫秒无节点信息上表中对应和的属性如果注解上没有指定默认值是关于缓存的超时时间等方法上指定了超时时间则以此时间为准等方法上未指定超时时间使用实例的默认超时时间实例的默认超时时间通过在和上的属性指定如果没有指定使用中定义的全局配置例如使用如果仍未指定则是无穷大注解说明如果需要使用缓存启动类添加两个注解开启可通过注解创建实例功能开启可通过注解创建实例功能初始化注解说明属性默认值说明无需要拦截的包名只有这些包名下的实例才会生效指定切面执行过程的顺序默认最低优先级的模式目前就提供默认值让你修改无为一个方法添加缓存创建对应的缓存实例注解可以添加在接口或者类的方法上面该类必须是注解说明属性默认值说明如果在配置中配置了多个缓存在这里指定使用哪个未定义指定缓存实例名称如果没有指定会根据类名方法名自动生成会被用于远程缓存的前缀另外在统计中一个简短有意义的名字会提高可读性是否激活缓存指定的单位未定义超时时间如果注解上没有定义会使用全局配置如果此时全局配置也没有定义则为无穷大未定义仅当为时适用为本地缓存指定一个不一样的超时时间通常应该小于如果没有设置且为那么本地缓存的超时时间和远程缓存保持一致缓存的类型支持如果定义为会使用和组合成两级缓存未定义如果为或这个参数指定本地缓存的最大元素数量以控制内存占用如果注解上没有定义会使用全局配置如果此时你没有定义全局配置则使用默认的全局配置请结合实际业务场景进行设置该值未定义指定远程缓存的序列化方式支持如果注解上没有定义会使用全局配置如果你没有定义全局配置则使用默认的全局配置未定义指定的转换方式用于将复杂的类型转换为缓存实现可以接受的类型支持表示不转换可以将复杂对象转换成如果注解上没有定义会使用全局配置未定义使用指定缓存如果没有指定会根据入参自动生成当方法返回值为的时候是否要缓存未定义使用指定条件如果表达式返回的时候才去缓存中查询未定义使用指定条件如果表达式返回的时候才更新缓存该评估在方法执行后进行因此可以访问到用于移除缓存配置说明配置默认值说明如果在配置中配置了多个缓存在这里指定使用哪个无指定缓存的唯一名称一般指向对应的定义的未定义使用指定如果没有指定会根据入参自动生成未定义使用指定条件如果表达式返回才执行删除可访问方法结果删除缓存实例中的元素如果根据指定的是一个集合是否从缓存实例中删除对应的每个缓存如果设置为但是不是集合则不会删除缓存用于更新缓存配置说明配置默认值说明如果在配置中配置了多个缓存在这里指定使用哪个无指定缓存的唯一名称一般指向对应的定义的未定义使用指定如果没有指定会根据入参自动生成无使用指定未定义使用指定条件如果表达式返回才执行更新可访问方法结果更新缓存实例中的元素如果根据指定和都是集合并且元素的个数相同则是否更新缓存实例中的对应的每个元素如果设置为但是不是集合或者不是集合或者它们的元素的个数不相同也不会更新缓存用于自定刷新缓存配置说明配置默认值说明无刷新间隔未定义指定该多长时间没有访问就停止刷新如果不指定会一直刷新秒类型为的缓存刷新时同时只会有一台服务器在刷新这台服务器会在远程缓存放置一个分布式锁此配置指定该锁的超时时间指定时间单位当缓存访问未命中的情况下对并发进行的加载行为进行保护当前版本实现的是单内的保护即同一个中同一个只有一个线程去加载其它线程等待结果配置说明配置默认值说明是否开启保护模式未定义其他线程的等待超时时间如果超时则自己执行方法直接返回结果指定时间单位在中使用该注解可创建一个实例配置说明配置默认值说明如果在配置中配置了多个缓存在这里指定使用哪个未定义指定缓存实例名称如果没有指定会根据类名方法名自动生成会被用于远程缓存的前缀另外在统计中一个简短有意义的名字会提高可读性指定的单位未定义超时时间如果注解上没有定义会使用全局配置如果此时全局配置也没有定义则为无穷大未定义仅当为时适用为本地缓存指定一个不一样的超时时间通常应该小于如果没有设置且为那么本地缓存的超时时间和远程缓存保持一致缓存的类型支持如果定义为会使用和组合成两级缓存未定义如果为或这个参数指定本地缓存的最大元素数量以控制内存占用如果注解上没有定义会使用全局配置如果此时你没有定义全局配置则使用默认的全局配置请结合实际业务场景进行设置该值未定义指定远程缓存的序列化方式支持如果注解上没有定义会使用全局配置如果你没有定义全局配置则使用默认的全局配置未定义指定的转换方式用于将复杂的类型转换为缓存实现可以接受的类型支持表示不转换可以将复杂对象转换成如果注解上没有定义会使用全局配置使用示例启动类接口实现类处理逻辑处理逻辑处理逻辑如上述所示方法会创建一个缓存实例通过注解可以看到缓存实例名称为缓存的有效时长为小时本地缓存的数量最多为缓存类型为优先从本地缓存获取通过注解可以看到会为该缓存实例设置一个刷新策略刷新间隔为小时个小时没访问后不再刷新需要刷新的缓存实例会为其每一个缓存数据创建一个周期性任务注解表示该缓存实例开启保护模式当缓存未命中同一个中同一个只有一个线程去加载数据其它线程等待结果方法可以更新缓存通过注解可以看到会更新缓存实例中缓存为的缓存为方法可以删除缓存通过注解可以看到会删除缓存实例中缓存为缓存数据字段会作为一个缓存实例对象通过注解可以看到会将该字段作为为缓存实例对象本地缓存的数量最多为缓存类型为注解表示该缓存实例开启保护模式我的业务场景是使用上述的方法创建缓存实例即可注意注解不能和或者同时使用可以多个同时使用另外通过注解创建缓存实例也可以这样初始化更加详细的使用方法请参考官方地址三源码解析参考本人仓库中的项目已做详细的注释简单概括利用功能在调用需要缓存的方法前通过解析注解获取缓存配置根据这些配置创建不同的实例对象进行缓存等操作分为两部分一部分是以及实现另一部分是注解支持项目的各个子模块定义注解和常量核心接口的实现提供各种缓存实例的操作不依赖于完成初始化解析配置文件中的相关配置以提供不同缓存实例的构造器基于提供和注解支持初始化以及注解等配置使用提供支持使用提供支持实现了异步访问缓存的的接口使用提供支持提供文件方式的基于提供文件方式的基于提供文件方式的基于提供相关测试常用注解与变量在模块中定义了需要用的缓存注解与常量在上述已经详细的讲述过其中注解定义为数组然后通过新增的注解在注解上面添加即可支持同一个地方可以使用多个注解缓存主要查看子模块提供各种缓存以支持不同的缓存类型接口的子关系结构如下图主要对象描述缓存接口定义基本方法抽象类缓存接口的继承者提供基本实现具体实现交由不同的子类基于设计的简易内存缓存基于工具设计的内存缓存实现使用客户端实现使用客户端两级缓存用于封装本地缓存和远程缓存基于装饰器模式提供自动刷新功能用于注解创建的缓存实例依赖于接口接口定义了缓存实例的操作方法部分有默认实现以及获取分布式锁非严格用于刷新远程缓存的实现因为继承了接口所以也提供了方法的默认实现空方法交由不同缓存实例的实现去实现该方法用于释放资源在方法中会调用每个缓存实例对象的方法进行资源释放主要代码如下多级缓存不支持此方法随机生成一个值过期时间创建一把会自动释放资源的锁实现其方法这把锁还没有过期则删除删除对应的值出现的结果成功失败不存在删除对应的值过程中出现了异常则重试释放成功锁已经被释放了该锁已失效往或者本地中存放值结尾的返回的结果成功已存在失败成功获取到锁尝试获取锁的过程中失败了也就是往中存放值出现异常这个时候可能值已经存储了但是由于其他原因导致返回的结果表示执行失败已存在表示该锁被其他人占有尝试获取锁获取到锁则执行下面的任务执行完锁的操作后会进行资源释放调用的方法定义的方法大都是关于缓存的获取删除和存放操作其中大写的方法返回自定义的完整的返回值可以清晰的知道执行结果例如返回的时候无法断定是对应的不存在还是访问缓存发生了异常小写的方法默认实现就是调用大写的方法方法最为核心交由子类去实现方法会非堵塞的尝试获取一把分布式锁非严格获取过程尝试往中设置已存在无法设置一个键值对为缓存为并设置这个键值对的过期时间为秒默认如果获取到锁后进行加载任务也就是重新加载方法并更新远程缓存该锁实现了接口使用方式在执行完加载任务后会自动释放资源也就是调用方法将获取锁过程中设置的键值对从中删除在中会调用该方法因为如果存在远程缓存需要刷新则需要采用分布式锁的方式抽象类抽象类实现了接口主要代码如下当缓存未命中时并发情况同一个是否只允许一个线程去加载其他线程等待结果可以设置超时则自己加载并直接返回如果是的话则由获取到对应的采用了的线程进行加载临时保存对应的对象获取内部的对象封装函数成一个对象主要在重新加载缓存后发出一个到该缓存实例需要刷新从缓存中获取数据如果是多级缓存先从本地缓存获取获取不到则从远程缓存获取如果缓存数据是从远程缓存获取到的数据则会更新至本地缓存并且如果本地缓存没有设置则使用远程缓存的到期时间作为自己的到期时间我一般不设置因为可能导致本地缓存的有效时间比远程缓存的有效时间更长如果设置了记得设置添加更新当前的刷新缓存任务存放于的中从缓存中获取数据缓存命中缓存未命中创建当缓存未命中去更新缓存的函数未在缓存注解中配置的生成方式则默认取入参作为缓存在进入当前方法时是否可以考虑为创建一个副本因为缓存未命中然后通过重新加载方法时如果方法内部对入参进行了修改那么生成的缓存也会被修改从而导致相同的进入该方法时一直与缓存中的不相同一直出现缓存未命中添加了注解一个只允许一个线程执行执行方法将新的结果异步缓存为什么加一个数组疑问加载该实例的方法将重新加载的数据更新至缓存标记已完成等待其他线程加载如果出现异常或者超时则自己加载返回数据但是不更新缓存重新加载数据锁栅栏持有的线程是否加载成功加载出来的数据实现了接口的大写方法内部调用自己定义的抽象方法以开头交由不同的子类实现操作缓存后发送相应的事件也就是调用自己定义的方法遍历每个对该事件进行后置操作用于统计信息方法实现了接口的核心方法从缓存实例中根据缓存获取缓存逻辑如下获取的因为我们通过注解创建的缓存实例将生成对象需要调用其方法才会完成缓存实例的初始化函数是对加载原有方法的封装这里再进行一层封装封装成类型目的是在加载原有方法后将发送事件从缓存实例中获取对应的缓存如果缓存实例对象是类型在方法中会将包装成则调用方法判断是否应该为它添加一个定时的刷新任务如果缓存未命中则执行函数如果开启了保护模式则调用自定义的方法大致逻辑根据缓存从自己的线程安全遍历中尝试获取不存在则创建加载锁获取到这把加载锁才可以执行函数如果已被其他线程占有则进行等待没有设置超时时间则一直等待通过计数器实现本地缓存抽象类继承抽象类定义了本地缓存的存放缓存数据的对象为接口和一个初始化该接口的抽象方法基于接口实现以开头的方法完成缓存实例各种操作的具体实现主要代码如下本地缓存的设置该缓存数据的最后一次访问时间抽象类实现了操作本地缓存的相关方法定义了缓存实例对象本地缓存的配置信息对象定义了缓存实例对象本地缓存基于内存操作缓存数据的对象它的初始化过程交由不同的内存缓存实例和基于完成缓存实例对象本地缓存基于内存操作缓存数据的对象的初始化工作主要代码如下将缓存实例添加至用于本地缓存类型为缓存实例存储缓存数据允许的最大缓存数量缓存实例锁当元素大于最大值时移除最老的元素最老的元素是否删除清理过期的元素占有当前缓存实例这把锁缓存的数据已经失效了则删除为什么不对进行判断取最小值疑问如果缓存不存在或者对应的已经失效则放入否则返回自定义继承并实现接口自定义字段存储元素个数的最大值并设置初始容量为自定义字段每个缓存实例的锁通过关键词保证线程安全所以性能相对来说不好覆盖的方法当元素大于最大值时移除最老的元素自定义方法遍历根据缓存被封装成的对象包含缓存数据失效时间戳和第一次访问的时间清理过期的元素该对象初始化时会被添加至清理器中会周期性每隔秒遍历缓存实例调用其方法清理器用于清理缓存类型为的缓存数据请查看相应注释代码如下执行任务定时清理每分钟缓存实例中过期的缓存数据存放弱引用对象以防内存溢出如果被弱引用的对象只被当前弱引用对象关联时时被弱引用的对象则会被回收取决于被弱引用的对象是否还与其他强引用对象关联个人理解当某个强引用对象没有被其他对象除了这里引用时我们应该让这个对象被回收但是由于这里使用的也是强引用这个对象被其他强引用对象关联了不可能被回收存在内存溢出的危险所以这里使用了弱引用对象如果被弱引用的对象没有被其他对象除了这里引用时这个对象会被回收举个例子如果我们往一个中存放一个键值对假设对应的键已经不再使用被回收了那我们无法再获取到对应的值也无法被回收占有一定的内存存在风险创建一个线程池个核心线程起一个循环任务一直清理过期的数据每隔秒创建一个弱引用对象并添加到清理对象中获取被弱引用的对象强引用表示被弱引用的对象被标记成了垃圾则移除基于完成缓存实例对象本地缓存基于内存操作缓存数据的对象的初始化工作主要代码如下缓存实例对象初始化本地缓存的容器对象设置缓存实例的最大缓存数量设置缓存实例的缓存数据的失效策略获取缓存的有效时间缓存数据有效时间如果本地缓存设置了多长时间没访问缓存则失效设置缓存的失效时间多长时间没访问缓存则失效缓存的有效时长取构建缓存实例通过构建一个缓存对象然后实现接口调用这个缓存对象的相关方法构建时设置每个元素的过期时间也就是根据每个元素的失效时间戳来设置底层如何实现的可以参考官方地址调用的方法我有遇到过内存溢出的问题所以请结合实际业务场景合理的设置缓存相关配置远程缓存抽象类继承抽象类定义了缓存实例对象远程缓存的配置信息对象提供了将缓存转换成字节数组的方法代码比较简单使用连接对远程的缓存数据进行操作代码没有很复杂可查看我的注释定义了配置对象包含连接池的相关信息实现了以开头的方法也就是通过操作缓存数据使用连接对远程的缓存数据进行操作代码没有很复杂可查看我的注释定义了配置对象包含客户端与建立的安全连接等信息因为底层是基于实现的所以无需配置线程池使用自定义管理器将与连接的相关信息封装成对象并管理与对应关系相比更加安全高效对不了解的可以参考我写的测试类两级缓存当你设置了缓存类型为两级缓存那么创建的实例对象会被封装成对象定义了字段类型为用于保存本地缓存实例和远程缓存实例本地缓存存放于远程缓存前面实现了方法遍历数组也就是先从本地缓存获取如果获取缓存不成功则从远程缓存获取成功获取到缓存后会调用方法从方法的逻辑可以看到将获取到的缓存数据更新至更底层的缓存中也就是说如果缓存数据是从远程获取到的那么进入这个方法后会将获取到的缓存数据更新到本地缓存中去这样下次请求可以直接从本地缓存获取避免与之间的网络消耗实现了方法遍历数组通过进行异步编程将所有的操作绑定在一条链上执行实现的了方法会先判断是否单独配置了本地缓存时间配置了则单独为本地缓存设置过期时间没有配置则到期时间和远程缓存的一样覆盖方法调用方法也就是只会调用最顶层远程缓存的这个方法主要代码如下本地缓存使用自己的失效时间设置了为本地缓存则使用自己的到期时间遍历多级缓存远程缓存排在后面这个遍历是从低层的缓存开始获取获取成功则将该值设置到更低层的缓存中情景本地没有获取到缓存远程获取到了缓存这里会将远程的缓存数据设置到本地中这样下次请求则直接从本次获取减少了远程获取的时间如果使用本地自己的缓存过期时间使用本地缓存自己的过期时间使用远程缓存的过期时间远程缓存数据还未失效则重新设置本地的缓存表示本地缓存使用自己过期时间将多个操作放在一条链上为缓存实例添加刷新任务前面在抽象类中讲到了在方法中会将包装成所以说每个缓存实例都会调用一下方法代码如下用于保存刷新任务获取缓存刷新策略没有则不进行刷新获取刷新时间间隔获取线程任务的获取对应的不存在则创建一个获取周期延迟线程池个核心线程创建的线程都是守护线程运行的任务多久延迟后开始执行后续执行的周期间隔多长时间单位通过其创建一个循环任务用于刷新缓存数据设置最后一次访问时间如果缓存实例配置了刷新策略并且刷新间隔大于则会从线程安全中尝试获取对应的刷新任务如果不存在则创建一个任务放入线程池周期性的执行代码如下如果是两级缓存则返回远程缓存唯一标志符也就是转换后的值缓存的执行方法的对象最后一次访问时间该的执行策略尝试中断当前任务从任务列表中删除重新加载数据异常封装成加载后会发起事件加载将重新加载的数据放入缓存远程加载数据缓存对象当前时间异常获取转换后的值创建分布式锁对应的分布式锁的存在时间刷新间隔对应的时间戳用于存放上次刷新时间获取上一次刷新时间是否需要重新加载当前时间与上一次刷新的时间间隔是否大于或等于刷新间隔无缓存将顶层的缓存数据更新至低层的缓存中例如将远程的缓存数据放入本地缓存因为如果是多级缓存创建刷新任务后我们只需更新远程的缓存然后从远程缓存获取缓存数据更新低层的缓存保证缓存一致重新加载保存一个至其中的信息为该的生成时间刷新缓存分布式缓存没有一个全局分配的功能这里尝试获取一把非严格的分布式锁获取锁的超时时间默认秒也就是获取到这把锁最多可以拥有秒只有获取对应的这把分布式锁才执行重新加载的操作没有获取到锁并且是多级缓存这个时候应该有其他实例在刷新缓存所以这里设置过一会直接获取远程的缓存数据更新到本地创建一个延迟任务刷新间隔后将最顶层的缓存数据更新至每一层获取多级缓存中顶层的缓存数据将缓存数据重新放入低层缓存刷新任务的具体执行取消执行最后一次访问到现在时间的间隔超过了设置的则取消当前任务执行获取缓存实例对象如果是多层则返回顶层也就是远程缓存远程缓存刷新本地缓存刷新刷新逻辑判断是否需要停止刷新了需要的话调用其的方法取消执行并从中删除获取缓存实例对象如果是多层则返回顶层也就是远程缓存实例对象如果是本地缓存则调用方法也就是执行函数加载原有方法将获取到的数据更新至缓存实例中如果是多级缓存则每级缓存都会更新如果是远程缓存对象则调用方法刷新后会往中存放一个键值对为为上一次刷新时间先从中获取上一次刷新时间的键值对根据上一次刷新的时间判断是否大于刷新间隔大于或者没有上一次刷新时间表示需要重新加载数据否则不需要重新加载数据如果不需要重新加载数据但是又是多级缓存则获取远程缓存数据更新至本地缓存保证两级缓存的一致性如果需要重新加载数据则调用方法尝试获取分布式锁执行刷新任务调用方法并往中重新设置上一次的刷新时间如果没有获取到分布式锁则创建一个延迟任务刷新间隔后将最顶层的缓存数据更新至每一层解析配置主要查看子模块解析中相关配置初始化不同缓存类型的构造器用于生产缓存实例也初始化以下对象缓存管理器注入了全局配置缓存实例管理器缓存上下文等大量信息存储构造器以及的相关信息全局配置类保存了一些全局信息初始化构造器通过注解将需要使用到的缓存类型对应的构造器初始化类注入到容器并执行初始化过程也就是创建构造器初始化构造器类的类型结构如下图所示主要对象描述抽象类实现的接口注入至容器时完成初始化抽象类继承解析本地缓存独有的配置初始化构造器初始化构造器抽象类继承解析远程缓存独有的配置初始化构造器初始化构造器抽象类主要实现了的接口在注入容器时会调用其方法完成本地缓存类型和远程缓存类型构造器的初始化主要代码如下初始化方法这里我们有两个指定前缀创建一个配置对象本地或者远程获取本地或者远程的配置项获取本地或者远程的这里我一般只有默认的获取本地或者远程存储类型例如缓存类型是否和当前的某一个匹配不同的会设置一个或者多个因为有很多继承者都会执行这个方法不同的继承者解析不同的配置例如只解析即可只解析即可获取本地或者远程的的子配置项根据配置信息构建本地或者远程缓存的构造器将构造器存放至设置公共的配置到构造器中构造器配置信息设置的转换函数设置超时时间兼容老版本多长时间没有访问就让缓存失效表示不使用该功能注意只支持本地缓存初始化构造器交由子类去实现配置信息配置前缀构造器在方法中可以看到会调用方法分别初始化本地缓存和远程缓存的构造器定义的方法首先会从当前环境中解析出的相关配置到对象中然后遍历缓存区域获取对应的缓存类型进行不同类型的缓存实例构造器初始化过程不同构造器的初始化方法交由子类实现获取到构造器后会将其放入对象中去另外也定义了方法解析本地缓存和远程缓存都有的配置至构造器中抽象类继承了主要是覆盖父类的解析本地缓存单有的配置代码如下设置本地缓存每个缓存实例的缓存数量个数限制默认继承了实现了方法先通过创建一个默认实现类然后解析相关配置至构造器中完成初始化代码如下创建一个构造器解析相关配置至的中配置了缓存类型为当前类才会被注入容器这里我们注意到注解这个注解的作用是满足条件这个才会被容器管理他的条件是继承了也就是说配置文件中配置了缓存类型为时这个类才会被容器管理才会完成构造器的初始化逻辑并不复杂可自行查看继承了实现了方法先通过创建一个默认实现类然后解析相关配置至构造器中完成初始化代码如下创建一个构造器解析相关配置至的中配置了缓存类型为当前类才会被注入容器同样使用了注解这个注解的作用是满足条件这个才会被容器管理他的条件是继承了也就是说配置文件中配置了缓存类型为时这个类才会被容器管理才会完成构造器的初始化抽象类继承了主要是覆盖父类的解析远程缓存单有的配置和代码如下设置远程缓存构造器的相关配置构造器配置信息设置远程缓存的前缀根据配置创建缓存数据的编码函数和解码函数继承了实现方法完成了通过连接的初始化操作主要代码如下配置了缓存类型为当前类才会被注入容器设置缓存类型是否只从的从节点读取数据获取从节点的配置信息依次创建每个从节点的连接池创建一个构造器解析相关配置至的中创建连接池配置信息连接池创建连接池配置对象创建一个连接池创建一个连接池是内部的静态类在内通过方法定义作为同样使用了注解满足条件这个才会被容器管理内部的也不会被管理也就是说配置文件中配置了缓存类型为时才会被容器管理才会完成构造器的初始化实现了方法先解析的相关配置通过创建连接池通过创建一个默认实现类解析相关配置至构造器中完成初始化将连接保存至中继承了实现方法完成了通过连接的初始化操作主要代码如下注入容器的条件配置了缓存类型为当前类才会被注入容器设置缓存类型初始化构造器配置信息配置前缀构造器数据节点偏好设置集群模式异步获取结果的超时时间默认只从节点中读取优先从节点中读取优先从节点中读取只从节点中读取使用最近一次连接的实例读取创建对应的只有一个集群模式只给一个域名怎么办疑问创建一个客户端设置失去连接时的行为拒绝命令默认为创建一个客户端创建一个安全连接并设置数据节点偏好多个集群模式创建一个客户端创建一个构造器解析相关配置至的中开始将客户端和安全连接保存至管理器中初始化连接初始化连接的相关信息保存至中并将相关信息保存至是内部的静态类在内通过方法定义作为同样使用了注解满足条件这个才会被容器管理内部的也不会被管理也就是说配置文件中配置了缓存类型为时才会被容器管理才会完成构造器的初始化实现了方法先解析的相关配置通过创建客户端和与的连接通过创建一个默认实现类解析相关配置至构造器中完成初始化获取管理器将通过创建客户端和与的连接保存将客户端与的连接同步命令异步命令和反应式命令相关保存至中自动配置上面的初始化构造器的类需要被容器管理就需被扫描到我们一般会设置扫描路径但是别人引入肯定是作为其他包不能够被扫描到的这些也就不会被管理这里我们查看模块下文件内容如下这应该是一种机制这样这个项目以外的包里面的就会被容器扫描到我们来看看他的代码该将会被容器注入依次注入下面几个为添加依赖由此会完成初始化配置操作缓存实例构造器也会被注入容器可以看到通过注解初始化构造器的那些类会被加入到容器加上注解只有我们配置过的缓存类型的构造器才会被加入然后保存至对象中注意到这里我们注入的是对象加上注解无法再次注册该对象至容器相比对象它的区别是设置了为设置了为目的是支持两个解析器能够解析自定义在中可以看到它是一个用于容器初始后执行操作目的是往的的依赖中添加几个类型的保证几个构造器已经初始化方法中设置全局的相关配置并添加已经初始化的构造器然后返回让容器管理这样一来就完成了的解析配置并初始化的功能构造器构造器的作用就是根据配置构建一个对应类型的缓存实例的子类结构如下根据类名就可以知道其作用接口只定义了一个方法用于构建缓存实例交由不同的实现类抽象类实现了方法主要代码如下该缓存实例的配置创建缓存实例函数克隆一份配置信息因为这里获取到的是全局配置信息以防后续被修改通过构建函数创建一个缓存实例目前发现都是后续都会把封装成疑问实现了的方法支持克隆该对象因为每个缓存实例的配置不一定相同这个构造器中保存的是全局的一些配置所以需要克隆一个构造器出来为每个缓存实例设置其自己的配置而不影响这个最初始的构造器定义对象存放缓存配置构建缓存实例需要根据这些配置定义的函数用于构建缓存实例我们在初始化构造器中可以看到不同的构造器设置的该函数都是一个缓存实例并传入配置信息例如设置构建缓存实例的函数进入的构造器你就可以看到会根据配置完成缓存实例的初始化不同类型的构造器区别在于类型不同因为远程和本地的配置是有所区别的还有就是设置的函数不同因为需要构建不同的缓存实例和上面的例子差不多都是一个缓存实例并传入配置信息这里就不一一讲述了主要查看子模块提供功能启用可以通过和注解完成的初始化工作我们在工程中的启动类上面添加这两个注解即可启用缓存注解的相关配置在上面的如何使用中已经讲过了这里我们关注注解中的和两个类将会被容器管理上面有注解所以会被作为一个里面定义了一个为所以这个也会被容器管理中保存方法与缓存注解配置信息的映射关系继承了通过注解他的方法会被调用根据不同的导入不同的配置类可以看到会返回一个类名称那么它也会被注入是配置的配置类代码如下获取注解信息的名称设置缓存拦截器为设置需要扫描的包设置优先级默认的最大值最低优先级注入一个拦截器设置为框架内部的角色因为是通过注解注入的并且实现了接口当被注入的时候会先调用其方法这里好像必须添加注解不然无法被识别出来获取到注解的元信息其中定义了两个实现了中的方法拦截器可用于拦截方法后执行相关处理继承了将会作为一个切面设置了通知为也就是说被拦截的方法都会进入就作为的入口了根据注解设置了需要扫描的包路径以及优先级默认是最低优先级实现了接口的方法设置这个切面的切入点为从作为切入点实现了接口用于判断哪些类需要被拦截实现了接口用于判断哪些类中的哪些方法会被拦截在判断方法是否需要进入的过程中会解析方法上面的相关缓存注解将配置信息封装对象中并把它保存至对象中总结注解主要就是生成一个切面用于拦截带有缓存注解的方法相比注解没有相关属性同样会导入类不同的是将导入类它继承了作为一个用于在初始化的时候做一些操作从代码中可以看到他的作用是如果这个内部存在添加了带有注解的字段没有添加会将这个字段作为需要注入的对象解析成缓存实例的主要代码如下是否初始化用于懒加载缓存实例所处上下文注解元信息字段刷新策略保护策略获取缓存实例不存在则新建缓存实例从的容器中获取全局缓存配置对象将注解信息封装到对象中从缓存实例管理器中获取或者创建对应的缓存实例可以看到通过创建的缓存实例也可以添加和注解在抽象类的方法中我们有讲到如果缓存实例是类型则会先调用其方法获取缓存实例对象所以在第一次访问的时候才进行初始化并根据缓存注解配置信息创建存在则直接获取一个缓存实例总结注解主要是支持能够创建缓存实例通过和两个注解加上前面的解析配置过程已经完成的的解析与初始化过程那么接下来我们来看看如何处理被拦截的方法拦截器从切入点判断方法是否需要拦截的逻辑方法所在的类对象是否匹配除去以开头和包含的类该类是否在我们通过注解配置的中从获取方法对应的对象也就是获取缓存配置信息如果是一个空对象那么不需要被拦截因为前面已经判断了所在的类是否需要被拦截而这个类中并不是所有的方法都会添加缓存注解所以这一类的方法会设置一个空对象定义在内部的一个静态对象添加了修饰保存在中如果不为则需被拦截通过解析这个方法的缓存注解如果有注解或者注解或者注解先解析注解生成对象保存至中然后该方法会被拦截否在保存一个空对象不会被拦截是一个配置提供者对象包含了的全局配置缓存实例管理器缓存转换器缓存转换器上下文和监控指标相关信息主要代码如下缓存的全局配置缓存实例管理器根据不同类型生成缓存数据转换函数的转换器根据不同类型生成缓存转换函数的转换器缓存监控指标管理器打印缓存各项指标的函数缓存更新事件消息接收者无实现类我们可以自己实现用于统计一些缓存的命中信息默认的缓存监控指标管理器缓存上下文启动缓存指标监控器周期性打印各项指标初始化缓存上下文启动缓存指标监控器根据编码类型通过缓存转换器生成编码函数编码类型编码函数根据解码类型通过缓存转换器生成解码函数解码类型解码函数根据转换类型通过缓存转换器生成转换函数转换类型转换函数继承了查看其代码可以看到有两个方法分别为初始化方法和销毁方法因为分别添加了注解和注解所以在初始化时会调用在容器销毁时会调用方法内部分别调用和这两个方法交由子类实现在方法中先启动缓存指标监控器用于周期性打印各项缓存指标然后初始化缓存上下文返回的是在方法中关闭缓存指标监控器清除缓存实例缓存上下文主要为每一个被拦截的请求创建缓存上下文构建对应的缓存实例主要代码如下缓存的管理器包含很多信息缓存的全局配置缓存实例管理器创建一个本次调用的上下文添加一个函数后续用于获取缓存实例根据注解配置信息获取缓存实例对象不存在则创建并设置到缓存注解配置类中缓存注解根据配置创建一个缓存实例对象通过更新使失效缓存注解缓存区域缓存实例名称没有定义缓存实例名称生成缓存实例名称类名方法名参数类型创建缓存实例对象缓存名称拼接从缓存实例管理器中根据缓存区域和缓存实例名称获取缓存实例加锁再次确认缓存区域的名称是否作为缓存名称前缀默认为我一般设置为构建一个缓存实例本地缓存远程缓存两级缓存构建本地缓存实例构建远程缓存实例两级缓存时是否单独设置了本地缓存失效时间创建一个两级缓存设置缓存刷新策略将封装成也就是类型后续添加刷新任务时会判断是否为类型然后决定是否执行方法添加刷新任务没有刷新策略不会添加设置缓存未命中时是否只允许一个线程执行方法其他线程等待全局配置默认为方法的注解添加监控统计配置获取缓存区域对应的构造器克隆一个构造器因为不同缓存实例有不同的配置设置失效时间设置缓存的前缀配置文件中配置了则设置为设置为如果注解中设置了的转换方式则替换否则还是使用全局的设置的转换器只支持缓存数据保存至远程需要进行编码和解码所以这里设置其编码和解码方式和可选择设置是否缓存值获取缓存区域对应的构造器克隆一个构造器因为不同缓存实例有不同的配置本地缓存数量限制设置本地缓存失效时间前提是多级缓存一般和远程缓存保持一致不设置设置失效时间设置是否缓存值构建一个缓存实例方法返回一个本次调用的上下文为这个上下文设置缓存函数用于获取或者构建缓存实例这个函数在中会被调用我们来看看这个函数的处理逻辑有两个入参分别为本次调用的上下文和缓存注解的配置信息首先从缓存注解的配置信息中获取缓存实例如果不为则直接返回否则调用方法根据配置通过构造器创建一个缓存实例对象方法如果没有定义缓存实例名称注解中的配置则生成类名方法名参数类型作为缓存实例名称然后调用方法方法通过缓存实例管理器根据缓存区域和缓存实例名称获取缓存实例对象如果不为则直接返回判断缓存实例对象是否为为进行两次确认第二次会给当前加锁进行判断避免线程不安全缓存实例对象还是为的话先判断缓存区域是否添加至缓存实例名称中是的话为缓存实例名称然后调用方法创建一个缓存实例对象方法根据缓存实例类型构建不同的缓存实例对象处理逻辑如下为则调用方法从全局配置的保存本地缓存构造器的集合中的获取本地缓存该缓存区域的构造器在之前讲到的自动配置中有说到过会将初始化好的构造器从中添加至中克隆一个构造器因为不同缓存实例有不同的配置将缓存注解的配置信息设置到构造器中有以下配置如果配置了则设置本地缓存最大数量的值如果为并且配置了大于则设置有效时间的值为否则如果配置的大于则设置其值为如果配置了则根据该值生成一个转换函数没有配置的话在初始化构造器的时候根据全局配置可能已经生成了一个转换函数我一般在全局配置中设置设置是否缓存值通过调用构造器的方法构建一个缓存实例对象该方法在之前讲到的构造器中有分析过为则调用方法从全局配置的保存远程缓存构造器的集合中的获取远程缓存该缓存区域的构造器克隆一个构造器因为不同缓存实例有不同的配置将缓存注解的配置信息设置到构造器中有以下配置如果配置了则设置远程缓存有效时间的值如果全局设置远程缓存的缓存的前缀则设置缓存的前缀为否则我为如果配置了则根据该值生成一个转换函数没有配置的话在初始化构造器的时候根据全局配置可能已经生成了一个转换函数我一般在全局配置中设置如果设置了则根据该值生成编码和解码函数没有配置的话在初始化构造器的时候根据全局配置可能已经生成了编码函数和解码函数我一般在全局配置中设置设置是否缓存值通过调用构造器的方法构建一个缓存实例对象为则调用方法构建本地缓存实例调用方法构建远程缓存实例创建一个构造器设置有效时间为远程缓存的有效时间添加和缓存实例设置是否单独配置了本地缓存的失效时间是否有配置设置是否缓存值通过调用构造器的方法构建一个缓存实例对象设置刷新策略没有的话为将缓存实例对象封装成对象用于后续的添加刷新任务在之前的抽象类有讲到设置是否开启缓存未命中时加载方法的保护模式全局默认为将缓存实例添加至监控管理器中被拦截后的处理在中代码如下缓存实例注解信息上下文缓存的全局配置缓存的管理器包含很多信息这里会获取到可查看获取被拦截的方法获取被拦截的对象获取改方法的方法所在类名方法名参数类型方法返回类型被拦截的类名获取该方法的缓存注解信息在中已经对注解进行解析并放入中无缓存相关注解配置信息表明无须缓存直接执行该方法为本次调用创建一个上下文对象包含对应的缓存实例继续往下执行从中获取被拦截的方法对象的缓存配置信息如果没有则直接执行该方法否则继续往下执行根据对象因为在之前讲到的自动配置中有说到注入的是对象在其初始化方法中调用方法生成调用其方法为本次调用创建一个上下文并设置获取缓存实例函数具体实现逻辑查看上面讲到的设置本次调用上下文的为被拦截对象为被拦截对象的调用器为被拦截方法为方法入参为缓存配置信息为缓存实例名称需要截断的包名通过的方法继续往下执行用于处理被拦截的方法部分代码如下获取缓存实例配置获取注解配置信息经过缓存中获取结果根据结果删除或者更新缓存执行该方法获取本地调用的上下文获取注解配置信息获取缓存实例对象不存在则会创建并设置到中可在创建本次调用的上下文时调用方法中查看详情无缓存实例对象执行原有方法生成缓存对象注解中没有配置的话就是入参没有入参则为生成缓存失败则执行原方法并记录事件根据配置的来决定是否走缓存缓存注解中没有配置表示所有请求都走缓存配置了表示满足条件的才走缓存不满足则直接执行原方法并记录事件创建一个执行原有方法的函数本次执行原方法后是否需要更新缓存获取结果调用原有方法发送事件执行被拦截的方法直接查看方法获取缓存注解信息根据本地调用的上下文获取缓存实例对象调用其函数在中有讲到如果缓存实例不存在则直接调用方法执行被拦截的对象的调用器根据本次调用的上下文生成缓存根据配置的缓存的表达式生成如果没有配置则返回入参对象如果没有对象则返回根据配置表达式判断是否需要走缓存创建一个对象用于执行被拦截的对象的调用器也就是加载原有方法调用缓存实例的方法获取结果这个方法的处理过程可查看缓存这一小节至此结束文章转自',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-10-01 10:54:00',
+  postMainColor: '',
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
 
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
 
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18171d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f7f9fe')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#FFF">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-
-<link rel="icon" type="image/ico" sizes="32x32" href="/images/favicon.ico">
-  <meta http-equiv="Cache-Control" content="no-transform">
-  <meta http-equiv="Cache-Control" content="no-siteapp">
-
-
-<link rel="alternate" type="application/rss+xml" title="生活科技馆" href="https://jlynet.github.io/rss.xml" />
-<link rel="alternate" type="application/atom+xml" title="生活科技馆" href="https://jlynet.github.io/atom.xml" />
-<link rel="alternate" type="application/json" title="生活科技馆" href="https://jlynet.github.io/feed.json" />
-
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic%7CFredericka%20the%20Great:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20JP:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20SC:300,300italic,400,400italic,700,700italic%7CInconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-
-<link rel="stylesheet" href="/css/app.css?v=0.2.5">
-
-  
-  <meta name="keywords" content="技术笔记,java" />
-
-
-<link rel="canonical" href="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
-
-
-
-  <title>
-etCache 缓存框架的使用以及源码分析 - java技术栈 |
-爱上猫的小鱼儿 = 生活科技馆 = --个人博客</title>
-<meta name="generator" content="Hexo 5.4.0">
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div id="loading">
-    <div class="cat">
-      <div class="body"></div>
-      <div class="head">
-        <div class="face"></div>
-      </div>
-      <div class="foot">
-        <div class="tummy-end"></div>
-        <div class="bottom"></div>
-        <div class="legs left"></div>
-        <div class="legs right"></div>
-      </div>
-      <div class="paw">
-        <div class="hands left"></div>
-        <div class="hands right"></div>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <header id="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="inner">
-        <div id="brand">
-          <div class="pjax">
-          
-  <h1 itemprop="name headline">etCache 缓存框架的使用以及源码分析
-  </h1>
-  
-<div class="meta">
-  <span class="item" title="创建时间：2021-10-01 10:41:48">
-    <span class="icon">
-      <i class="ic i-calendar"></i>
-    </span>
-    <span class="text">发表于</span>
-    <time itemprop="dateCreated datePublished" datetime="2021-10-01T10:41:48+08:00">2021-10-01</time>
-  </span>
-</div>
+</head><body data-type="anzhiyu"><div id="web_bg"></div><div id="an_music_bg"></div><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><img class="loading-img nolazyload" alt="加载头像" src="/img/avatar.jpg"/><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.getElementById('loading-box').classList.add("loaded");
+  },
+  initLoading: () => {
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+setTimeout(function(){preloader.endLoading();},10000)
 
-
-          </div>
-        </div>
-        <nav id="nav">
-  <div class="inner">
-    <div class="toggle">
-      <div class="lines" aria-label="切换导航栏">
-        <span class="line"></span>
-        <span class="line"></span>
-        <span class="line"></span>
-      </div>
-    </div>
-    <ul class="menu">
-      <li class="item title"><a href="/" rel="start">爱上猫的小鱼儿</a></li>
-    </ul>
-    <ul class="right">
-      <li class="item theme">
-        <i class="ic i-sun"></i>
-      </li>
-      <li class="item search">
-        <i class="ic i-search"></i>
-      </li>
-    </ul>
-  </div>
-</nav>
-
-      </div>
-      <div id="imgs" class="pjax">
-        <ul>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giclx29mstj20zk0m8hdt.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giclhpw3lwj20zk0m8gvw.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipewkhf1zj20zk0m81kx.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipeyvx1d4j20zk0m8hdt.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giclfw2t96j20zk0m8x6p.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipevgoki5j20zk0m84qp.jpg"></li>
-        </ul>
-      </div>
-    </header>
-    <div id="waves">
-      <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-        <defs>
-          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-        </defs>
-        <g class="parallax">
-          <use xlink:href="#gentle-wave" x="48" y="0" />
-          <use xlink:href="#gentle-wave" x="48" y="3" />
-          <use xlink:href="#gentle-wave" x="48" y="5" />
-          <use xlink:href="#gentle-wave" x="48" y="7" />
-        </g>
-      </svg>
-    </div>
-    <main>
-      <div class="inner">
-        <div id="main" class="pjax">
-          
-  <div class="article wrap">
-    
-<div class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
-<i class="ic i-home"></i>
-<span><a href="/">首页</a></span><i class="ic i-angle-right"></i>
-<span  class="current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" itemprop="item" rel="index" title="分类于 java技术栈"><span itemprop="name">java技术栈</span></a>
-<meta itemprop="position" content="1" /></span>
-</div>
-
-    <article itemscope itemtype="http://schema.org/Article" class="post block" lang="zh-CN">
-  <link itemprop="mainEntityOfPage" href="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
-
-  <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="image" content="/images/avatar.jpg">
-    <meta itemprop="name" content="jlynet">
-    <meta itemprop="description" content="--个人博客, 技术决定未来....">
-  </span>
-
-  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="生活科技馆">
-  </span>
-
-  <div class="body md" itemprop="articleBody">
-    
-
-    <!-- toc -->
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.10/progress_bar/progress_bar.css"/><script async="async" src="https://cdn.cbd.int/pace-js@1.2.4/pace.min.js" data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"></script><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><div id="nav-group"><span id="blog_name"><a id="site-name" href="/" accesskey="h"><div class="title">生活科技馆</div><i class="anzhiyufont anzhiyu-icon-house-chimney"></i></a></span><div class="mask-name-container"><div id="name-container"><a id="page-name" href="javascript:anzhiyu.scrollToDest(0, 500)">PAGE_NAME</a></div></div><div id="menus"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机前往一个文章" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-dice"></i></a></div><input id="center-console" type="checkbox"/><label class="widget" for="center-console" title="中控台" onclick="anzhiyu.switchConsole();"><i class="left"></i><i class="widget center"></i><i class="widget right"></i></label><div id="console"><div class="console-card-group-reward"><ul class="reward-all console-card"><li class="reward-item"><a href="/img/weixin.png" target="_blank"><img class="post-qr-code-img" alt="微信" src="/img/weixin.png"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" alt="支付宝" src="/img/alipay.jpg"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div><div class="console-card-group"><div class="console-card-group-left"><div class="console-card" id="card-newest-comments"><div class="card-content"><div class="author-content-item-tips">互动</div><span class="author-content-item-title"> 最新评论</span></div><div class="aside-list"><span>正在加载中...</span></div></div></div><div class="console-card-group-right"><div class="console-card tags"><div class="card-content"><div class="author-content-item-tips">兴趣点</div><span class="author-content-item-title">寻找你感兴趣的领域</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 入门教程<sup>2</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 最佳实践<sup>14</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 高级命令教程<sup>25</sup></a><a href="/tags/Spring/" style="font-size: 1.05rem;">Spring<sup>1</sup></a><a href="/tags/SpringBoot/" style="font-size: 1.05rem;">SpringBoot<sup>1</sup></a><a href="/tags/Tomcat/" style="font-size: 1.05rem;">Tomcat<sup>1</sup></a><a href="/tags/docker/" style="font-size: 1.05rem;">docker<sup>2</sup></a><a href="/tags/hexo/" style="font-size: 1.05rem;">hexo<sup>3</sup></a><a href="/tags/java/" style="font-size: 1.05rem;">java<sup>4</sup></a><a href="/tags/linux/" style="font-size: 1.05rem;">linux<sup>8</sup></a><a href="/tags/nginx/" style="font-size: 1.05rem;">nginx<sup>2</sup></a><a href="/tags/php/" style="font-size: 1.05rem;">php<sup>1</sup></a><a href="/tags/shell/" style="font-size: 1.05rem;">shell<sup>6</sup></a><a href="/tags/ssh/" style="font-size: 1.05rem;">ssh<sup>1</sup></a><a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 1.05rem;">中间件<sup>1</sup></a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" style="font-size: 1.05rem;">技术笔记<sup>17</sup></a><a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 1.05rem;">网络<sup>2</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.05rem;">随笔<sup>12</sup></a></div></div><hr/></div></div><div class="console-card history"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-box-archiv"></i><span>文章</span></div><div class="card-archives"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/06/"><span class="card-archive-list-date">六月 2024</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/08/"><span class="card-archive-list-date">八月 2022</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/06/"><span class="card-archive-list-date">六月 2022</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/11/"><span class="card-archive-list-date">十一月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/10/"><span class="card-archive-list-date">十月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">9</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/09/"><span class="card-archive-list-date">九月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/08/"><span class="card-archive-list-date">八月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">42</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/07/"><span class="card-archive-list-date">七月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li></ul></div><hr/></div></div></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" title="显示模式切换" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-moon"></i></a></div><div class="console-btn-item" id="consoleHideAside" onclick="anzhiyu.hideAsideBtn()" title="边栏显示控制"><a class="asideSwitch"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="anzhiyu.musicToggle()" title="音乐开关"><a class="music-switch"><i class="anzhiyufont anzhiyu-icon-music"></i></a></div></div><div class="console-mask" onclick="anzhiyu.hideConsole()" href="javascript:void(0);"></div></div><div class="nav-button" id="nav-totop"><a class="totopbtn" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i><span id="percent" onclick="anzhiyu.scrollToDest(0,500)">0</span></a></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);" title="切换"><i class="anzhiyufont anzhiyu-icon-bars"></i></a></div></div></div></nav><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original">原创</a><span class="post-meta-categories"><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" itemprop="url">java技术栈</a></span><span class="article-meta tags"><a class="article-meta__tags" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>技术笔记</span></a><a class="article-meta__tags" href="/tags/java/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>java</span></a></span></div></div><h1 class="post-title" itemprop="name headline">etCache 缓存框架的使用以及源码分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="anzhiyufont anzhiyu-icon-calendar-days post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" itemprop="dateCreated datePublished" datetime="2021-10-01T02:41:48.000Z" title="发表于 2021-10-01 10:41:48">2021-10-01</time><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-history post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" itemprop="dateCreated datePublished" datetime="2021-10-01T02:54:00.000Z" title="更新于 2021-10-01 10:54:00">2021-10-01</time></span></div><div class="meta-secondline"><span class="post-meta-separator">       </span><span class="post-meta-position" title="作者IP属地为长沙"><i class="anzhiyufont anzhiyu-icon-location-dot"></i>长沙</span></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section><div id="post-top-cover"><img class="nolazyload" id="post-top-bg" src=""></div></header><main id="blog-container"><div class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container" itemscope itemtype="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"><header><a class="post-meta-categories" href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" itemprop="url">java技术栈</a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" tabindex="-1" itemprop="url">技术笔记</a><a href="/tags/java/" tabindex="-1" itemprop="url">java</a><h1 id="CrawlerTitle" itemprop="name headline">etCache 缓存框架的使用以及源码分析</h1><span itemprop="author" itemscope itemtype="http://schema.org/Person">jlynet</span><time itemprop="dateCreated datePublished" datetime="2021-10-01T02:41:48.000Z" title="发表于 2021-10-01 10:41:48">2021-10-01</time><time itemprop="dateCreated datePublished" datetime="2021-10-01T02:54:00.000Z" title="更新于 2021-10-01 10:54:00">2021-10-01</time></header><!-- toc -->
 
 <ul>
 <li><a href="#%E4%B8%80-%E7%AE%80%E4%BB%8B">一、简介</a><ul>
@@ -724,11 +773,11 @@ etCache 缓存框架的使用以及源码分析 - java技术栈 |
 <li>jetcache-starter-redis-springdata：提供pom文件，Spring Boot方式的Starter，基于Spring Data。</li>
 <li>jetcache-test：提供相关测试。</li>
 </ul>
-<h3><span id="常用注解与变量">常用注解与变量</span></h3><p><a href="AnnoAPI.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/AnnoAPI.png" alt="AnnoAPI"></a></p>
+<h3><span id="常用注解与变量">常用注解与变量</span></h3><p><a href="AnnoAPI.png"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/AnnoAPI.png" alt="AnnoAPI"></a></p>
 <p>在jetcache-anno-api模块中定义了需要用的缓存注解与常量，在上述已经详细的讲述过，其中<code>@CacheInvalidateContainer</code>注解定义value为<code>@CacheInvalidate</code>数组，然后通过jdk8新增的<code>@Repeatable</code>注解，在<code>@CacheInvalidate</code>注解上面添加<code>@Repeatable(CacheInvalidateContainer.class)</code>，即可支持同一个地方可以使用多个<code>@CacheInvalidate</code>注解。</p>
 <h3><span id="缓存api">缓存API</span></h3><p>主要查看jetcache-core子模块，提供各种<code>Cache</code>缓存，以支持不同的缓存类型</p>
 <p>Cache接口的子关系，结构如下图：</p>
-<p><a href="Cache.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/Cache.png" alt="Cache"></a></p>
+<p><a href="Cache.png"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/Cache.png" alt="Cache"></a></p>
 <p>主要对象描述：</p>
 <ul>
 <li>Cache：缓存接口，定义基本方法</li>
@@ -848,7 +897,7 @@ etCache 缓存框架的使用以及源码分析 - java技术栈 |
 <p><code>com.alicp.jetcache.anno.support.GlobalCacheConfig</code>：全局配置类，保存了一些全局信息</p>
 <h4><span id="初始化构造器">初始化构造器</span></h4><p>通过<code>@Conditional</code>注解将需要使用到的缓存类型对应的构造器初始化类注入到Spring容器并执行初始化过程，也就是创建CacheBuilder构造器</p>
 <p>初始化构造器类的类型结构如下图所示：</p>
-<p><a href="AbstractCacheAutoInit.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/AbstractCacheAutoInit.png" alt="AbstractCacheAutoInit"></a></p>
+<p><a href="AbstractCacheAutoInit.png"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/AbstractCacheAutoInit.png" alt="AbstractCacheAutoInit"></a></p>
 <p>主要对象描述：</p>
 <p>AbstractCacheAutoInit：抽象类，实现Spring的InitializingBean接口，注入至Spring容器时完成初始化</p>
 <p>EmbeddedCacheAutoInit：抽象类，继承AbstractCacheAutoInit，解析本地缓存独有的配置</p>
@@ -943,7 +992,7 @@ etCache 缓存框架的使用以及源码分析 - java技术栈 |
 </ol>
 <h4><span id="cachebuilder构造器">CacheBuilder构造器</span></h4><p>构造器的作用就是根据配置构建一个对应类型的缓存实例</p>
 <p>CacheBuilder的子类结构如下：</p>
-<p><a href="CacheBuilder.png"><img src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/CacheBuilder.png" alt="CacheBuilder"></a></p>
+<p><a href="CacheBuilder.png"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/CacheBuilder.png" alt="CacheBuilder"></a></p>
 <p>根据类名就可以知道其作用</p>
 <p>CacheBuilder接口只定义了一个<code>buildCache()</code>方法，用于构建缓存实例，交由不同的实现类</p>
 <p>AbstractCacheBuilder抽象类实现了<code>buildCache()</code>方法，主要代码如下：</p>
@@ -1077,347 +1126,148 @@ etCache 缓存框架的使用以及源码分析 - java技术栈 |
 </ol>
 <p>至此结束！！！😄😄😄</p>
 <p>文章转自：<a href="https://www.cnblogs.com/lifullmoon/p/13854158.html">https://www.cnblogs.com/lifullmoon/p/13854158.html</a></p>
+</article><div class="post-copyright"><div class="copyright-cc-box"><i class="anzhiyufont anzhiyu-icon-copyright"></i></div><div class="post-copyright__author_box"><a class="post-copyright__author_img" href="/" title="头像"><img class="post-copyright__author_img_back" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" title="头像" alt="头像"><img class="post-copyright__author_img_front" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" title="头像" alt="头像"></a><div class="post-copyright__author_name">jlynet</div><div class="post-copyright__author_desc">--个人博客</div></div><div class="post-copyright__post__info"><a class="post-copyright__original" title="该文章为原创文章，注意版权协议" href="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">原创</a><a class="post-copyright-title"><span onclick="rm.copyPageUrl('https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/')">etCache 缓存框架的使用以及源码分析</span></a></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div class="rewardLeftButton"><div class="post-reward" onclick="anzhiyu.addRewardMask()"><div class="reward-button button--animated" title="赞赏作者"><i class="anzhiyufont anzhiyu-icon-hand-heart-fill"></i>打赏作者</div><div class="reward-main"><div class="reward-all"><span class="reward-title">感谢你赐予我前进的力量</span><ul class="reward-group"><li class="reward-item"><a href="/img/weixin.png" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/weixin.png" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul><a class="reward-main-btn" href="/about/#about-reward" target="_blank"><div class="reward-text">赞赏者名单</div><div class="reward-dec">因为你们的支持让我意识到写文章的价值🙏</div></a></div></div></div><div id="quit-box" onclick="anzhiyu.removeRewardMask()" style="display: none"></div></div><div class="shareRight"><div class="share-link mobile"><div class="share-qrcode"><div class="share-button" title="使用手机访问这篇文章"><i class="anzhiyufont anzhiyu-icon-qrcode"></i></div><div class="share-main"><div class="share-main-all"><div id="qrcode" title="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"></div><div class="reward-dec">使用手机访问这篇文章</div></div></div></div></div><div class="share-link weibo"><a class="share-button" target="_blank" href="https://service.weibo.com/share/share.php?title=etCache 缓存框架的使用以及源码分析&amp;url=https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/&amp;pic=" rel="external nofollow noreferrer noopener"><i class="anzhiyufont anzhiyu-icon-weibo"></i></a></div><script>function copyCurrentPageUrl() {
+  var currentPageUrl = window.location.href;
+  var input = document.createElement("input");
+  input.setAttribute("value", currentPageUrl);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}</script><div class="share-link copyurl"><div class="share-button" id="post-share-url" title="复制链接" onclick="copyCurrentPageUrl()"><i class="anzhiyufont anzhiyu-icon-link"></i></div></div></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://jlynet.github.io" target="_blank">生活科技馆</a>！</span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__box"><div class="post-meta__box__tag-list"><a class="post-meta__box__tags" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>技术笔记<span class="tagsPageCount">17</span></a><a class="post-meta__box__tags" href="/tags/java/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>java<span class="tagsPageCount">4</span></a></div></div></div><div class="post_share"><div class="social-share" data-image="/img/64496e511b09c.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"/><script src="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer="defer"></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">各种开源协议介绍</div></div></a></div><div class="next-post pull-right"><a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Docker 私有仓库搭建</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="anzhiyufont anzhiyu-icon-thumbs-up fa-fw" style="font-size: 1.5rem; margin-right: 4px"></i><span>喜欢这篇文章的人也看了</span></div><div class="relatedPosts-list"><div><a href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" title="Arthas安装使用"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-07-30</div><div class="title">Arthas安装使用</div></div></a></div><div><a href="/2021/08/16/PHP%E5%92%8CJava%E4%B8%AD%E7%9A%84SHA256/" title="PHP和Java中的SHA256"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-08-16</div><div class="title">PHP和Java中的SHA256</div></div></a></div><div><a href="/2021/10/21/%E8%A7%A3%E5%86%B3SpringBoot-2-3-MultipartFile%E4%B8%BA%E7%A9%BA%E7%9A%84%E9%97%AE%E9%A2%98/" title="解决SpringBoot 2.3 MultipartFile为空的问题"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-21</div><div class="title">解决SpringBoot 2.3 MultipartFile为空的问题</div></div></a></div><div><a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" title="Docker 私有仓库搭建"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-09</div><div class="title">Docker 私有仓库搭建</div></div></a></div><div><a href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" title="GitHub博客hexo建站之设置SSH密钥"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2022-06-30</div><div class="title">GitHub博客hexo建站之设置SSH密钥</div></div></a></div><div><a href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/" title="Linux网络基础，路由的追踪"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-18</div><div class="title">Linux网络基础，路由的追踪</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="author-info-avatar"><img class="avatar-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__description">技术决定未来....</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bars"></i><span>文章目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">一、简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.1.</span> <span class="toc-text">为什么使用缓存？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.2.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.3.</span> <span class="toc-text">使用规范</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">二、如何使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.1.</span> <span class="toc-text">引入maven依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.2.</span> <span class="toc-text">添加配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.3.</span> <span class="toc-text">配置说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.4.</span> <span class="toc-text">注解说明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.1.</span> <span class="toc-text">@EnableCreateCacheAnnotation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.2.</span> <span class="toc-text">@EnableMethodCache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.3.</span> <span class="toc-text">@Cached</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.4.</span> <span class="toc-text">@CacheInvalidate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.5.</span> <span class="toc-text">@CacheUpdate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.6.</span> <span class="toc-text">@CacheRefresh</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.7.</span> <span class="toc-text">@CachePenetrationProtect</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.8.</span> <span class="toc-text">@CreateCache</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.5.</span> <span class="toc-text">使用示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">三、源码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.1.</span> <span class="toc-text">项目的各个子模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.2.</span> <span class="toc-text">常用注解与变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.3.</span> <span class="toc-text">缓存API</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.1.</span> <span class="toc-text">Cache接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.2.</span> <span class="toc-text">AbstractCache抽象类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.3.</span> <span class="toc-text">AbstractEmbeddedCache本地缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.3.1.</span> <span class="toc-text">LinkedHashMapCache</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.3.2.</span> <span class="toc-text">Cleaner清理器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.3.3.</span> <span class="toc-text">CaffeineCache</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.4.</span> <span class="toc-text">AbstractExternalCache远程缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.4.1.</span> <span class="toc-text">RedisCache</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.4.2.</span> <span class="toc-text">RedisLettuceCache</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.5.</span> <span class="toc-text">MultiLevelCache两级缓存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.6.</span> <span class="toc-text">RefreshCache</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.4.</span> <span class="toc-text">解析配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.4.1.</span> <span class="toc-text">初始化构造器</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.4.1.1.</span> <span class="toc-text">AbstractCacheAutoInit</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.4.1.2.</span> <span class="toc-text">EmbeddedCacheAutoInit</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.2.1.</span> <span class="toc-text">LinkedHashMapAutoConfiguration</span></a></li><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.2.2.</span> <span class="toc-text">CaffeineAutoConfiguration</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.4.1.3.</span> <span class="toc-text">ExternalCacheAutoInit</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.3.1.</span> <span class="toc-text">RedisAutoInit</span></a></li><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.3.2.</span> <span class="toc-text">RedisLettuceAutoInit</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.4.2.</span> <span class="toc-text">JetCacheAutoConfiguration自动配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.4.3.</span> <span class="toc-text">CacheBuilder构造器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.5.</span> <span class="toc-text">AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.5.1.</span> <span class="toc-text">启用JetCache</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.1.1.</span> <span class="toc-text">@EnableMethodCache</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.1.2.</span> <span class="toc-text">@EnableCreateCacheAnnotation</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.5.2.</span> <span class="toc-text">拦截器</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.1.</span> <span class="toc-text">ConfigProvider</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.2.</span> <span class="toc-text">CacheContext</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.3.</span> <span class="toc-text">JetCacheInterceptor</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.4.</span> <span class="toc-text">CacheHandler</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-history"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/05/Unicode-character-issue-0-to-255/" title="Unicode character issue 0 to 255">Unicode character issue 0 to 255</a><time datetime="2024-06-05T03:16:29.000Z" title="发表于 2024-06-05 11:16:29">2024-06-05</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/" title="HAProxy 原理 &amp; dash board 各指标含义">HAProxy 原理 &amp; dash board 各指标含义</a><time datetime="2022-08-04T03:05:01.000Z" title="发表于 2022-08-04 11:05:01">2022-08-04</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" title="GitHub博客hexo建站之设置SSH密钥">GitHub博客hexo建站之设置SSH密钥</a><time datetime="2022-06-30T06:27:23.000Z" title="发表于 2022-06-30 14:27:23">2022-06-30</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2021/11/17/hello-world/" title="Hello World">Hello World</a><time datetime="2021-11-17T01:41:10.000Z" title="发表于 2021-11-17 09:41:10">2021-11-17</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" title="ssh端口转发笔记">ssh端口转发笔记</a><time datetime="2021-10-23T10:33:25.000Z" title="发表于 2021-10-23 18:33:25">2021-10-23</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div id="footer-bar-tips"><div class="copyright">&copy;2020 - 2024 By <a class="footer-bar-link" href="/" title="jlynet" target="_blank">jlynet</a></div></div><div id="footer-type-tips"></div></div><div class="footer-bar-right"><a class="footer-bar-link" href="https://gitee.com/jlynet-openSrc" title="jlynet.cn开源">jlynet.cn开源</a></div></div></div></footer></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="sidebar-site-data site-data is-center"><a href="/archives/" title="archive"><div class="headline">文章</div><div class="length-num">62</div></a><a href="/tags/" title="tag"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/" title="category"><div class="headline">分类</div><div class="length-num">8</div></a></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" href="javascript:void(0);" title="显示模式"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span>显示模式</span></a></div><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://blog.anheyu.com/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/favicon.ico" alt="博客"/><span class="back-menu-item-text">博客</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" href="https://image.anheyu.com/" title="安知鱼图床"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="https://image.anheyu.com/favicon.ico" alt="安知鱼图床"/><span class="back-menu-item-text">安知鱼图床</span></a></div></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 入门教程<sup>2</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 最佳实践<sup>14</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 高级命令教程<sup>25</sup></a><a href="/tags/Spring/" style="font-size: 0.88rem;">Spring<sup>1</sup></a><a href="/tags/SpringBoot/" style="font-size: 0.88rem;">SpringBoot<sup>1</sup></a><a href="/tags/Tomcat/" style="font-size: 0.88rem;">Tomcat<sup>1</sup></a><a href="/tags/docker/" style="font-size: 0.88rem;">docker<sup>2</sup></a><a href="/tags/hexo/" style="font-size: 0.88rem;">hexo<sup>3</sup></a><a href="/tags/java/" style="font-size: 0.88rem;">java<sup>4</sup></a><a href="/tags/linux/" style="font-size: 0.88rem;">linux<sup>8</sup></a><a href="/tags/nginx/" style="font-size: 0.88rem;">nginx<sup>2</sup></a><a href="/tags/php/" style="font-size: 0.88rem;">php<sup>1</sup></a><a href="/tags/shell/" style="font-size: 0.88rem;">shell<sup>6</sup></a><a href="/tags/ssh/" style="font-size: 0.88rem;">ssh<sup>1</sup></a><a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 0.88rem;">中间件<sup>1</sup></a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" style="font-size: 0.88rem;">技术笔记<sup>17</sup></a><a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 0.88rem;">网络<sup>2</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 0.88rem;">随笔<sup>12</sup></a></div></div><hr/></div></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="anzhiyufont anzhiyu-icon-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="anzhiyufont anzhiyu-icon-gear"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="anzhiyufont anzhiyu-icon-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></button></div></div><div id="nav-music"><a id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()" accesskey="m">播放音乐</a><div id="console-music-bg"></div><meting-js id="8152976493" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random" volume="0.7"></meting-js></div><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="anzhiyufont anzhiyu-icon-arrow-left"></i></div><div class="rightMenu-item" id="menu-forward"><i class="anzhiyufont anzhiyu-icon-arrow-right"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="anzhiyufont anzhiyu-icon-arrow-rotate-right" style="font-size: 1rem;"></i></div><div class="rightMenu-item" id="menu-top"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="anzhiyufont anzhiyu-icon-paste"></i><span>粘贴文本</span></div><a class="rightMenu-item" id="menu-commenttext"><i class="anzhiyufont anzhiyu-icon-comment-medical"></i><span>引用到评论</span></a><div class="rightMenu-item" id="menu-newwindow"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="anzhiyufont anzhiyu-icon-link"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="anzhiyufont anzhiyu-icon-images"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="anzhiyufont anzhiyu-icon-download"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-newwindowimg"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开图片</span></div><div class="rightMenu-item" id="menu-search"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-searchBaidu"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>百度搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="anzhiyufont anzhiyu-icon-backward"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="anzhiyufont anzhiyu-icon-forward"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open(&quot;https://y.qq.com/n/ryqq/playlist/8802438608&quot;, &quot;_blank&quot;);" style="display: none;"><i class="anzhiyufont anzhiyu-icon-radio"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-link" id="menu-randomPost"><i class="anzhiyufont anzhiyu-icon-shuffle"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="anzhiyufont anzhiyu-icon-cube"></i><span>博客分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item" id="menu-copy" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制地址</span></a><a class="rightMenu-item" id="menu-commentBarrage" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-message"></i><span class="menu-commentBarrage-text">关闭热评</span></a><a class="rightMenu-item" id="menu-darkmode" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span class="menu-darkmode-text">深色模式</span></a><a class="rightMenu-item" id="menu-translate" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-language"></i><span>轉為繁體</span></a></div></div><div id="rightmenu-mask"></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.cbd.int/@fancyapps/ui@5.0.28/dist/fancybox/fancybox.umd.js"></script><script src="https://cdn.cbd.int/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://cdn.cbd.int/vanilla-lazyload@17.8.5/dist/lazyload.iife.min.js"></script><script src="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.js"></script><canvas id="universe"></canvas><script async src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/dark/dark.js"></script><script>// 消除控制台打印
+var HoldLog = console.log;
+console.log = function () {};
+let now1 = new Date();
+queueMicrotask(() => {
+  const Log = function () {
+    HoldLog.apply(console, arguments);
+  }; //在恢复前输出日志
+  const grt = new Date("04/01/2021 00:00:00"); //此处修改你的建站时间或者网站上线时间
+  now1.setTime(now1.getTime() + 250);
+  const days = (now1 - grt) / 1000 / 60 / 60 / 24;
+  const dnum = Math.floor(days);
+  const ascll = [
+    `欢迎使用安知鱼!`,
+    `生活明朗, 万物可爱`,
+    `
+        
+       █████╗ ███╗   ██╗███████╗██╗  ██╗██╗██╗   ██╗██╗   ██╗
+      ██╔══██╗████╗  ██║╚══███╔╝██║  ██║██║╚██╗ ██╔╝██║   ██║
+      ███████║██╔██╗ ██║  ███╔╝ ███████║██║ ╚████╔╝ ██║   ██║
+      ██╔══██║██║╚██╗██║ ███╔╝  ██╔══██║██║  ╚██╔╝  ██║   ██║
+      ██║  ██║██║ ╚████║███████╗██║  ██║██║   ██║   ╚██████╔╝
+      ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝    ╚═════╝
+        
+        `,
+    "已上线",
+    dnum,
+    "天",
+    "©2020 By 安知鱼 V1.6.12",
+  ];
+  const ascll2 = [`NCC2-036`, `调用前置摄像头拍照成功，识别为【小笨蛋】.`, `Photo captured: `, `🤪`];
 
-      <div class="tags">
-          <a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" rel="tag"><i class="ic i-tag"></i> 技术笔记</a>
-          <a href="/tags/java/" rel="tag"><i class="ic i-tag"></i> java</a>
-      </div>
-  </div>
+  setTimeout(
+    Log.bind(
+      console,
+      `\n%c${ascll[0]} %c ${ascll[1]} %c ${ascll[2]} %c${ascll[3]}%c ${ascll[4]}%c ${ascll[5]}\n\n%c ${ascll[6]}\n`,
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      ""
+    )
+  );
+  setTimeout(
+    Log.bind(
+      console,
+      `%c ${ascll2[0]} %c ${ascll2[1]} %c \n${ascll2[2]} %c\n${ascll2[3]}\n`,
+      "color:white; background-color:#4fd953",
+      "",
+      "",
+      'background:url("https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/tinggge.gif") no-repeat;font-size:450%'
+    )
+  );
 
-   <footer>
+  setTimeout(Log.bind(console, "%c WELCOME %c 你好，小笨蛋.", "color:white; background-color:#4f90d9", ""));
 
-    <div class="meta">
-  <span class="item">
-    <span class="icon">
-      <i class="ic i-calendar-check"></i>
-    </span>
-    <span class="text">更新于</span>
-    <time title="修改时间：2021-10-01 10:54:00" itemprop="dateModified" datetime="2021-10-01T10:54:00+08:00">2021-10-01</time>
-  </span>
-</div>
+  setTimeout(
+    console.warn.bind(
+      console,
+      "%c ⚡ Powered by 安知鱼 %c 你正在访问 jlynet 的博客.",
+      "color:white; background-color:#f0ad4e",
+      ""
+    )
+  );
 
-      
-<div class="reward">
-  <button><i class="ic i-heartbeat"></i> 赞赏</button>
-  <p>请我喝[茶]~(￣▽￣)~*</p>
-  <div id="qr">
-      
-      <div>
-        <img data-src="/images/wechatpay.png" alt="jlynet 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div>
-        <img data-src="/images/alipay.png" alt="jlynet 支付宝">
-        <p>支付宝</p>
-      </div>
-      
-      <div>
-        <img data-src="/images/paypal.png" alt="jlynet 贝宝">
-        <p>贝宝</p>
-      </div>
-  </div>
-</div>
+  setTimeout(Log.bind(console, "%c W23-12 %c 你已打开控制台.", "color:white; background-color:#4f90d9", ""));
 
-      
+  setTimeout(
+    console.warn.bind(console, "%c S013-782 %c 你现在正处于监控中.", "color:white; background-color:#d9534f", "")
+  );
+});</script><script async src="/anzhiyu/random.js"></script><div class="js-pjax"><input type="hidden" name="page-type" id="page-type" value="post"></div><script>var visitorMail = "";
+</script><script async data-pjax src="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/waterfall/waterfall.js"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/qrcodejs/1.0.0/qrcode.min.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.9/icon/ali_iconfont_css.css"><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/aplayer/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.cbd.int/anzhiyu-blog-static@1.0.1/js/APlayer.min.js"></script><script src="https://cdn.cbd.int/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js"></script><script src="https://cdn.cbd.int/pjax@0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
 
-<div id="copyright">
-<ul>
-  <li class="author">
-    <strong>本文作者： </strong>jlynet <i class="ic i-at"><em>@</em></i>生活科技馆
-  </li>
-  <li class="link">
-    <strong>本文链接：</strong>
-    <a href="https://jlynet.github.io/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="etCache 缓存框架的使用以及源码分析">https://jlynet.github.io/2021/10/01/etCache-缓存框架的使用以及源码分析/</a>
-  </li>
-  <li class="license">
-    <strong>版权声明： </strong>本站所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpo"><i class="ic i-creative-commons"><em>(CC)</em></i>BY-NC-SA</span> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
+document.addEventListener('pjax:send', function () {
+  // removeEventListener scroll 
+  anzhiyu.removeGlobalFnEvent('pjax')
+  anzhiyu.removeGlobalFnEvent('themeChange')
 
-  </footer>
-
-</article>
-
-  </div>
+  document.getElementById('rightside').classList.remove('rightside-show')
   
-
-<div class="post-nav">
-    <div class="item left">
-      
-
-  <a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/" itemprop="url" rel="prev" data-background-image="https:&#x2F;&#x2F;tva2.sinaimg.cn&#x2F;mw690&#x2F;6833939bly1gipey0a334j20zk0m8qpt.jpg" title="各种开源协议介绍">
-  <span class="type">上一篇</span>
-  <span class="category"><i class="ic i-flag"></i> 技术笔记</span>
-  <h3>各种开源协议介绍</h3>
-  </a>
-
-    </div>
-    <div class="item right">
-      
-
-  <a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" itemprop="url" rel="next" data-background-image="https:&#x2F;&#x2F;tva2.sinaimg.cn&#x2F;mw690&#x2F;6833939bly1gipewr8iypj20zk0m8b29.jpg" title="Docker 私有仓库搭建">
-  <span class="type">下一篇</span>
-  <span class="category"><i class="ic i-flag"></i> 技术笔记</span>
-  <h3>Docker 私有仓库搭建</h3>
-  </a>
-
-    </div>
-</div>
-
-  
-  <div class="wrap" id="comments"></div>
-
-
-        </div>
-        <div id="sidebar">
-          
-
-<div class="inner">
-
-  <div class="panels">
-    <div class="inner">
-      <div class="contents panel pjax" data-title="文章目录">
-          <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">一、简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.1.</span> <span class="toc-text">为什么使用缓存？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.2.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.3.</span> <span class="toc-text">使用规范</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">二、如何使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.1.</span> <span class="toc-text">引入maven依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.2.</span> <span class="toc-text">添加配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.3.</span> <span class="toc-text">配置说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.4.</span> <span class="toc-text">注解说明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.1.</span> <span class="toc-text">@EnableCreateCacheAnnotation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.2.</span> <span class="toc-text">@EnableMethodCache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.3.</span> <span class="toc-text">@Cached</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.4.</span> <span class="toc-text">@CacheInvalidate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.5.</span> <span class="toc-text">@CacheUpdate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.6.</span> <span class="toc-text">@CacheRefresh</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.7.</span> <span class="toc-text">@CachePenetrationProtect</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">2.4.8.</span> <span class="toc-text">@CreateCache</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">2.5.</span> <span class="toc-text">使用示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">三、源码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.1.</span> <span class="toc-text">项目的各个子模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.2.</span> <span class="toc-text">常用注解与变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.3.</span> <span class="toc-text">缓存API</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.1.</span> <span class="toc-text">Cache接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.2.</span> <span class="toc-text">AbstractCache抽象类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.3.</span> <span class="toc-text">AbstractEmbeddedCache本地缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.3.1.</span> <span class="toc-text">LinkedHashMapCache</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.3.2.</span> <span class="toc-text">Cleaner清理器</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.3.3.</span> <span class="toc-text">CaffeineCache</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.4.</span> <span class="toc-text">AbstractExternalCache远程缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.4.1.</span> <span class="toc-text">RedisCache</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.3.4.2.</span> <span class="toc-text">RedisLettuceCache</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.5.</span> <span class="toc-text">MultiLevelCache两级缓存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.3.6.</span> <span class="toc-text">RefreshCache</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.4.</span> <span class="toc-text">解析配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.4.1.</span> <span class="toc-text">初始化构造器</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.4.1.1.</span> <span class="toc-text">AbstractCacheAutoInit</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.4.1.2.</span> <span class="toc-text">EmbeddedCacheAutoInit</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.2.1.</span> <span class="toc-text">LinkedHashMapAutoConfiguration</span></a></li><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.2.2.</span> <span class="toc-text">CaffeineAutoConfiguration</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.4.1.3.</span> <span class="toc-text">ExternalCacheAutoInit</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.3.1.</span> <span class="toc-text">RedisAutoInit</span></a></li><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">3.4.1.3.2.</span> <span class="toc-text">RedisLettuceAutoInit</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.4.2.</span> <span class="toc-text">JetCacheAutoConfiguration自动配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.4.3.</span> <span class="toc-text">CacheBuilder构造器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">3.5.</span> <span class="toc-text">AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.5.1.</span> <span class="toc-text">启用JetCache</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.1.1.</span> <span class="toc-text">@EnableMethodCache</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.1.2.</span> <span class="toc-text">@EnableCreateCacheAnnotation</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-number">3.5.2.</span> <span class="toc-text">拦截器</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.1.</span> <span class="toc-text">ConfigProvider</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.2.</span> <span class="toc-text">CacheContext</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.3.</span> <span class="toc-text">JetCacheInterceptor</span></a></li><li class="toc-item toc-level-5"><a class="toc-link"><span class="toc-number">3.5.2.4.</span> <span class="toc-text">CacheHandler</span></a></li></ol></li></ol></li></ol></li></ol>
-      </div>
-      <div class="related panel pjax" data-title="系列文章">
-        <ul>
-          <li><a href="/2021/07/30/Arthas%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/" rel="bookmark" title="Arthas安装使用">Arthas安装使用</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/" rel="bookmark" title="Arthas 基础教程">Arthas 基础教程</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E8%BF%9B%E9%98%B6/" rel="bookmark" title="Arthas 进阶">Arthas 进阶</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%90%8E%E5%8F%B0%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 后台异步任务 案例">Arthas 后台异步任务 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasarthas-boot%E6%94%AF%E6%8C%81%E7%9A%84%E5%8F%82%E6%95%B0%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas arthas-boot支持的参数 案例">Arthas arthas-boot支持的参数 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 理解Spring Boot应用的ClassLoader结构 案例">Arthas 理解Spring Boot应用的ClassLoader结构 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E8%8E%B7%E5%8F%96Spring%E4%B8%8A%E4%B8%8B%E6%96%87%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 获取Spring Context 案例">Arthas 获取Spring Context 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E401%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 排查HTTP请求返回401 案例">Arthas 排查HTTP请求返回401 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasHttpAPI%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas Http API案例">Arthas Http API案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5HTTP%E8%AF%B7%E6%B1%82%E8%BF%94%E5%9B%9E404%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 排查HTTP请求返回404 案例">Arthas 排查HTTP请求返回404 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E7%83%AD%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 热更新代码 案例">Arthas 热更新代码 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5logger%E5%86%B2%E7%AA%81%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 排查logger冲突问题 案例">Arthas 排查logger冲突问题 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%E5%AD%98%E6%97%A5%E5%BF%97%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 执行结果存日志 案例">Arthas 执行结果存日志 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 查找Top N线程 案例">Arthas 查找Top N线程 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 排查函数调用异常 案例">Arthas 排查函数调用异常 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasWebConsole%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas Web Console 案例">Arthas Web Console 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8LoggerLevel%E6%A1%88%E4%BE%8B/" rel="bookmark" title="Arthas 动态更新应用Logger Level 案例">Arthas 动态更新应用Logger Level 案例</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasvmoption%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas vmoption命令">Arthas vmoption命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasthread%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas thread命令">Arthas thread命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysenv%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas sysenv命令">Arthas sysenv命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysprop%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas sysprop命令">Arthas sysprop命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasognl%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas ognl">Arthas ognl</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasperfcounter%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas perfcounter命令">Arthas perfcounter命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaslogger%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas logger命令">Arthas logger命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmbean%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas mbean命令">Arthas mbean命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasheapdump%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas heapdump命令">Arthas heapdump命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas jvm命令">Arthas jvm命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdashboard%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas dashboard命令">Arthas dashboard命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas getstatic命令">Arthas getstatic命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthastt%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas tt命令">Arthas tt命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas watch命令">Arthas watch命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthastrace%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas trace命令">Arthas trace命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasstack%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas stack命令">Arthas stack命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas monitor命令">Arthas monitor命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasprofiler%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas profiler命令">Arthas profiler命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-retransform%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas mc-retransform命令">Arthas mc-retransform命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassm%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas sm命令">Arthas sm命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassc%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas sc命令">Arthas sc命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas mc-redefine命令">Arthas mc-redefine命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas dump命令">Arthas dump命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas jad命令">Arthas jad命令</a></li><li><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasclassloader%E5%91%BD%E4%BB%A4/" rel="bookmark" title="Arthas classloader命令">Arthas classloader命令</a></li><li class="active"><a href="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="bookmark" title="etCache 缓存框架的使用以及源码分析">etCache 缓存框架的使用以及源码分析</a></li>
-        </ul>
-      </div>
-      <div class="overview panel" data-title="站点概览">
-        <div class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <img class="image" itemprop="image" alt="jlynet"
-      data-src="/images/avatar.jpg">
-  <p class="name" itemprop="name">jlynet</p>
-  <div class="description" itemprop="description">技术决定未来....</div>
-</div>
-
-<nav class="state">
-    <div class="item posts">
-      <a href="/archives/">
-        <span class="count">61</span>
-        <span class="name">文章</span>
-      </a>
-    </div>
-    <div class="item categories">
-      <a href="/categories/">
-        <span class="count">6</span>
-        <span class="name">分类</span>
-      </a>
-    </div>
-    <div class="item tags">
-      <a href="/tags/">
-        <span class="count">16</span>
-        <span class="name">标签</span>
-      </a>
-    </div>
-</nav>
-
-<div class="social">
-</div>
-
-<ul class="menu">
-  
-    
-  <li class="item">
-    <a href="/" rel="section"><i class="ic i-home"></i>首页</a>
-  </li>
-
-
-</ul>
-
-      </div>
-    </div>
-  </div>
-
-  <ul id="quick">
-    <li class="prev pjax">
-        <a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/" rel="prev" title="上一篇"><i class="ic i-chevron-left"></i></a>
-    </li>
-    <li class="up"><i class="ic i-arrow-up"></i></li>
-    <li class="down"><i class="ic i-arrow-down"></i></li>
-    <li class="next pjax">
-        <a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" rel="next" title="下一篇"><i class="ic i-chevron-right"></i></a>
-    </li>
-    <li class="percent"></li>
-  </ul>
-</div>
-
-
-        </div>
-        <div class="dimmer"></div>
-      </div>
-    </main>
-    <footer id="footer">
-      <div class="inner">
-        <div class="widgets">
-          
-<div class="rpost pjax">
-  <h2>随机文章</h2>
-  <ul>
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%9F%A5%E6%89%BETopN%E7%BA%BF%E7%A8%8B%E6%A1%88%E4%BE%8B/" title="Arthas 查找Top N线程 案例">Arthas 查找Top N线程 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/ArthasWebConsole%E6%A1%88%E4%BE%8B/" title="Arthas Web Console 案例">Arthas Web Console 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="etCache 缓存框架的使用以及源码分析">etCache 缓存框架的使用以及源码分析</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthaswatch%E5%91%BD%E4%BB%A4/" title="Arthas watch命令">Arthas watch命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/" title="Arthas 理解Spring Boot应用的ClassLoader结构 案例">Arthas 理解Spring Boot应用的ClassLoader结构 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/" title="Arthas getstatic命令">Arthas getstatic命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5logger%E5%86%B2%E7%AA%81%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B/" title="Arthas 排查logger冲突问题 案例">Arthas 排查logger冲突问题 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjad%E5%91%BD%E4%BB%A4/" title="Arthas jad命令">Arthas jad命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" title="分类于 默认分类">默认分类</a>
-<i class="ic i-angle-right"></i>
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" title="分类于 技术笔记">技术笔记</a>
-</div>
-
-    <span><a href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" title="ssh端口转发笔记">ssh端口转发笔记</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthastrace%E5%91%BD%E4%BB%A4/" title="Arthas trace命令">Arthas trace命令</a></span>
-  </li>
-
-  </ul>
-</div>
-<div>
-  <h2>最新评论</h2>
-  <ul class="leancloud-recent-comment"></ul>
-</div>
-
-        </div>
-        <div class="status">
-  <div class="copyright">
-    
-    &copy; 2010 – 
-    <span itemprop="copyrightYear">2023</span>
-    <span class="with-love">
-      <i class="ic i-sakura rotate"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">jlynet @ 爱上猫的小鱼儿</span>
-  </div>
-  <div class="powered-by">
-    基于 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & Theme.<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2FtZWhpbWUvaGV4by10aGVtZS1zaG9rYQ==">Shoka</span>
-  </div>
-</div>
-
-      </div>
-    </footer>
-  </div>
-<script data-config type="text/javascript">
-  var LOCAL = {
-    path: '2021/10/01/etCache-缓存框架的使用以及源码分析/',
-    favicon: {
-      show: "（●´3｀●）やれやれだぜ",
-      hide: "(´Д｀)大変だ！"
-    },
-    search : {
-      placeholder: "文章搜索",
-      empty: "关于 「 ${query} 」，什么也没搜到",
-      stats: "${time} ms 内找到 ${hits} 条结果"
-    },
-    valine: true,fancybox: true,
-    copyright: '复制成功，转载请遵守 <i class="ic i-creative-commons"></i>BY-NC-SA 协议。',
-    ignores : [
-      function(uri) {
-        return uri.includes('#');
-      },
-      function(uri) {
-        return new RegExp(LOCAL.path+"$").test(uri);
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
       }
-    ]
-  };
-</script>
+    }
+  }
 
-<script src="https://cdn.polyfill.io/v2/polyfill.js"></script>
+  typeof typed === 'object' && typed.destroy()
 
-<script src="//cdn.jsdelivr.net/combine/npm/pace-js@1.0.2/pace.min.js,npm/pjax@0.2.8/pjax.min.js,npm/whatwg-fetch@3.4.0/dist/fetch.umd.min.js,npm/animejs@3.2.0/lib/anime.min.js,npm/algoliasearch@4/dist/algoliasearch-lite.umd.js,npm/instantsearch.js@4/dist/instantsearch.production.min.js,npm/lozad@1/dist/lozad.min.js,npm/quicklink@2/dist/quicklink.umd.js"></script>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+})
 
-<script src="/js/app.js?v=0.2.5"></script>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof panguInit === 'function' && panguInit()
 
-</body>
-</html>
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div></body></html>

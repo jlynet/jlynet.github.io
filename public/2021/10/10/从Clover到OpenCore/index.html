@@ -1,164 +1,210 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>从Clover到OpenCore | 生活科技馆</title><meta name="keywords" content="技术笔记,随笔"><meta name="author" content="jlynet"><meta name="copyright" content="jlynet"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7f9fe"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-touch-fullscreen" content="yes"><meta name="apple-mobile-web-app-title" content="从Clover到OpenCore"><meta name="application-name" content="从Clover到OpenCore"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="#f7f9fe"><meta property="og:type" content="article"><meta property="og:title" content="从Clover到OpenCore"><meta property="og:url" content="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/index.html"><meta property="og:site_name" content="生活科技馆"><meta property="og:description" content="由于是转载文章，文章中的我特指作者：SukkaW  随着 OpenCore 日渐成熟、acidanthera 团队宣布放弃旗下绝大部分内核驱动（包括 Lilu、VirtualSMC、WhateverGreen、AppleALC 等）对 Clover 的兼容性支持，与其届时被迫换到 OpenCor"><meta property="og:locale" content="zh-CN"><meta property="og:image" content="https://jlynet.github.io/img/64496e511b09c.jpg"><meta property="article:author" content="jlynet"><meta property="article:tag" content="[&quot;java&quot;,&quot;php&quot;,&quot;linux&quot;,&quot;win&quot;,&quot;jlynet&quot;,&quot;jlynet.cn&quot;,&quot;jlynet.com&quot;,&quot;爱上猫的小鱼儿&quot;]"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://jlynet.github.io/img/64496e511b09c.jpg"><meta name="description" content="由于是转载文章，文章中的我特指作者：SukkaW  随着 OpenCore 日渐成熟、acidanthera 团队宣布放弃旗下绝大部分内核驱动（包括 Lilu、VirtualSMC、WhateverGreen、AppleALC 等）对 Clover 的兼容性支持，与其届时被迫换到 OpenCor"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/"><link rel="preconnect" href="//cdn.cbd.int"/><meta name="google-site-verification" content="xxx"/><meta name="baidu-site-verification" content="code-xxx"/><meta name="msvalidate.01" content="xxx"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/@fancyapps/ui@5.0.28/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  linkPageTop: undefined,
+  peoplecanvas: {"enable":true,"img":"https://upload-bbs.miyoushe.com/upload/2023/09/03/125766904/ee23df8517f3c3e3efc4145658269c06_5714860933110284659.png"},
+  postHeadAiDescription: {"enable":true,"gptName":"AnZhiYu","mode":"local","switchBtn":false,"btnLink":"https://afdian.net/item/886a79d4db6711eda42a52540025c377","randomNum":3,"basicWordCount":1000,"key":"xxxx","Referer":"https://xx.xx/"},
+  diytitle: {"enable":true,"leaveTitle":"w(ﾟДﾟ)w 不要走！再看看嘛！","backTitle":"♪(^∇^*)欢迎肥来！"},
+  LA51: undefined,
+  greetingBox: undefined,
+  twikooEnvId: '',
+  commentBarrageConfig:undefined,
+  root: '/',
+  preloader: {"source":3},
+  friends_vue_info: undefined,
+  navMusic: true,
+  mainTone: undefined,
+  authorStatus: undefined,
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简","rightMenuMsgToTraditionalChinese":"转为繁体","rightMenuMsgToSimplifiedChinese":"转为简体"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":330},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    simplehomepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"copy":true,"copyrightEbable":false,"limitCount":50,"languages":{"author":"作者: jlynet","link":"链接: ","source":"来源: 生活科技馆","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。","copySuccess":"复制成功，复制和转载请标注本文地址"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#425AEF","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.cbd.int/flickr-justified-gallery@2.1.2/dist/fjGallery.min.js',
+      css: 'https://cdn.cbd.int/flickr-justified-gallery@2.1.2/dist/fjGallery.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  shortcutKey: undefined,
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  configTitle: '生活科技馆',
+  title: '从Clover到OpenCore',
+  postAI: '',
+  pageFillDescription: '序言以外应该写在最前面的话, 修改 SSDT / DSDT 以搭配 OpenCore, 减少不必要的 DSDT 重命名, 摆脱对 Clover ACPI Quirks 的依赖, 更新设备属性, 使用缓冲帧补丁驱动 Intel 核显, 新的声卡 layout-id 注入方式, 开始组织 OpenCore 目录, 下载 OpenCore 所需文件, 决定你使用的配置文件编辑器, 生成目录结构, 删除不需要的文件, 开始配置 OpenCore, Clover 中的设置在 OpenCore 的等效配置, Boot 的相关设置, 原文链接：, 感谢名单, 参考及引用：由于是转载文章文章中的我特指作者随着日渐成熟团队宣布放弃旗下绝大部分内核驱动包括等对的兼容性支持与其届时被迫换到不如主动开始迁移当然面对迁移有的人会选择直接抛弃之前的全部成果直接从零开始配置但是我相信对于大部分人来说更希望通过简简单单的修补在现有的的基础上迁移到因此我开始撰写这篇文章然而不幸的是从切换到并不是一个简单的任务因此这种迁移应该是渐进式的不可能一蹴而就那什么是渐进式呢意思就是如果你按照本文的步骤一步一步按顺序进行那么大部分迁移步骤产生的修改在下一样可用你不需要一下子就扔掉序言以外应该写在最前面的话丢掉了不少的历史包袱毫无疑问依然有不少设置在是没有可以直接替代的因此完全照搬到是肯定行不通的在迁移到之前的大部分设置都要精简用代替改为注入设备属性这篇教程的主题就是教你这些事情如果你一开始在组织的时就有洁癖的话你会发现迁移到出人意料地简单只有完美的的在按照本文档的步骤精简后能获得完美的的如果你的是不完美的那么迁移到也一定是不完美的因此如果你是为了解决不完美才想迁移到那么我建议先在下完善独木难成林这篇教程初次发布以后等许多大佬在远景论坛上提供了许多意见正是在他们的帮助下这篇教程得以不断完善修改以搭配和最大的不同其实是决定在中设置的机型信息和都将一视同仁的对所有操作系统生效这样做的目的是让黑苹果更像白苹果但是却有可能导致在上正常可用的表到了上反而会出问题因此迁移的第一步我个人推荐从修改现有的和开始因为在下能用的在下是一定可用的也就是说当你完成这一步后你可以继续使用而不受影响这里主要介绍对函数的修改方法以补丁为例在上我们一般采用这种方法这个的原理是通过重命名将原始的函数重命名为然后通过新增一个函数这样实际调用函数时就是调用的里添加的函数但是现在将会对所有操作系统一视同仁所有重命名对包括在内的所有操作系统生效那么中的函数也会在生效可能就会导致未知的后果所以我们需要通过函数判断当前操作系统确保函数的行为只对某一个操作系统生效需要注意的是里不支持非字符注释这里仅做示例不可直接用于编译对函数的外部引用如果当前的操作系统是生效以下行为否则直接返回函数只有三种情况下会走到这一步第一个参数不是第一个参数不是当前操作系统不是是中原始的函数重命名而来所以这一步实际上是调用了原始中原始的方法上面以为例介绍了相关思路接下来我们以亮度快捷键补丁为例实际操作一下如何一步一步修改大部分亮度快捷键都是基于触发的因此在中我们的亮度快捷键可能是这样的如果想知道亮度快捷键补丁的工作原理请参看我的另一篇文章黑苹果自定义键盘快捷键根据同样的思路我们先在定义中添加函数判断操作系统由于这里不是以结束的所以我们要为加上在区域中调用原始中原始的函数也就是现在已经被重命名为和的函数当然别忘了在文件头部添加对和的函数的外部引用这样就大功告成了是不是有些头昏脑涨实际上和现成的补丁库一样也有现成的补丁库由资深黑苹果爱好者们维护我也在其中贡献了一些补丁如关机变重启修复和说明你在中使用的补丁大部分都有对应的下可用的替代免去了你手动修改的痛苦而且你还可能通过库里的其他补丁修复了一些你之前的补丁没有解决的问题当然对于一些中没有等价替代的补丁你仍然需要手动修改添加操作系统判断对于直接修补的你也只能自己在中添加对应的判断如果你完成了对的修改现在备份你的然后修改后的放到之中然后以重启看看能不能正常开机如果可以正常开机登录以后打开终端执行以下命令查看日志中是否包括如果正常开机没有那么恭喜你你已经迈出了向迁移的第一步而且此时你依然还在继续使用你的黑苹果没有收到任何影响减少不必要的重命名团队认为应该尽可能减少重命名减少改动以避免对设备硬件造成伤害以下是一些不再需要的重命名你可以参考这个表自己精简重命名使用代替和建议由官方的关闭控制器这类六代以上已经没有控制器了可以直接删除和实质上完全没用和能够处理这个问题和能够处理这个问题和虽然的电源管理需要名称为的控制器但是你完全可以在中找到仿冒的相关补丁和能够处理这个问题除非你在用万能声卡建议由中的相关补丁替代经大佬指出由于新的时钟设备的普及用会导致同时启用两个时钟设备在下只有一个能正常工作但是在下面暴露两个设备无疑对系统有害同时也严重违反规范这个变量的意义使和互锁以避免这种危害因此使用是更理想的办法和建议用这个修复的电源管理如果你要添加支持中分别有的注入补丁和设备补丁顺便提醒一下使用的补丁的时候需要注意设备的原始中的总线名称并且要自己修改以使总线匹配和这些重命名也是实质上是完全没用的和除非你的某些硬件设备只能在下工作比如触摸板只能在下使用再比如对的特殊优化否则完全没有必要使用补丁来伪装操作系统而且大部分情况下直接定制也可以解除某些硬件的操作系统限制关于定制以解除限制大佬做了一些说明一种方法是通过预置变量法详见的总述章节禁用原始设备的函数如另一种方法是通过重命名实现对相关的函数的精确重命名然后通过添加新的函数中可以添加操作系统判断函数首先遍历一下你的补丁中没有依赖的如果没有这个重命名也应该删除因为这个重命名涉及的范围实在太大了太过于危险我的建议是尽可能只添加和名称有关的重命名如而且随后要通过确保在非操作系统下要调用并返回原始函数确保在非操作系统下的原始行为不会被改变如果万不得已要添加其它重命名如通过重命名禁用某些设备那么就要权衡这一重命名的后果如果你完成了精简重命名并保存了接下来的操作还是一样的备份原始然后以重启看看能不能正常开机如果可以正常开机登录以后打开终端执行以下命令查看日志中是否包括完成这一步你依然没有必要离开我说过了渐进式地迁移嗯摆脱对的依赖实在是非常方便一个开关关机变重启就修复了三个开关就修复了等等等等但是是没有内置这些修复的所以在下用开关实现的修复现在都必须用实现所幸的是我们依然可以从里找到绝大部分我们需要的补丁参考的声卡补丁章节参考的注入设备参考的综合补丁章节需要添加其中的插件补丁该补丁由我贡献使用和定制缓冲帧补丁解决参考的注入缺失的章节使用即可参考的声卡补丁章节这个先不管它中有个的也可以使用解决使用重命名可能还要额外注入参考的声卡补丁章节参考的声卡补丁章节参考的注入章节使用即可使用即可使用即可除了这些开关以外还有一些其它的设定也有与之对应的替代没有很好的代替方法可以在设备属性中分别添加相关设备的总线位置并注入属性参考的注入章节和这些是六代以前才需要的设置可以用生成对应的当然之后的事情还是一样的以重启正常开机后打开终端查看日志中是否包括当你把所有的开关都用代替以后你离迁移到就越来越近了更新设备属性使用缓冲帧补丁驱动核显如果你还在用的的方式来驱动核显的话是时候更换到和缓冲帧补丁的方式了建议参考以下几篇文章使用驱动核显醉渔小站原使用教程及插入姿势黑果小兵的部落阁核显驱动常见问题务必看英文版中文翻译严重过时新的声卡注入方式大部分黑苹果的声卡教程都已经推荐此处留空直接在设备属性中注入了不过我还是再冗笔一下下载开发的工具使用下述命令找出声卡的总线位置然后在设备属性中添加总线位置注入属性至于需要额外为声卡设备注入属性值为至于推荐安装开始组织目录终于是时候了所有的准备工作都做完了你可以抽出一天最好占卜一下是否是吉日沐浴更衣然后开始组织你的目录下载所需文件本体一些补丁目录结构导出你当前的三码以及生成新的三码包括三个驱动包含两个闭源驱动和以及官方主题的图标文件非常推荐安装官方做的主题和真的一模一样除了没有网络图标不过那可能是另一篇文章的主题了决定你使用的配置文件编辑器一个编写的编辑器专门优化了和配置文件编写非常不推荐不仅花里胡哨而且处理和大整数方面存在问题简单来说没有再开放旧版的下载而且的还有防盗链因此如果我要写一篇从官方下载的教程那么会比你现在看的这篇的从到要长得多如果你和我一样成功下载了或者就没有升级到我刚才什么都没写你什么都没看见作者的新作品很适合新手使用的配置文件变更非常频繁因此只应该用最新版的搭配最新的正式版的否则配置文件格式错误将会导致无法引导有不少低级后来更新时都修复了比如之前有一个版本在应对和这种嵌套时会只添加内部的签名文件却不添加内部本体反正就是使用后果自负生成目录结构解压下载的并解压将其中的目录复制出来到别处直到配置好以后再将这个目录合并进硬盘上的分区将目录下的复制到目录下并重命名为如果你下载的是版本还需要额外将目录复制到目录之中解压下载的将其中的目录和目录中的文件复制到目录和目录中解压下载的将其中目录复制到目录中删除不需要的文件删除目录中的这些文件和除非你的分区或者某个系统分区是分区格式的否则不需要保留和三者只要留其中一个即可一般推荐用比速度快三倍在四代以前机型上应该用而不是或这是为三代以前机型使用的现代的机器应该使用中的这个这是为四代以前机型使用的硬盘加载驱动现代的机器已经不需要了为二代以前的主板提供支持的现代的机器已经不需要了为四代以前的设备提供界面字体渲染支持的现代的机器已经不需要了删除目录中的这些文件调用内置的引导界面是用于给白苹果安装时用的黑苹果用不上现在你的目录的结构应该是这样的现在你可以把你的从里的复制出来粘贴进目录中将从中复制出来粘贴进目录中开始配置这里我就不再赘述的配置教程了这里推荐几个写的不错的教程和足够有用的参考资料参考文档当你解压下载的时文件就是的官方文档这是最权威的参考资料没有之一简体中文参考手册参考手册的翻译由我和一些黑苹果爱好者们共同在维护上面两份参考资料资料适合你在配置时不知道某个选项的具体作用具体副作用时参考用但是不适合直接对着它们配置如果想要快速上手配置应该参考下面的教程官方认可写得较好的新手教程这篇教程受众是第一次接触黑苹果就想用的人因此内容写得非常浅显精解黑果小兵的部落阁国内最早的介绍文档之一提供了不少配置思路和的推荐配置使用引导黑苹果比较详细的配置介绍但是这篇文章的排版我实在是欣赏不来引导迁移折腾记录宇宙遠場所内容详细的配置介绍提供了不少的推荐配置中的部分配置如重命名由于在之前已经精简因此可以将和的十六进制字符串逐对复制到的配置文件中中的设置在的等效配置现在你开始跟着我推荐的教程和参考资料开始配置了接下来我会写一些中一些选项在的对应等效配置在配置时别忘了跟着看看的相关设置引导参数中其实不再建议禁用休眠由于的行为和白苹果更加接近以至于已经可以实现的完美休眠中然后在的引导菜单处使用按键进行选择你也可以直接用系统偏好设置中的启动磁盘设置中的需要自己将转换为中中注意自行判断键值对位置相关配置在中有对应的可以设置处理器类型在这个文件查看可以选用的值如果你真的要依赖注意这里说的不是原生电源管理的电源管理建议安装开发的也是他开发的已经完整支持虚拟机因此中不包含这一选项建议用或者来修复电源管理设备属性相关设置中需要自己注入对应的设备属性属性为需要自己注入对应的设备属性属性为对于来说已经没啥用了对于更新版的推荐用中的补丁同样使用工具找到总线位置然后分别注入相关属性中相关的图形设置和前文一样这些在中设置的属性都需要改为注入对应的设备属性即可核显推荐使用和缓冲帧补丁驱动一般的在注入仿造显卡或仿造的时候更推荐使用搭配的方式至于注入的文档中有详细介绍内核扩展驱动相关和对应中和在中对应了两个和分别对应中的和提供了专门的功能除此以外一些常用的在中也有了对应了解除端口限制以前根据不同的系统需要打不同的现在只需要一个内置硬盘变外置硬盘也只需要一个和前面的不同顾名思义只修复硬盘而这个会修复所有的硬盘为提供现在也只需要启用一个机型信息和系统参数需要注入到设备属性中就连都不推荐配置这一项直接就不提供硬件配置功能兼容变色龙的历史遗留配置也不再提供需要注入到中需要注入到中配置好以后可以将复制到盘或者硬盘中需要注意的是需要直接替换在添加引导项时必须从启动而不是从启动如果启动项中添加的不是那么有很大的概率你会遇到各种奇怪的问题清理残余重启到引导之前务必清理掉的残留文件删除位于系统偏好设置中的面板删除的自动脚本删除的守护进程除此以外还要删除分区中的文件在中还需要重置可以在引导菜单中按下空格键显示隐藏条目最后一个条目就是的重置功能原文链接感谢名单的维护的项目等维护的项目等提供的工具维护的项目宪武整理的维护的项目开发的提供的工具更新维护的从到迁移指南提供的工具更新维护的精解更新维护的配置错误故障与解决办法更新维护的部件补丁码云扣钉参考及引用更新的更新的支持机型列表提供的蓝牙驱动使用引导黑苹果系列主板正确使用的姿势重写版远景论坛文章转载',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-10-10 05:50:26',
+  postMainColor: '',
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
 
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
 
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18171d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f7f9fe')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#FFF">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-
-<link rel="icon" type="image/ico" sizes="32x32" href="/images/favicon.ico">
-  <meta http-equiv="Cache-Control" content="no-transform">
-  <meta http-equiv="Cache-Control" content="no-siteapp">
-
-
-<link rel="alternate" type="application/rss+xml" title="生活科技馆" href="https://jlynet.github.io/rss.xml" />
-<link rel="alternate" type="application/atom+xml" title="生活科技馆" href="https://jlynet.github.io/atom.xml" />
-<link rel="alternate" type="application/json" title="生活科技馆" href="https://jlynet.github.io/feed.json" />
-
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic%7CFredericka%20the%20Great:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20JP:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20SC:300,300italic,400,400italic,700,700italic%7CInconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-
-<link rel="stylesheet" href="/css/app.css?v=0.2.5">
-
-  
-  <meta name="keywords" content="技术笔记,随笔" />
-
-
-<link rel="canonical" href="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/">
-
-
-
-  <title>
-从Clover到OpenCore - 技术笔记 - 默认分类 |
-爱上猫的小鱼儿 = 生活科技馆 = --个人博客</title>
-<meta name="generator" content="Hexo 5.4.0">
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div id="loading">
-    <div class="cat">
-      <div class="body"></div>
-      <div class="head">
-        <div class="face"></div>
-      </div>
-      <div class="foot">
-        <div class="tummy-end"></div>
-        <div class="bottom"></div>
-        <div class="legs left"></div>
-        <div class="legs right"></div>
-      </div>
-      <div class="paw">
-        <div class="hands left"></div>
-        <div class="hands right"></div>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <header id="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="inner">
-        <div id="brand">
-          <div class="pjax">
-          
-  <h1 itemprop="name headline">从Clover到OpenCore
-  </h1>
-  
-<div class="meta">
-  <span class="item" title="创建时间：2021-10-10 05:46:25">
-    <span class="icon">
-      <i class="ic i-calendar"></i>
-    </span>
-    <span class="text">发表于</span>
-    <time itemprop="dateCreated datePublished" datetime="2021-10-10T05:46:25+08:00">2021-10-10</time>
-  </span>
-</div>
+</head><body data-type="anzhiyu"><div id="web_bg"></div><div id="an_music_bg"></div><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><img class="loading-img nolazyload" alt="加载头像" src="/img/avatar.jpg"/><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.getElementById('loading-box').classList.add("loaded");
+  },
+  initLoading: () => {
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+setTimeout(function(){preloader.endLoading();},10000)
 
-
-          </div>
-        </div>
-        <nav id="nav">
-  <div class="inner">
-    <div class="toggle">
-      <div class="lines" aria-label="切换导航栏">
-        <span class="line"></span>
-        <span class="line"></span>
-        <span class="line"></span>
-      </div>
-    </div>
-    <ul class="menu">
-      <li class="item title"><a href="/" rel="start">爱上猫的小鱼儿</a></li>
-    </ul>
-    <ul class="right">
-      <li class="item theme">
-        <i class="ic i-sun"></i>
-      </li>
-      <li class="item search">
-        <i class="ic i-search"></i>
-      </li>
-    </ul>
-  </div>
-</nav>
-
-      </div>
-      <div id="imgs" class="pjax">
-        <ul>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giph4baakhj20zk0m8h5q.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giciusoyjnj219g0u0x56.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giciszlczyj20zk0m816d.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giclh0m9pdj20zk0m8hdt.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipewr8iypj20zk0m8b29.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipeu1usa7j20zk0m8b29.jpg"></li>
-        </ul>
-      </div>
-    </header>
-    <div id="waves">
-      <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-        <defs>
-          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-        </defs>
-        <g class="parallax">
-          <use xlink:href="#gentle-wave" x="48" y="0" />
-          <use xlink:href="#gentle-wave" x="48" y="3" />
-          <use xlink:href="#gentle-wave" x="48" y="5" />
-          <use xlink:href="#gentle-wave" x="48" y="7" />
-        </g>
-      </svg>
-    </div>
-    <main>
-      <div class="inner">
-        <div id="main" class="pjax">
-          
-  <div class="article wrap">
-    
-<div class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
-<i class="ic i-home"></i>
-<span><a href="/">首页</a></span><i class="ic i-angle-right"></i>
-<span  itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" itemprop="item" rel="index" title="分类于 默认分类"><span itemprop="name">默认分类</span></a>
-<meta itemprop="position" content="1" /></span>
-<i class="ic i-angle-right"></i>
-<span  class="current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" itemprop="item" rel="index" title="分类于 技术笔记"><span itemprop="name">技术笔记</span></a>
-<meta itemprop="position" content="2" /></span>
-</div>
-
-    <article itemscope itemtype="http://schema.org/Article" class="post block" lang="zh-CN">
-  <link itemprop="mainEntityOfPage" href="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/">
-
-  <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="image" content="/images/avatar.jpg">
-    <meta itemprop="name" content="jlynet">
-    <meta itemprop="description" content="--个人博客, 技术决定未来....">
-  </span>
-
-  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="生活科技馆">
-  </span>
-
-  <div class="body md" itemprop="articleBody">
-    
-
-    <p><a href="from-clover-to-opencore.png"><img src="/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/from-clover-to-opencore.png" alt="img"></a></p>
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.10/progress_bar/progress_bar.css"/><script async="async" src="https://cdn.cbd.int/pace-js@1.2.4/pace.min.js" data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"></script><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><div id="nav-group"><span id="blog_name"><a id="site-name" href="/" accesskey="h"><div class="title">生活科技馆</div><i class="anzhiyufont anzhiyu-icon-house-chimney"></i></a></span><div class="mask-name-container"><div id="name-container"><a id="page-name" href="javascript:anzhiyu.scrollToDest(0, 500)">PAGE_NAME</a></div></div><div id="menus"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机前往一个文章" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-dice"></i></a></div><input id="center-console" type="checkbox"/><label class="widget" for="center-console" title="中控台" onclick="anzhiyu.switchConsole();"><i class="left"></i><i class="widget center"></i><i class="widget right"></i></label><div id="console"><div class="console-card-group-reward"><ul class="reward-all console-card"><li class="reward-item"><a href="/img/weixin.png" target="_blank"><img class="post-qr-code-img" alt="微信" src="/img/weixin.png"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" alt="支付宝" src="/img/alipay.jpg"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div><div class="console-card-group"><div class="console-card-group-left"><div class="console-card" id="card-newest-comments"><div class="card-content"><div class="author-content-item-tips">互动</div><span class="author-content-item-title"> 最新评论</span></div><div class="aside-list"><span>正在加载中...</span></div></div></div><div class="console-card-group-right"><div class="console-card tags"><div class="card-content"><div class="author-content-item-tips">兴趣点</div><span class="author-content-item-title">寻找你感兴趣的领域</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 入门教程<sup>2</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 最佳实践<sup>14</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 高级命令教程<sup>25</sup></a><a href="/tags/Spring/" style="font-size: 1.05rem;">Spring<sup>1</sup></a><a href="/tags/SpringBoot/" style="font-size: 1.05rem;">SpringBoot<sup>1</sup></a><a href="/tags/Tomcat/" style="font-size: 1.05rem;">Tomcat<sup>1</sup></a><a href="/tags/docker/" style="font-size: 1.05rem;">docker<sup>2</sup></a><a href="/tags/hexo/" style="font-size: 1.05rem;">hexo<sup>3</sup></a><a href="/tags/java/" style="font-size: 1.05rem;">java<sup>4</sup></a><a href="/tags/linux/" style="font-size: 1.05rem;">linux<sup>8</sup></a><a href="/tags/nginx/" style="font-size: 1.05rem;">nginx<sup>2</sup></a><a href="/tags/php/" style="font-size: 1.05rem;">php<sup>1</sup></a><a href="/tags/shell/" style="font-size: 1.05rem;">shell<sup>6</sup></a><a href="/tags/ssh/" style="font-size: 1.05rem;">ssh<sup>1</sup></a><a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 1.05rem;">中间件<sup>1</sup></a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" style="font-size: 1.05rem;">技术笔记<sup>17</sup></a><a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 1.05rem;">网络<sup>2</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.05rem;">随笔<sup>12</sup></a></div></div><hr/></div></div><div class="console-card history"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-box-archiv"></i><span>文章</span></div><div class="card-archives"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/06/"><span class="card-archive-list-date">六月 2024</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/08/"><span class="card-archive-list-date">八月 2022</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/06/"><span class="card-archive-list-date">六月 2022</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/11/"><span class="card-archive-list-date">十一月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/10/"><span class="card-archive-list-date">十月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">9</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/09/"><span class="card-archive-list-date">九月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/08/"><span class="card-archive-list-date">八月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">42</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/07/"><span class="card-archive-list-date">七月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li></ul></div><hr/></div></div></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" title="显示模式切换" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-moon"></i></a></div><div class="console-btn-item" id="consoleHideAside" onclick="anzhiyu.hideAsideBtn()" title="边栏显示控制"><a class="asideSwitch"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="anzhiyu.musicToggle()" title="音乐开关"><a class="music-switch"><i class="anzhiyufont anzhiyu-icon-music"></i></a></div></div><div class="console-mask" onclick="anzhiyu.hideConsole()" href="javascript:void(0);"></div></div><div class="nav-button" id="nav-totop"><a class="totopbtn" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i><span id="percent" onclick="anzhiyu.scrollToDest(0,500)">0</span></a></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);" title="切换"><i class="anzhiyufont anzhiyu-icon-bars"></i></a></div></div></div></nav><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original">原创</a><span class="post-meta-categories"><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" itemprop="url">默认分类</a><i class="anzhiyufont anzhiyu-icon-angle-right post-meta-separator"></i><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" itemprop="url">技术笔记</a></span><span class="article-meta tags"><a class="article-meta__tags" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>技术笔记</span></a><a class="article-meta__tags" href="/tags/%E9%9A%8F%E7%AC%94/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>随笔</span></a></span></div></div><h1 class="post-title" itemprop="name headline">从Clover到OpenCore</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="anzhiyufont anzhiyu-icon-calendar-days post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" itemprop="dateCreated datePublished" datetime="2021-10-09T21:46:25.000Z" title="发表于 2021-10-10 05:46:25">2021-10-10</time><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-history post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" itemprop="dateCreated datePublished" datetime="2021-10-09T21:50:26.000Z" title="更新于 2021-10-10 05:50:26">2021-10-10</time></span></div><div class="meta-secondline"><span class="post-meta-separator">       </span><span class="post-meta-position" title="作者IP属地为长沙"><i class="anzhiyufont anzhiyu-icon-location-dot"></i>长沙</span></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section><div id="post-top-cover"><img class="nolazyload" id="post-top-bg" src=""></div></header><main id="blog-container"><div class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container" itemscope itemtype="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/"><header><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" itemprop="url">默认分类</a><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" itemprop="url">技术笔记</a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" tabindex="-1" itemprop="url">技术笔记</a><a href="/tags/%E9%9A%8F%E7%AC%94/" tabindex="-1" itemprop="url">随笔</a><h1 id="CrawlerTitle" itemprop="name headline">从Clover到OpenCore</h1><span itemprop="author" itemscope itemtype="http://schema.org/Person">jlynet</span><time itemprop="dateCreated datePublished" datetime="2021-10-09T21:46:25.000Z" title="发表于 2021-10-10 05:46:25">2021-10-10</time><time itemprop="dateCreated datePublished" datetime="2021-10-09T21:50:26.000Z" title="更新于 2021-10-10 05:50:26">2021-10-10</time></header><p><a href="from-clover-to-opencore.png"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/from-clover-to-opencore.png" alt="img"></a></p>
 <blockquote>
 <p>由于是转载文章，文章中的<code>我</code>特指作者：<a href="https://github.com/SukkaW">SukkaW</a></p>
 </blockquote>
@@ -463,351 +509,148 @@ rm -rf &#39;/Library/Application Support/Clover/CloverWrapper.sh&#39;
 <li><a href="https://www.olarila.com/">olarila.com</a></li>
 </ul>
 <p>文章转载：<a href="https://blog.daliansky.net/From-Clover-To-OpenCore.html">https://blog.daliansky.net/From-Clover-To-OpenCore.html</a></p>
+</article><div class="post-copyright"><div class="copyright-cc-box"><i class="anzhiyufont anzhiyu-icon-copyright"></i></div><div class="post-copyright__author_box"><a class="post-copyright__author_img" href="/" title="头像"><img class="post-copyright__author_img_back" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" title="头像" alt="头像"><img class="post-copyright__author_img_front" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" title="头像" alt="头像"></a><div class="post-copyright__author_name">jlynet</div><div class="post-copyright__author_desc">--个人博客</div></div><div class="post-copyright__post__info"><a class="post-copyright__original" title="该文章为原创文章，注意版权协议" href="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/">原创</a><a class="post-copyright-title"><span onclick="rm.copyPageUrl('https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/')">从Clover到OpenCore</span></a></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div class="rewardLeftButton"><div class="post-reward" onclick="anzhiyu.addRewardMask()"><div class="reward-button button--animated" title="赞赏作者"><i class="anzhiyufont anzhiyu-icon-hand-heart-fill"></i>打赏作者</div><div class="reward-main"><div class="reward-all"><span class="reward-title">感谢你赐予我前进的力量</span><ul class="reward-group"><li class="reward-item"><a href="/img/weixin.png" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/weixin.png" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul><a class="reward-main-btn" href="/about/#about-reward" target="_blank"><div class="reward-text">赞赏者名单</div><div class="reward-dec">因为你们的支持让我意识到写文章的价值🙏</div></a></div></div></div><div id="quit-box" onclick="anzhiyu.removeRewardMask()" style="display: none"></div></div><div class="shareRight"><div class="share-link mobile"><div class="share-qrcode"><div class="share-button" title="使用手机访问这篇文章"><i class="anzhiyufont anzhiyu-icon-qrcode"></i></div><div class="share-main"><div class="share-main-all"><div id="qrcode" title="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/"></div><div class="reward-dec">使用手机访问这篇文章</div></div></div></div></div><div class="share-link weibo"><a class="share-button" target="_blank" href="https://service.weibo.com/share/share.php?title=从Clover到OpenCore&amp;url=https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/&amp;pic=" rel="external nofollow noreferrer noopener"><i class="anzhiyufont anzhiyu-icon-weibo"></i></a></div><script>function copyCurrentPageUrl() {
+  var currentPageUrl = window.location.href;
+  var input = document.createElement("input");
+  input.setAttribute("value", currentPageUrl);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}</script><div class="share-link copyurl"><div class="share-button" id="post-share-url" title="复制链接" onclick="copyCurrentPageUrl()"><i class="anzhiyufont anzhiyu-icon-link"></i></div></div></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://jlynet.github.io" target="_blank">生活科技馆</a>！</span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__box"><div class="post-meta__box__tag-list"><a class="post-meta__box__tags" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>技术笔记<span class="tagsPageCount">17</span></a><a class="post-meta__box__tags" href="/tags/%E9%9A%8F%E7%AC%94/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>随笔<span class="tagsPageCount">12</span></a></div></div></div><div class="post_share"><div class="social-share" data-image="/img/64496e511b09c.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"/><script src="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer="defer"></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Portainer安装配置</div></div></a></div><div class="next-post pull-right"><a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">OpenResty 执行流程阶段</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="anzhiyufont anzhiyu-icon-thumbs-up fa-fw" style="font-size: 1.5rem; margin-right: 4px"></i><span>喜欢这篇文章的人也看了</span></div><div class="relatedPosts-list"><div><a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" title="Docker 私有仓库搭建"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-09</div><div class="title">Docker 私有仓库搭建</div></div></a></div><div><a href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" title="GitHub博客hexo建站之设置SSH密钥"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2022-06-30</div><div class="title">GitHub博客hexo建站之设置SSH密钥</div></div></a></div><div><a href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/" title="Linux网络基础，路由的追踪"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-18</div><div class="title">Linux网络基础，路由的追踪</div></div></a></div><div><a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" title="OpenResty 执行流程阶段"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-17</div><div class="title">OpenResty 执行流程阶段</div></div></a></div><div><a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" title="Portainer安装配置"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-09</div><div class="title">Portainer安装配置</div></div></a></div><div><a href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/" title="hexo命令说明"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-07-28</div><div class="title">hexo命令说明</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="author-info-avatar"><img class="avatar-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__description">技术决定未来....</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bars"></i><span>文章目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">序言以外应该写在最前面的话</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">修改 SSDT &#x2F; DSDT 以搭配 OpenCore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">减少不必要的 DSDT 重命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">摆脱对 Clover ACPI Quirks 的依赖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">更新设备属性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">5.1.</span> <span class="toc-text">使用缓冲帧补丁驱动 Intel 核显</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">5.2.</span> <span class="toc-text">新的声卡 layout-id 注入方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">6.</span> <span class="toc-text">开始组织 OpenCore 目录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.1.</span> <span class="toc-text">下载 OpenCore 所需文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.2.</span> <span class="toc-text">决定你使用的配置文件编辑器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.3.</span> <span class="toc-text">生成目录结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.4.</span> <span class="toc-text">删除不需要的文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">7.</span> <span class="toc-text">开始配置 OpenCore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">8.</span> <span class="toc-text">Clover 中的设置在 OpenCore 的等效配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">8.1.</span> <span class="toc-text">Boot 的相关设置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">9.</span> <span class="toc-text">原文链接：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">10.</span> <span class="toc-text">感谢名单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">11.</span> <span class="toc-text">参考及引用：</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-history"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/05/Unicode-character-issue-0-to-255/" title="Unicode character issue 0 to 255">Unicode character issue 0 to 255</a><time datetime="2024-06-05T03:16:29.000Z" title="发表于 2024-06-05 11:16:29">2024-06-05</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/" title="HAProxy 原理 &amp; dash board 各指标含义">HAProxy 原理 &amp; dash board 各指标含义</a><time datetime="2022-08-04T03:05:01.000Z" title="发表于 2022-08-04 11:05:01">2022-08-04</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" title="GitHub博客hexo建站之设置SSH密钥">GitHub博客hexo建站之设置SSH密钥</a><time datetime="2022-06-30T06:27:23.000Z" title="发表于 2022-06-30 14:27:23">2022-06-30</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2021/11/17/hello-world/" title="Hello World">Hello World</a><time datetime="2021-11-17T01:41:10.000Z" title="发表于 2021-11-17 09:41:10">2021-11-17</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" title="ssh端口转发笔记">ssh端口转发笔记</a><time datetime="2021-10-23T10:33:25.000Z" title="发表于 2021-10-23 18:33:25">2021-10-23</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div id="footer-bar-tips"><div class="copyright">&copy;2020 - 2024 By <a class="footer-bar-link" href="/" title="jlynet" target="_blank">jlynet</a></div></div><div id="footer-type-tips"></div></div><div class="footer-bar-right"><a class="footer-bar-link" href="https://gitee.com/jlynet-openSrc" title="jlynet.cn开源">jlynet.cn开源</a></div></div></div></footer></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="sidebar-site-data site-data is-center"><a href="/archives/" title="archive"><div class="headline">文章</div><div class="length-num">62</div></a><a href="/tags/" title="tag"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/" title="category"><div class="headline">分类</div><div class="length-num">8</div></a></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" href="javascript:void(0);" title="显示模式"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span>显示模式</span></a></div><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://blog.anheyu.com/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/favicon.ico" alt="博客"/><span class="back-menu-item-text">博客</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" href="https://image.anheyu.com/" title="安知鱼图床"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="https://image.anheyu.com/favicon.ico" alt="安知鱼图床"/><span class="back-menu-item-text">安知鱼图床</span></a></div></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 入门教程<sup>2</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 最佳实践<sup>14</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 高级命令教程<sup>25</sup></a><a href="/tags/Spring/" style="font-size: 0.88rem;">Spring<sup>1</sup></a><a href="/tags/SpringBoot/" style="font-size: 0.88rem;">SpringBoot<sup>1</sup></a><a href="/tags/Tomcat/" style="font-size: 0.88rem;">Tomcat<sup>1</sup></a><a href="/tags/docker/" style="font-size: 0.88rem;">docker<sup>2</sup></a><a href="/tags/hexo/" style="font-size: 0.88rem;">hexo<sup>3</sup></a><a href="/tags/java/" style="font-size: 0.88rem;">java<sup>4</sup></a><a href="/tags/linux/" style="font-size: 0.88rem;">linux<sup>8</sup></a><a href="/tags/nginx/" style="font-size: 0.88rem;">nginx<sup>2</sup></a><a href="/tags/php/" style="font-size: 0.88rem;">php<sup>1</sup></a><a href="/tags/shell/" style="font-size: 0.88rem;">shell<sup>6</sup></a><a href="/tags/ssh/" style="font-size: 0.88rem;">ssh<sup>1</sup></a><a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 0.88rem;">中间件<sup>1</sup></a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" style="font-size: 0.88rem;">技术笔记<sup>17</sup></a><a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 0.88rem;">网络<sup>2</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 0.88rem;">随笔<sup>12</sup></a></div></div><hr/></div></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="anzhiyufont anzhiyu-icon-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="anzhiyufont anzhiyu-icon-gear"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="anzhiyufont anzhiyu-icon-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></button></div></div><div id="nav-music"><a id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()" accesskey="m">播放音乐</a><div id="console-music-bg"></div><meting-js id="8152976493" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random" volume="0.7"></meting-js></div><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="anzhiyufont anzhiyu-icon-arrow-left"></i></div><div class="rightMenu-item" id="menu-forward"><i class="anzhiyufont anzhiyu-icon-arrow-right"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="anzhiyufont anzhiyu-icon-arrow-rotate-right" style="font-size: 1rem;"></i></div><div class="rightMenu-item" id="menu-top"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="anzhiyufont anzhiyu-icon-paste"></i><span>粘贴文本</span></div><a class="rightMenu-item" id="menu-commenttext"><i class="anzhiyufont anzhiyu-icon-comment-medical"></i><span>引用到评论</span></a><div class="rightMenu-item" id="menu-newwindow"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="anzhiyufont anzhiyu-icon-link"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="anzhiyufont anzhiyu-icon-images"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="anzhiyufont anzhiyu-icon-download"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-newwindowimg"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开图片</span></div><div class="rightMenu-item" id="menu-search"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-searchBaidu"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>百度搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="anzhiyufont anzhiyu-icon-backward"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="anzhiyufont anzhiyu-icon-forward"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open(&quot;https://y.qq.com/n/ryqq/playlist/8802438608&quot;, &quot;_blank&quot;);" style="display: none;"><i class="anzhiyufont anzhiyu-icon-radio"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-link" id="menu-randomPost"><i class="anzhiyufont anzhiyu-icon-shuffle"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="anzhiyufont anzhiyu-icon-cube"></i><span>博客分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item" id="menu-copy" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制地址</span></a><a class="rightMenu-item" id="menu-commentBarrage" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-message"></i><span class="menu-commentBarrage-text">关闭热评</span></a><a class="rightMenu-item" id="menu-darkmode" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span class="menu-darkmode-text">深色模式</span></a><a class="rightMenu-item" id="menu-translate" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-language"></i><span>轉為繁體</span></a></div></div><div id="rightmenu-mask"></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.cbd.int/@fancyapps/ui@5.0.28/dist/fancybox/fancybox.umd.js"></script><script src="https://cdn.cbd.int/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://cdn.cbd.int/vanilla-lazyload@17.8.5/dist/lazyload.iife.min.js"></script><script src="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.js"></script><canvas id="universe"></canvas><script async src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/dark/dark.js"></script><script>// 消除控制台打印
+var HoldLog = console.log;
+console.log = function () {};
+let now1 = new Date();
+queueMicrotask(() => {
+  const Log = function () {
+    HoldLog.apply(console, arguments);
+  }; //在恢复前输出日志
+  const grt = new Date("04/01/2021 00:00:00"); //此处修改你的建站时间或者网站上线时间
+  now1.setTime(now1.getTime() + 250);
+  const days = (now1 - grt) / 1000 / 60 / 60 / 24;
+  const dnum = Math.floor(days);
+  const ascll = [
+    `欢迎使用安知鱼!`,
+    `生活明朗, 万物可爱`,
+    `
+        
+       █████╗ ███╗   ██╗███████╗██╗  ██╗██╗██╗   ██╗██╗   ██╗
+      ██╔══██╗████╗  ██║╚══███╔╝██║  ██║██║╚██╗ ██╔╝██║   ██║
+      ███████║██╔██╗ ██║  ███╔╝ ███████║██║ ╚████╔╝ ██║   ██║
+      ██╔══██║██║╚██╗██║ ███╔╝  ██╔══██║██║  ╚██╔╝  ██║   ██║
+      ██║  ██║██║ ╚████║███████╗██║  ██║██║   ██║   ╚██████╔╝
+      ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝    ╚═════╝
+        
+        `,
+    "已上线",
+    dnum,
+    "天",
+    "©2020 By 安知鱼 V1.6.12",
+  ];
+  const ascll2 = [`NCC2-036`, `调用前置摄像头拍照成功，识别为【小笨蛋】.`, `Photo captured: `, `🤪`];
 
-      <div class="tags">
-          <a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" rel="tag"><i class="ic i-tag"></i> 技术笔记</a>
-          <a href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag"><i class="ic i-tag"></i> 随笔</a>
-      </div>
-  </div>
+  setTimeout(
+    Log.bind(
+      console,
+      `\n%c${ascll[0]} %c ${ascll[1]} %c ${ascll[2]} %c${ascll[3]}%c ${ascll[4]}%c ${ascll[5]}\n\n%c ${ascll[6]}\n`,
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      ""
+    )
+  );
+  setTimeout(
+    Log.bind(
+      console,
+      `%c ${ascll2[0]} %c ${ascll2[1]} %c \n${ascll2[2]} %c\n${ascll2[3]}\n`,
+      "color:white; background-color:#4fd953",
+      "",
+      "",
+      'background:url("https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/tinggge.gif") no-repeat;font-size:450%'
+    )
+  );
 
-   <footer>
+  setTimeout(Log.bind(console, "%c WELCOME %c 你好，小笨蛋.", "color:white; background-color:#4f90d9", ""));
 
-    <div class="meta">
-  <span class="item">
-    <span class="icon">
-      <i class="ic i-calendar-check"></i>
-    </span>
-    <span class="text">更新于</span>
-    <time title="修改时间：2021-10-10 05:50:26" itemprop="dateModified" datetime="2021-10-10T05:50:26+08:00">2021-10-10</time>
-  </span>
-</div>
+  setTimeout(
+    console.warn.bind(
+      console,
+      "%c ⚡ Powered by 安知鱼 %c 你正在访问 jlynet 的博客.",
+      "color:white; background-color:#f0ad4e",
+      ""
+    )
+  );
 
-      
-<div class="reward">
-  <button><i class="ic i-heartbeat"></i> 赞赏</button>
-  <p>请我喝[茶]~(￣▽￣)~*</p>
-  <div id="qr">
-      
-      <div>
-        <img data-src="/images/wechatpay.png" alt="jlynet 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div>
-        <img data-src="/images/alipay.png" alt="jlynet 支付宝">
-        <p>支付宝</p>
-      </div>
-      
-      <div>
-        <img data-src="/images/paypal.png" alt="jlynet 贝宝">
-        <p>贝宝</p>
-      </div>
-  </div>
-</div>
+  setTimeout(Log.bind(console, "%c W23-12 %c 你已打开控制台.", "color:white; background-color:#4f90d9", ""));
 
-      
+  setTimeout(
+    console.warn.bind(console, "%c S013-782 %c 你现在正处于监控中.", "color:white; background-color:#d9534f", "")
+  );
+});</script><script async src="/anzhiyu/random.js"></script><div class="js-pjax"><input type="hidden" name="page-type" id="page-type" value="post"></div><script>var visitorMail = "";
+</script><script async data-pjax src="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/waterfall/waterfall.js"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/qrcodejs/1.0.0/qrcode.min.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.9/icon/ali_iconfont_css.css"><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/aplayer/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.cbd.int/anzhiyu-blog-static@1.0.1/js/APlayer.min.js"></script><script src="https://cdn.cbd.int/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js"></script><script src="https://cdn.cbd.int/pjax@0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
 
-<div id="copyright">
-<ul>
-  <li class="author">
-    <strong>本文作者： </strong>jlynet <i class="ic i-at"><em>@</em></i>生活科技馆
-  </li>
-  <li class="link">
-    <strong>本文链接：</strong>
-    <a href="https://jlynet.github.io/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/" title="从Clover到OpenCore">https://jlynet.github.io/2021/10/10/从Clover到OpenCore/</a>
-  </li>
-  <li class="license">
-    <strong>版权声明： </strong>本站所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpo"><i class="ic i-creative-commons"><em>(CC)</em></i>BY-NC-SA</span> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
+document.addEventListener('pjax:send', function () {
+  // removeEventListener scroll 
+  anzhiyu.removeGlobalFnEvent('pjax')
+  anzhiyu.removeGlobalFnEvent('themeChange')
 
-  </footer>
-
-</article>
-
-  </div>
+  document.getElementById('rightside').classList.remove('rightside-show')
   
-
-<div class="post-nav">
-    <div class="item left">
-      
-
-  <a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" itemprop="url" rel="prev" data-background-image="https:&#x2F;&#x2F;tva2.sinaimg.cn&#x2F;mw690&#x2F;6833939bly1gipey0a334j20zk0m8qpt.jpg" title="Portainer安装配置">
-  <span class="type">上一篇</span>
-  <span class="category"><i class="ic i-flag"></i> 技术笔记</span>
-  <h3>Portainer安装配置</h3>
-  </a>
-
-    </div>
-    <div class="item right">
-      
-
-  <a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" itemprop="url" rel="next" data-background-image="https:&#x2F;&#x2F;tva2.sinaimg.cn&#x2F;mw690&#x2F;6833939bly1gicivghyooj20zk0m8dir.jpg" title="OpenResty 执行流程阶段">
-  <span class="type">下一篇</span>
-  <span class="category"><i class="ic i-flag"></i> 技术笔记</span>
-  <h3>OpenResty 执行流程阶段</h3>
-  </a>
-
-    </div>
-</div>
-
-  
-  <div class="wrap" id="comments"></div>
-
-
-        </div>
-        <div id="sidebar">
-          
-
-<div class="inner">
-
-  <div class="panels">
-    <div class="inner">
-      <div class="contents panel pjax" data-title="文章目录">
-          <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">序言以外应该写在最前面的话</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">修改 SSDT &#x2F; DSDT 以搭配 OpenCore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">减少不必要的 DSDT 重命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">摆脱对 Clover ACPI Quirks 的依赖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">更新设备属性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">5.1.</span> <span class="toc-text">使用缓冲帧补丁驱动 Intel 核显</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">5.2.</span> <span class="toc-text">新的声卡 layout-id 注入方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">6.</span> <span class="toc-text">开始组织 OpenCore 目录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.1.</span> <span class="toc-text">下载 OpenCore 所需文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.2.</span> <span class="toc-text">决定你使用的配置文件编辑器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.3.</span> <span class="toc-text">生成目录结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">6.4.</span> <span class="toc-text">删除不需要的文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">7.</span> <span class="toc-text">开始配置 OpenCore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">8.</span> <span class="toc-text">Clover 中的设置在 OpenCore 的等效配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">8.1.</span> <span class="toc-text">Boot 的相关设置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">9.</span> <span class="toc-text">原文链接：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">10.</span> <span class="toc-text">感谢名单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">11.</span> <span class="toc-text">参考及引用：</span></a></li></ol>
-      </div>
-      <div class="related panel pjax" data-title="系列文章">
-        <ul>
-          <li><a href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/" rel="bookmark" title="hexo命令说明">hexo命令说明</a></li><li><a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/" rel="bookmark" title="各种开源协议介绍">各种开源协议介绍</a></li><li><a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" rel="bookmark" title="Docker 私有仓库搭建">Docker 私有仓库搭建</a></li><li><a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" rel="bookmark" title="Portainer安装配置">Portainer安装配置</a></li><li class="active"><a href="/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/" rel="bookmark" title="从Clover到OpenCore">从Clover到OpenCore</a></li><li><a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" rel="bookmark" title="OpenResty 执行流程阶段">OpenResty 执行流程阶段</a></li><li><a href="/2021/10/17/ngx-lua-%E6%A8%A1%E5%9D%97%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3%EF%BC%88%E5%9F%BA%E4%BA%8Eopenresty%EF%BC%89/" rel="bookmark" title="ngx_lua 模块详细讲解（基于openresty）">ngx_lua 模块详细讲解（基于openresty）</a></li><li><a href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/" rel="bookmark" title="Linux网络基础，路由的追踪">Linux网络基础，路由的追踪</a></li><li><a href="/2021/10/21/%E8%A7%A3%E5%86%B3SpringBoot-2-3-MultipartFile%E4%B8%BA%E7%A9%BA%E7%9A%84%E9%97%AE%E9%A2%98/" rel="bookmark" title="解决SpringBoot 2.3 MultipartFile为空的问题">解决SpringBoot 2.3 MultipartFile为空的问题</a></li><li><a href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" rel="bookmark" title="ssh端口转发笔记">ssh端口转发笔记</a></li><li><a href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" rel="bookmark" title="GitHub博客hexo建站之设置SSH密钥">GitHub博客hexo建站之设置SSH密钥</a></li><li><a href="/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/" rel="bookmark" title="HAProxy 原理 & dash board 各指标含义">HAProxy 原理 & dash board 各指标含义</a></li>
-        </ul>
-      </div>
-      <div class="overview panel" data-title="站点概览">
-        <div class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <img class="image" itemprop="image" alt="jlynet"
-      data-src="/images/avatar.jpg">
-  <p class="name" itemprop="name">jlynet</p>
-  <div class="description" itemprop="description">技术决定未来....</div>
-</div>
-
-<nav class="state">
-    <div class="item posts">
-      <a href="/archives/">
-        <span class="count">61</span>
-        <span class="name">文章</span>
-      </a>
-    </div>
-    <div class="item categories">
-      <a href="/categories/">
-        <span class="count">6</span>
-        <span class="name">分类</span>
-      </a>
-    </div>
-    <div class="item tags">
-      <a href="/tags/">
-        <span class="count">16</span>
-        <span class="name">标签</span>
-      </a>
-    </div>
-</nav>
-
-<div class="social">
-</div>
-
-<ul class="menu">
-  
-    
-  <li class="item">
-    <a href="/" rel="section"><i class="ic i-home"></i>首页</a>
-  </li>
-
-
-</ul>
-
-      </div>
-    </div>
-  </div>
-
-  <ul id="quick">
-    <li class="prev pjax">
-        <a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" rel="prev" title="上一篇"><i class="ic i-chevron-left"></i></a>
-    </li>
-    <li class="up"><i class="ic i-arrow-up"></i></li>
-    <li class="down"><i class="ic i-arrow-down"></i></li>
-    <li class="next pjax">
-        <a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" rel="next" title="下一篇"><i class="ic i-chevron-right"></i></a>
-    </li>
-    <li class="percent"></li>
-  </ul>
-</div>
-
-
-        </div>
-        <div class="dimmer"></div>
-      </div>
-    </main>
-    <footer id="footer">
-      <div class="inner">
-        <div class="widgets">
-          
-<div class="rpost pjax">
-  <h2>随机文章</h2>
-  <ul>
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmc-redefine%E5%91%BD%E4%BB%A4/" title="Arthas mc-redefine命令">Arthas mc-redefine命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasarthas-boot%E6%94%AF%E6%8C%81%E7%9A%84%E5%8F%82%E6%95%B0%E6%A1%88%E4%BE%8B/" title="Arthas arthas-boot支持的参数 案例">Arthas arthas-boot支持的参数 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasmonitor%E5%91%BD%E4%BB%A4/" title="Arthas monitor命令">Arthas monitor命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" title="分类于 默认分类">默认分类</a>
-<i class="ic i-angle-right"></i>
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" title="分类于 技术笔记">技术笔记</a>
-</div>
-
-    <span><a href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" title="ssh端口转发笔记">ssh端口转发笔记</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" title="分类于 默认分类">默认分类</a>
-<i class="ic i-angle-right"></i>
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" title="分类于 技术笔记">技术笔记</a>
-</div>
-
-    <span><a href="/2021/10/17/ngx-lua-%E6%A8%A1%E5%9D%97%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3%EF%BC%88%E5%9F%BA%E4%BA%8Eopenresty%EF%BC%89/" title="ngx_lua 模块详细讲解（基于openresty）">ngx_lua 模块详细讲解（基于openresty）</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E6%8E%92%E6%9F%A5%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8%E6%A1%88%E4%BE%8B/" title="Arthas 排查函数调用异常 案例">Arthas 排查函数调用异常 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" title="分类于 默认分类">默认分类</a>
-<i class="ic i-angle-right"></i>
-<a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" title="分类于 技术笔记">技术笔记</a>
-</div>
-
-    <span><a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/" title="各种开源协议介绍">各种开源协议介绍</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/" title="Arthas dump命令">Arthas dump命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/%E4%B8%AA%E4%BA%BA%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/" title="分类于 个人作品展示">个人作品展示</a>
-</div>
-
-    <span><a href="/2021/07/28/JsonFormatTool/" title="JsonFormatTool 跨平台json 格式化工具">JsonFormatTool 跨平台json 格式化工具</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/10/01/etCache-%E7%BC%93%E5%AD%98%E6%A1%86%E6%9E%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E4%BB%A5%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="etCache 缓存框架的使用以及源码分析">etCache 缓存框架的使用以及源码分析</a></span>
-  </li>
-
-  </ul>
-</div>
-<div>
-  <h2>最新评论</h2>
-  <ul class="leancloud-recent-comment"></ul>
-</div>
-
-        </div>
-        <div class="status">
-  <div class="copyright">
-    
-    &copy; 2010 – 
-    <span itemprop="copyrightYear">2023</span>
-    <span class="with-love">
-      <i class="ic i-sakura rotate"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">jlynet @ 爱上猫的小鱼儿</span>
-  </div>
-  <div class="powered-by">
-    基于 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & Theme.<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2FtZWhpbWUvaGV4by10aGVtZS1zaG9rYQ==">Shoka</span>
-  </div>
-</div>
-
-      </div>
-    </footer>
-  </div>
-<script data-config type="text/javascript">
-  var LOCAL = {
-    path: '2021/10/10/从Clover到OpenCore/',
-    favicon: {
-      show: "（●´3｀●）やれやれだぜ",
-      hide: "(´Д｀)大変だ！"
-    },
-    search : {
-      placeholder: "文章搜索",
-      empty: "关于 「 ${query} 」，什么也没搜到",
-      stats: "${time} ms 内找到 ${hits} 条结果"
-    },
-    valine: true,fancybox: true,
-    copyright: '复制成功，转载请遵守 <i class="ic i-creative-commons"></i>BY-NC-SA 协议。',
-    ignores : [
-      function(uri) {
-        return uri.includes('#');
-      },
-      function(uri) {
-        return new RegExp(LOCAL.path+"$").test(uri);
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
       }
-    ]
-  };
-</script>
+    }
+  }
 
-<script src="https://cdn.polyfill.io/v2/polyfill.js"></script>
+  typeof typed === 'object' && typed.destroy()
 
-<script src="//cdn.jsdelivr.net/combine/npm/pace-js@1.0.2/pace.min.js,npm/pjax@0.2.8/pjax.min.js,npm/whatwg-fetch@3.4.0/dist/fetch.umd.min.js,npm/animejs@3.2.0/lib/anime.min.js,npm/algoliasearch@4/dist/algoliasearch-lite.umd.js,npm/instantsearch.js@4/dist/instantsearch.production.min.js,npm/lozad@1/dist/lozad.min.js,npm/quicklink@2/dist/quicklink.umd.js"></script>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+})
 
-<script src="/js/app.js?v=0.2.5"></script>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof panguInit === 'function' && panguInit()
 
-</body>
-</html>
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div></body></html>

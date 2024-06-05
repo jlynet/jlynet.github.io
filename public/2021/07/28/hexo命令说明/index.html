@@ -1,196 +1,242 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><title>hexo命令说明 | 生活科技馆</title><meta name="keywords" content="技术笔记,随笔,hexo"><meta name="author" content="jlynet"><meta name="copyright" content="jlynet"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7f9fe"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-touch-fullscreen" content="yes"><meta name="apple-mobile-web-app-title" content="hexo命令说明"><meta name="application-name" content="hexo命令说明"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="#f7f9fe"><meta property="og:type" content="article"><meta property="og:title" content="hexo命令说明"><meta property="og:url" content="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/index.html"><meta property="og:site_name" content="生活科技馆"><meta property="og:description" content="hexo 搭建博客命令收集备忘"><meta property="og:locale" content="zh-CN"><meta property="og:image" content="https://jlynet.github.io/img/64496e511b09c.jpg"><meta property="article:author" content="jlynet"><meta property="article:tag" content="[&quot;java&quot;,&quot;php&quot;,&quot;linux&quot;,&quot;win&quot;,&quot;jlynet&quot;,&quot;jlynet.cn&quot;,&quot;jlynet.com&quot;,&quot;爱上猫的小鱼儿&quot;]"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://jlynet.github.io/img/64496e511b09c.jpg"><meta name="description" content="hexo 搭建博客命令收集备忘"><link rel="shortcut icon" href="/favicon.ico"><link rel="canonical" href="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/"><link rel="preconnect" href="//cdn.cbd.int"/><meta name="google-site-verification" content="xxx"/><meta name="baidu-site-verification" content="code-xxx"/><meta name="msvalidate.01" content="xxx"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/@fancyapps/ui@5.0.28/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  linkPageTop: undefined,
+  peoplecanvas: {"enable":true,"img":"https://upload-bbs.miyoushe.com/upload/2023/09/03/125766904/ee23df8517f3c3e3efc4145658269c06_5714860933110284659.png"},
+  postHeadAiDescription: {"enable":true,"gptName":"AnZhiYu","mode":"local","switchBtn":false,"btnLink":"https://afdian.net/item/886a79d4db6711eda42a52540025c377","randomNum":3,"basicWordCount":1000,"key":"xxxx","Referer":"https://xx.xx/"},
+  diytitle: {"enable":true,"leaveTitle":"w(ﾟДﾟ)w 不要走！再看看嘛！","backTitle":"♪(^∇^*)欢迎肥来！"},
+  LA51: undefined,
+  greetingBox: undefined,
+  twikooEnvId: '',
+  commentBarrageConfig:undefined,
+  root: '/',
+  preloader: {"source":3},
+  friends_vue_info: undefined,
+  navMusic: true,
+  mainTone: undefined,
+  authorStatus: undefined,
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简","rightMenuMsgToTraditionalChinese":"转为繁体","rightMenuMsgToSimplifiedChinese":"转为简体"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":330},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    simplehomepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"copy":true,"copyrightEbable":false,"limitCount":50,"languages":{"author":"作者: jlynet","link":"链接: ","source":"来源: 生活科技馆","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。","copySuccess":"复制成功，复制和转载请标注本文地址"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#425AEF","bgDark":"#1f1f1f","position":"top-center"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.cbd.int/flickr-justified-gallery@2.1.2/dist/fjGallery.min.js',
+      css: 'https://cdn.cbd.int/flickr-justified-gallery@2.1.2/dist/fjGallery.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  shortcutKey: undefined,
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  configTitle: '生活科技馆',
+  title: 'hexo命令说明',
+  postAI: '',
+  pageFillDescription: '文字里面添加图片, 给文章添加目录, yilia上一页下一页显示的问题安装创建并初始化初始化安装组件部署插件配置检查本机已存在的密钥邮箱进入部署目录设置递交信息你的户名昵称填写你的注册邮箱测试是否成功注意邮箱地址不改常见命令新建章新建成成静静态态录录开启预览访问端默认端关闭部署到查看帮助查看的版本清楚缩写组合命令成并本地预览成并上传文字里面添加图片在配置文件中修改为网站切割域名路径前缀位置此时再执行命令创建新的文章在中会生成文章和同名文件夹我们将文章中所使用到的将图片资源均放在中这时就可以在文章中使用相对路径引用图片资源了文章中的图片资源路径格式给文章添加目录安装使用方法跟显示文章摘要类似在中需要显示文章目录的地方添加上一页下一页显示的问题在博客根目录下的中如下配置表示目录深度为即最多生成三级目录找到主题下的文章模版我的是在其末尾增加代码上一页下一页显示的问题修改文件上一页下一页上一页下一页修改修改成字数和阅读时间统计插件项目地址链接安装配置安装插件在站点配置文件中添加以下代码然后由于此插件集成在中然后只需修改主题配置文件最后一步三步走',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-06-05 10:18:17',
+  postMainColor: '',
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
 
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
 
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#18171d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f7f9fe')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#FFF">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-
-<link rel="icon" type="image/ico" sizes="32x32" href="/images/favicon.ico">
-  <meta http-equiv="Cache-Control" content="no-transform">
-  <meta http-equiv="Cache-Control" content="no-siteapp">
-
-
-<link rel="alternate" type="application/rss+xml" title="生活科技馆" href="https://jlynet.github.io/rss.xml" />
-<link rel="alternate" type="application/atom+xml" title="生活科技馆" href="https://jlynet.github.io/atom.xml" />
-<link rel="alternate" type="application/json" title="生活科技馆" href="https://jlynet.github.io/feed.json" />
-
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic%7CFredericka%20the%20Great:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20JP:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20SC:300,300italic,400,400italic,700,700italic%7CInconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-
-<link rel="stylesheet" href="/css/app.css?v=0.2.5">
-
-  
-  <meta name="keywords" content="技术笔记,随笔,hexo" />
-
-
-<link rel="canonical" href="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/">
-
-
-
-  <title>
-hexo命令说明 - 技术笔记 - 默认分类 |
-爱上猫的小鱼儿 = 生活科技馆 = --个人博客</title>
-<meta name="generator" content="Hexo 5.4.0">
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div id="loading">
-    <div class="cat">
-      <div class="body"></div>
-      <div class="head">
-        <div class="face"></div>
-      </div>
-      <div class="foot">
-        <div class="tummy-end"></div>
-        <div class="bottom"></div>
-        <div class="legs left"></div>
-        <div class="legs right"></div>
-      </div>
-      <div class="paw">
-        <div class="hands left"></div>
-        <div class="hands right"></div>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <header id="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="inner">
-        <div id="brand">
-          <div class="pjax">
-          
-  <h1 itemprop="name headline">hexo命令说明
-  </h1>
-  
-<div class="meta">
-  <span class="item" title="创建时间：2021-07-28 12:27:05">
-    <span class="icon">
-      <i class="ic i-calendar"></i>
-    </span>
-    <span class="text">发表于</span>
-    <time itemprop="dateCreated datePublished" datetime="2021-07-28T12:27:05+08:00">2021-07-28</time>
-  </span>
-</div>
+</head><body data-type="anzhiyu"><div id="web_bg"></div><div id="an_music_bg"></div><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><img class="loading-img nolazyload" alt="加载头像" src="/img/avatar.jpg"/><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.getElementById('loading-box').classList.add("loaded");
+  },
+  initLoading: () => {
+    document.getElementById('loading-box').classList.remove("loaded")
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+setTimeout(function(){preloader.endLoading();},10000)
 
-
-          </div>
-        </div>
-        <nav id="nav">
-  <div class="inner">
-    <div class="toggle">
-      <div class="lines" aria-label="切换导航栏">
-        <span class="line"></span>
-        <span class="line"></span>
-        <span class="line"></span>
-      </div>
-    </div>
-    <ul class="menu">
-      <li class="item title"><a href="/" rel="start">爱上猫的小鱼儿</a></li>
-    </ul>
-    <ul class="right">
-      <li class="item theme">
-        <i class="ic i-sun"></i>
-      </li>
-      <li class="item search">
-        <i class="ic i-search"></i>
-      </li>
-    </ul>
-  </div>
-</nav>
-
-      </div>
-      <div id="imgs" class="pjax">
-        <ul>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipeybxm1pj20zk0m8niv.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipetfk5zwj20zk0m8e81.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1gipetv6p75j20zk0m8x6p.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giclize41wj20zk0m87gk.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giclh3brzpj20zk0m8ann.jpg"></li>
-          <li class="item" data-background-image="https://tva2.sinaimg.cn/large/6833939bly1giph47e9vtj20zk0m8x6l.jpg"></li>
-        </ul>
-      </div>
-    </header>
-    <div id="waves">
-      <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-        <defs>
-          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-        </defs>
-        <g class="parallax">
-          <use xlink:href="#gentle-wave" x="48" y="0" />
-          <use xlink:href="#gentle-wave" x="48" y="3" />
-          <use xlink:href="#gentle-wave" x="48" y="5" />
-          <use xlink:href="#gentle-wave" x="48" y="7" />
-        </g>
-      </svg>
-    </div>
-    <main>
-      <div class="inner">
-        <div id="main" class="pjax">
-          
-  <div class="article wrap">
-    
-<div class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
-<i class="ic i-home"></i>
-<span><a href="/">首页</a></span><i class="ic i-angle-right"></i>
-<span  itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" itemprop="item" rel="index" title="分类于 默认分类"><span itemprop="name">默认分类</span></a>
-<meta itemprop="position" content="1" /></span>
-<i class="ic i-angle-right"></i>
-<span  class="current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" itemprop="item" rel="index" title="分类于 技术笔记"><span itemprop="name">技术笔记</span></a>
-<meta itemprop="position" content="2" /></span>
-</div>
-
-    <article itemscope itemtype="http://schema.org/Article" class="post block" lang="zh-CN">
-  <link itemprop="mainEntityOfPage" href="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/">
-
-  <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="image" content="/images/avatar.jpg">
-    <meta itemprop="name" content="jlynet">
-    <meta itemprop="description" content="--个人博客, 技术决定未来....">
-  </span>
-
-  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="生活科技馆">
-  </span>
-
-  <div class="body md" itemprop="articleBody">
-    
-
-    <p>安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo npm install -g hexo hexo-cli</span><br></pre></td></tr></table></figure>
+if (true) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.10/progress_bar/progress_bar.css"/><script async="async" src="https://cdn.cbd.int/pace-js@1.2.4/pace.min.js" data-pace-options="{ &quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}"></script><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><div id="nav-group"><span id="blog_name"><a id="site-name" href="/" accesskey="h"><div class="title">生活科技馆</div><i class="anzhiyufont anzhiyu-icon-house-chimney"></i></a></span><div class="mask-name-container"><div id="name-container"><a id="page-name" href="javascript:anzhiyu.scrollToDest(0, 500)">PAGE_NAME</a></div></div><div id="menus"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机前往一个文章" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-dice"></i></a></div><input id="center-console" type="checkbox"/><label class="widget" for="center-console" title="中控台" onclick="anzhiyu.switchConsole();"><i class="left"></i><i class="widget center"></i><i class="widget right"></i></label><div id="console"><div class="console-card-group-reward"><ul class="reward-all console-card"><li class="reward-item"><a href="/img/weixin.png" target="_blank"><img class="post-qr-code-img" alt="微信" src="/img/weixin.png"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" alt="支付宝" src="/img/alipay.jpg"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div><div class="console-card-group"><div class="console-card-group-left"><div class="console-card" id="card-newest-comments"><div class="card-content"><div class="author-content-item-tips">互动</div><span class="author-content-item-title"> 最新评论</span></div><div class="aside-list"><span>正在加载中...</span></div></div></div><div class="console-card-group-right"><div class="console-card tags"><div class="card-content"><div class="author-content-item-tips">兴趣点</div><span class="author-content-item-title">寻找你感兴趣的领域</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 入门教程<sup>2</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 最佳实践<sup>14</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" style="font-size: 1.05rem;">Java 诊断工具 Arthas 高级命令教程<sup>25</sup></a><a href="/tags/Spring/" style="font-size: 1.05rem;">Spring<sup>1</sup></a><a href="/tags/SpringBoot/" style="font-size: 1.05rem;">SpringBoot<sup>1</sup></a><a href="/tags/Tomcat/" style="font-size: 1.05rem;">Tomcat<sup>1</sup></a><a href="/tags/docker/" style="font-size: 1.05rem;">docker<sup>2</sup></a><a href="/tags/hexo/" style="font-size: 1.05rem;">hexo<sup>3</sup></a><a href="/tags/java/" style="font-size: 1.05rem;">java<sup>4</sup></a><a href="/tags/linux/" style="font-size: 1.05rem;">linux<sup>8</sup></a><a href="/tags/nginx/" style="font-size: 1.05rem;">nginx<sup>2</sup></a><a href="/tags/php/" style="font-size: 1.05rem;">php<sup>1</sup></a><a href="/tags/shell/" style="font-size: 1.05rem;">shell<sup>6</sup></a><a href="/tags/ssh/" style="font-size: 1.05rem;">ssh<sup>1</sup></a><a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 1.05rem;">中间件<sup>1</sup></a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" style="font-size: 1.05rem;">技术笔记<sup>17</sup></a><a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 1.05rem;">网络<sup>2</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.05rem;">随笔<sup>12</sup></a></div></div><hr/></div></div><div class="console-card history"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-box-archiv"></i><span>文章</span></div><div class="card-archives"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/06/"><span class="card-archive-list-date">六月 2024</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/08/"><span class="card-archive-list-date">八月 2022</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/06/"><span class="card-archive-list-date">六月 2022</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/11/"><span class="card-archive-list-date">十一月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/10/"><span class="card-archive-list-date">十月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">9</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/09/"><span class="card-archive-list-date">九月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">1</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/08/"><span class="card-archive-list-date">八月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">42</span><span>篇</span></div></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/07/"><span class="card-archive-list-date">七月 2021</span><div class="card-archive-list-count-group"><span class="card-archive-list-count">6</span><span>篇</span></div></a></li></ul></div><hr/></div></div></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" title="显示模式切换" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-moon"></i></a></div><div class="console-btn-item" id="consoleHideAside" onclick="anzhiyu.hideAsideBtn()" title="边栏显示控制"><a class="asideSwitch"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="anzhiyu.musicToggle()" title="音乐开关"><a class="music-switch"><i class="anzhiyufont anzhiyu-icon-music"></i></a></div></div><div class="console-mask" onclick="anzhiyu.hideConsole()" href="javascript:void(0);"></div></div><div class="nav-button" id="nav-totop"><a class="totopbtn" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i><span id="percent" onclick="anzhiyu.scrollToDest(0,500)">0</span></a></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);" title="切换"><i class="anzhiyufont anzhiyu-icon-bars"></i></a></div></div></div></nav><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original">原创</a><span class="post-meta-categories"><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" itemprop="url">默认分类</a><i class="anzhiyufont anzhiyu-icon-angle-right post-meta-separator"></i><i class="anzhiyufont anzhiyu-icon-inbox post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" itemprop="url">技术笔记</a></span><span class="article-meta tags"><a class="article-meta__tags" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>技术笔记</span></a><a class="article-meta__tags" href="/tags/%E9%9A%8F%E7%AC%94/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>随笔</span></a><a class="article-meta__tags" href="/tags/hexo/" tabindex="-1" itemprop="url"> <span> <i class="anzhiyufont anzhiyu-icon-hashtag"></i>hexo</span></a></span></div></div><h1 class="post-title" itemprop="name headline">hexo命令说明</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="anzhiyufont anzhiyu-icon-calendar-days post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" itemprop="dateCreated datePublished" datetime="2021-07-28T04:27:05.000Z" title="发表于 2021-07-28 12:27:05">2021-07-28</time><span class="post-meta-separator"></span><i class="anzhiyufont anzhiyu-icon-history post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" itemprop="dateCreated datePublished" datetime="2024-06-05T02:18:17.350Z" title="更新于 2024-06-05 10:18:17">2024-06-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">       </span><span class="post-meta-position" title="作者IP属地为长沙"><i class="anzhiyufont anzhiyu-icon-location-dot"></i>长沙</span></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section><div id="post-top-cover"><img class="nolazyload" id="post-top-bg" src=""></div></header><main id="blog-container"><div class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container" itemscope itemtype="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/"><header><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/" itemprop="url">默认分类</a><a class="post-meta-categories" href="/categories/%E9%BB%98%E8%AE%A4%E5%88%86%E7%B1%BB/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" itemprop="url">技术笔记</a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" tabindex="-1" itemprop="url">技术笔记</a><a href="/tags/%E9%9A%8F%E7%AC%94/" tabindex="-1" itemprop="url">随笔</a><a href="/tags/hexo/" tabindex="-1" itemprop="url">hexo</a><h1 id="CrawlerTitle" itemprop="name headline">hexo命令说明</h1><span itemprop="author" itemscope itemtype="http://schema.org/Person">jlynet</span><time itemprop="dateCreated datePublished" datetime="2021-07-28T04:27:05.000Z" title="发表于 2021-07-28 12:27:05">2021-07-28</time><time itemprop="dateCreated datePublished" datetime="2024-06-05T02:18:17.350Z" title="更新于 2024-06-05 10:18:17">2024-06-05</time></header><p>安装：</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo npm install -g hexo hexo-cli --registry=https://registry.npmmirror.com</span><br></pre></td></tr></tbody></table></figure>
 
 <p>创建并初始化</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ~/myappWeb &amp;&amp; <span class="built_in">cd</span> ~/myappWeb</span><br><span class="line">hexo init <span class="comment"># 初始化</span></span><br><span class="line">npm install <span class="comment"># 安装组件</span></span><br><span class="line">npm install hexo-deployer-git --save <span class="comment">#git 部署插件</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p ~/myappWeb &amp;&amp; <span class="built_in">cd</span> ~/myappWeb</span><br><span class="line">hexo init <span class="comment"># 初始化</span></span><br><span class="line">npm install <span class="comment"># 安装组件</span></span><br><span class="line">npm install hexo-deployer-git --save <span class="comment">#git 部署插件</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>配置SSH key</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/. ssh <span class="comment">#检查本机已存在的ssh密钥</span></span><br><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;GitHub 邮箱&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/. ssh <span class="comment">#检查本机已存在的ssh密钥</span></span><br><span class="line">ssh-keygen -t rsa -C <span class="string">"GitHub 邮箱"</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>进入部署目录设置git递交信息</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> .deploy_git</span><br><span class="line">$ git config user.name <span class="string">&quot;liuxianan&quot;</span>// 你的github⽤户名，⾮昵称</span><br><span class="line">$ git config user.email <span class="string">&quot; xxx@qq.com &quot;</span>// <span class="string">&quot;// 填写你的github注册邮箱</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> .deploy_git</span><br><span class="line">$ git config user.name <span class="string">"liuxianan"</span>// 你的github⽤户名，⾮昵称</span><br><span class="line">$ git config user.email <span class="string">" xxx@qq.com "</span>// <span class="string">"// 填写你的github注册邮箱</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>测试是否成功</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -T git@github.com <span class="comment"># # 注意邮箱地址不⽤改</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -T git@github.com <span class="comment"># # 注意邮箱地址不⽤改</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>常见命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;postName&quot;</span> <span class="comment">#新建⽂章</span></span><br><span class="line">$ hexo new page <span class="string">&quot;pageName&quot;</span> <span class="comment">#新建⻚⾯</span></span><br><span class="line">$ hexo generate <span class="comment">#⽣⽣成成静静态态⻚⾯⻚⾯⾄⾄public public⽬⽬录录</span></span><br><span class="line">$ hexo server <span class="comment">#开启预览访问端⼝（默认端⼝4000，，&#x27;ctrl + c&#x27;关闭server）</span></span><br><span class="line">$ hexo deploy <span class="comment">#部署到GitHub</span></span><br><span class="line">$ hexo <span class="built_in">help</span> <span class="comment"># 查看帮助</span></span><br><span class="line">$ hexo version <span class="comment">#查看Hexo的版本</span></span><br><span class="line">$ hexo clean <span class="comment">#清楚</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"postName"</span> <span class="comment">#新建⽂章</span></span><br><span class="line">$ hexo new page <span class="string">"pageName"</span> <span class="comment">#新建⻚⾯</span></span><br><span class="line">$ hexo generate <span class="comment">#⽣⽣成成静静态态⻚⾯⻚⾯⾄⾄public public⽬⽬录录</span></span><br><span class="line">$ hexo server <span class="comment">#开启预览访问端⼝（默认端⼝4000，，'ctrl + c'关闭server）</span></span><br><span class="line">$ hexo deploy <span class="comment">#部署到GitHub</span></span><br><span class="line">$ hexo <span class="built_in">help</span> <span class="comment"># 查看帮助</span></span><br><span class="line">$ hexo version <span class="comment">#查看Hexo的版本</span></span><br><span class="line">$ hexo clean <span class="comment">#清楚</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>缩写：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ hexo n == hexo new</span><br><span class="line">$ hexo g == hexo generate</span><br><span class="line">$ hexo s == hexo server</span><br><span class="line">$ hexo d == hexo deploy</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ hexo n == hexo new</span><br><span class="line">$ hexo g == hexo generate</span><br><span class="line">$ hexo s == hexo server</span><br><span class="line">$ hexo d == hexo deploy</span><br></pre></td></tr></tbody></table></figure>
 
 <p>组合命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo s -g <span class="comment">#⽣成并本地预览</span></span><br><span class="line">hexo d -g <span class="comment">#⽣成并上传</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo s -g <span class="comment">#⽣成并本地预览</span></span><br><span class="line">hexo d -g <span class="comment">#⽣成并上传</span></span><br></pre></td></tr></tbody></table></figure>
 
 <h1><span id="文字里面添加图片">文字里面添加图片</span></h1><blockquote>
 <p>在<code>_config.yml</code>配置文件中，修改为 <code>post_asset_folder: true</code> 网站切割域名路径前缀位置 <code>post_asset_folder_position_length: 4</code></p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install https://github.com/ai930/hexo-asset-image --save</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install https://github.com/ai930/hexo-asset-image --save</span><br></pre></td></tr></tbody></table></figure>
 <blockquote>
 <p>此时再执行命令 <code>hexo n article_name</code> 创建新的文章，在 <code>source/_posts</code> 中会生成文章 <code>post_name.md</code> 和同名文件夹 post_name,我们将文章中所使用到的将图片资源均放在 post_name 中，这时就可以在文章中使用相对路径引用图片资源了<br><code>![img_name](img_name.jpg) #文章中的图片资源路径格式</code></p>
 </blockquote>
 <h1><span id="给文章添加目录">给文章添加目录</span></h1><p>安装</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-toc --save</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-toc --save</span><br></pre></td></tr></tbody></table></figure>
 <p>使用方法跟显示文章摘要类似，在Markdown中需要显示文章目录的地方添加 `</p>
 <!-- toc -->
 
@@ -200,16 +246,16 @@ hexo命令说明 - 技术笔记 - 默认分类 |
 <!-- tocstop -->
 
 <p><code>在博客根目录下的</code>_config.yml` 中如下配置：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">toc:</span></span><br><span class="line">  <span class="attr">maxDepth:</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">toc:</span></span><br><span class="line">  <span class="attr">maxDepth:</span> <span class="number">3</span></span><br></pre></td></tr></tbody></table></figure>
 <p><code>maxDepth</code> 表示目录深度为3，即最多生成三级目录。<br>找到主题下的文章模版，我的是<code>themes\yilia\layout\_partial\article.ejs</code>。<br>在其末尾增加代码：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;% if (!index &amp;&amp; theme.toc)&#123; %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="handlebars"><span class="xml"></span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  var tocEx = function(el)&#123;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    var toc = document.querySelector(el), content = toc.innerHTML;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    content = content.replace(&#x27;<span class="comment">&lt;!-- toc --&gt;</span>&#x27;, &#x27;<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;toc&quot;</span>&gt;</span>&#x27;).replace(&#x27;<span class="comment">&lt;!-- tocstop --&gt;</span>&#x27;, &#x27;<span class="tag">&lt;/<span class="name">div</span>&gt;</span>&#x27;);</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    toc.innerHTML = content;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  &#125;(&#x27;.article-entry&#x27;);</span></span></span><br><span class="line"><span class="xml"><span class="handlebars"></span></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">&lt;% &#125; %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css"><span class="selector-class">.toc</span> &#123;</span></span><br><span class="line"><span class="css">  <span class="attribute">float</span>: right;</span></span><br><span class="line"><span class="css">  <span class="attribute">margin-left</span>: <span class="number">40px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">padding</span>: <span class="number">10px</span> <span class="number">20px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">background</span>: <span class="number">#f1f1f1</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">border-radius</span>: <span class="number">10px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">box-shadow</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">3px</span> <span class="number">#bbb</span>;</span></span><br><span class="line"><span class="css">&#125;</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;% if (!index &amp;&amp; theme.toc){ %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="handlebars"><span class="xml"></span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  var tocEx = function(el){</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    var toc = document.querySelector(el), content = toc.innerHTML;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    content = content.replace('<span class="comment">&lt;!-- toc --&gt;</span>', '<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"toc"</span>&gt;</span>').replace('<span class="comment">&lt;!-- tocstop --&gt;</span>', '<span class="tag">&lt;/<span class="name">div</span>&gt;</span>');</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">    toc.innerHTML = content;</span></span></span><br><span class="line"><span class="xml"><span class="handlebars">  }('.article-entry');</span></span></span><br><span class="line"><span class="xml"><span class="handlebars"></span></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">&lt;% } %&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="css"></span></span><br><span class="line"><span class="css"><span class="selector-class">.toc</span> {</span></span><br><span class="line"><span class="css">  <span class="attribute">float</span>: right;</span></span><br><span class="line"><span class="css">  <span class="attribute">margin-left</span>: <span class="number">40px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">padding</span>: <span class="number">10px</span> <span class="number">20px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">background</span>: <span class="number">#f1f1f1</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">border-radius</span>: <span class="number">10px</span>;</span></span><br><span class="line"><span class="css">  <span class="attribute">box-shadow</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">3px</span> <span class="number">#bbb</span>;</span></span><br><span class="line"><span class="css">}</span></span><br><span class="line"><span class="css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
 
 <h1><span id="yilia上一页下一页显示的问题">yilia上一页下一页显示的问题</span></h1><p>修改<code>themes/yilia-plus/layout/_partial/archive.ejs</code> 文件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1)&#123; %&gt;</span><br><span class="line">    &lt;nav id=&quot;page-nav&quot;&gt;</span><br><span class="line">      &lt;%- paginator(&#123;</span><br><span class="line">        prev_text: &#x27;上一页&#x27;,</span><br><span class="line">        next_text: &#x27;下一页&#x27;</span><br><span class="line">      &#125;) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% &#125; %&gt;</span><br><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1)&#123; %&gt;</span><br><span class="line">    &lt;nav id=&quot;page-nav&quot;&gt;</span><br><span class="line">      &lt;%- paginator(&#123;</span><br><span class="line">        prev_text: &#x27;上一页&#x27;,</span><br><span class="line">        next_text: &#x27;下一页&#x27;</span><br><span class="line">      &#125;) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% &#125; %&gt;</span><br><span class="line">.......</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1){ %&gt;</span><br><span class="line">    &lt;nav id="page-nav"&gt;</span><br><span class="line">      &lt;%- paginator({</span><br><span class="line">        prev_text: '上一页',</span><br><span class="line">        next_text: '下一页'</span><br><span class="line">      }) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% } %&gt;</span><br><span class="line">.......</span><br><span class="line">&lt;% if (page.total &gt; 1){ %&gt;</span><br><span class="line">    &lt;nav id="page-nav"&gt;</span><br><span class="line">      &lt;%- paginator({</span><br><span class="line">        prev_text: '上一页',</span><br><span class="line">        next_text: '下一页'</span><br><span class="line">      }) %&gt;</span><br><span class="line">    &lt;/nav&gt;</span><br><span class="line">  &lt;% } %&gt;</span><br><span class="line">.......</span><br></pre></td></tr></tbody></table></figure>
 <p>修改<code>/Volumes/macData/Documents/jlynet_project/www.jlynet.cn/themes/yilia-plus/source-src/js/fix.js</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector(&#x27;#page-nav&#x27;)</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.prev&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = &#x27;&lt;a class=&quot;extend prev disabled&quot; rel=&quot;prev&quot;&gt;&amp;laquo; Prev&lt;/a&gt;&#x27; + $nav.innerHTML</span><br><span class="line">  &#125;</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.next&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + &#x27;&lt;a class=&quot;extend next disabled&quot; rel=&quot;next&quot;&gt;Next &amp;raquo;&lt;/a&gt;&#x27;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector('#page-nav')</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector('#page-nav .extend.prev')) {</span><br><span class="line">    $nav.innerHTML = '&lt;a class="extend prev disabled" rel="prev"&gt;&amp;laquo; Prev&lt;/a&gt;' + $nav.innerHTML</span><br><span class="line">  }</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector('#page-nav .extend.next')) {</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + '&lt;a class="extend next disabled" rel="next"&gt;Next &amp;raquo;&lt;/a&gt;'</span><br><span class="line">  }</span><br></pre></td></tr></tbody></table></figure>
 <p>修改成</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector(&#x27;#page-nav&#x27;)</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.prev&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = &#x27;&lt;a class=&quot;extend prev disabled&quot; rel=&quot;prev&quot;&gt;&lt;/a&gt;&#x27; + $nav.innerHTML</span><br><span class="line">  &#125;</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector(&#x27;#page-nav .extend.next&#x27;)) &#123;</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + &#x27;&lt;a class=&quot;extend next disabled&quot; rel=&quot;next&quot;&gt;&lt;/a&gt;&#x27;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var $nav = document.querySelector('#page-nav')</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector('#page-nav .extend.prev')) {</span><br><span class="line">    $nav.innerHTML = '&lt;a class="extend prev disabled" rel="prev"&gt;&lt;/a&gt;' + $nav.innerHTML</span><br><span class="line">  }</span><br><span class="line">  if ($nav &amp;&amp; !document.querySelector('#page-nav .extend.next')) {</span><br><span class="line">    $nav.innerHTML = $nav.innerHTML + '&lt;a class="extend next disabled" rel="next"&gt;&lt;/a&gt;'</span><br><span class="line">  }</span><br></pre></td></tr></tbody></table></figure>
 
 
 <p>Hexo 字数和阅读时间统计插件</p>
@@ -217,347 +263,159 @@ hexo命令说明 - 技术笔记 - 默认分类 |
 <p>链接: hexo-symbols-count-time</p>
 <p>安装配置</p>
 <p>安装插件：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-symbols-count-time --save</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-symbols-count-time --save</span><br></pre></td></tr></tbody></table></figure>
 
 <p>在站点配置文件_config.yml 中添加以下代码：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">symbols_count_time:</span><br><span class="line">  symbols: true</span><br><span class="line">  time: true</span><br><span class="line">  total_symbols: true</span><br><span class="line">  total_time: true</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">symbols_count_time:</span><br><span class="line">  symbols: true</span><br><span class="line">  time: true</span><br><span class="line">  total_symbols: true</span><br><span class="line">  total_time: true</span><br></pre></td></tr></tbody></table></figure>
 
 <p>然后由于此插件集成在 NexT 中，然后只需修改主题配置文件_config.yml：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">symbols_count_time:</span><br><span class="line">  separated_meta: true</span><br><span class="line">  item_text_post: true</span><br><span class="line">  item_text_total: false</span><br><span class="line">  awl: 4</span><br><span class="line">  wpm: 275</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">symbols_count_time:</span><br><span class="line">  separated_meta: true</span><br><span class="line">  item_text_post: true</span><br><span class="line">  item_text_total: false</span><br><span class="line">  awl: 4</span><br><span class="line">  wpm: 275</span><br></pre></td></tr></tbody></table></figure>
 
 <p>最后一步，hexo三步走</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d &amp;&amp; hexo s</span><br></pre></td></tr></tbody></table></figure>
 
+</article><div class="post-copyright"><div class="copyright-cc-box"><i class="anzhiyufont anzhiyu-icon-copyright"></i></div><div class="post-copyright__author_box"><a class="post-copyright__author_img" href="/" title="头像"><img class="post-copyright__author_img_back" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" title="头像" alt="头像"><img class="post-copyright__author_img_front" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" title="头像" alt="头像"></a><div class="post-copyright__author_name">jlynet</div><div class="post-copyright__author_desc">--个人博客</div></div><div class="post-copyright__post__info"><a class="post-copyright__original" title="该文章为原创文章，注意版权协议" href="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/">原创</a><a class="post-copyright-title"><span onclick="rm.copyPageUrl('https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/')">hexo命令说明</span></a></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div class="rewardLeftButton"><div class="post-reward" onclick="anzhiyu.addRewardMask()"><div class="reward-button button--animated" title="赞赏作者"><i class="anzhiyufont anzhiyu-icon-hand-heart-fill"></i>打赏作者</div><div class="reward-main"><div class="reward-all"><span class="reward-title">感谢你赐予我前进的力量</span><ul class="reward-group"><li class="reward-item"><a href="/img/weixin.png" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/weixin.png" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul><a class="reward-main-btn" href="/about/#about-reward" target="_blank"><div class="reward-text">赞赏者名单</div><div class="reward-dec">因为你们的支持让我意识到写文章的价值🙏</div></a></div></div></div><div id="quit-box" onclick="anzhiyu.removeRewardMask()" style="display: none"></div></div><div class="shareRight"><div class="share-link mobile"><div class="share-qrcode"><div class="share-button" title="使用手机访问这篇文章"><i class="anzhiyufont anzhiyu-icon-qrcode"></i></div><div class="share-main"><div class="share-main-all"><div id="qrcode" title="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/"></div><div class="reward-dec">使用手机访问这篇文章</div></div></div></div></div><div class="share-link weibo"><a class="share-button" target="_blank" href="https://service.weibo.com/share/share.php?title=hexo命令说明&amp;url=https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/&amp;pic=" rel="external nofollow noreferrer noopener"><i class="anzhiyufont anzhiyu-icon-weibo"></i></a></div><script>function copyCurrentPageUrl() {
+  var currentPageUrl = window.location.href;
+  var input = document.createElement("input");
+  input.setAttribute("value", currentPageUrl);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.body.removeChild(input);
+}</script><div class="share-link copyurl"><div class="share-button" id="post-share-url" title="复制链接" onclick="copyCurrentPageUrl()"><i class="anzhiyufont anzhiyu-icon-link"></i></div></div></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://jlynet.github.io" target="_blank">生活科技馆</a>！</span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__box"><div class="post-meta__box__tag-list"><a class="post-meta__box__tags" href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>技术笔记<span class="tagsPageCount">17</span></a><a class="post-meta__box__tags" href="/tags/%E9%9A%8F%E7%AC%94/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>随笔<span class="tagsPageCount">12</span></a><a class="post-meta__box__tags" href="/tags/hexo/"><span class="tags-punctuation"> <i class="anzhiyufont anzhiyu-icon-tag"></i></span>hexo<span class="tagsPageCount">3</span></a></div></div></div><div class="post_share"><div class="social-share" data-image="/img/64496e511b09c.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"/><script src="https://cdn.cbd.int/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer="defer"></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/07/28/swagger2word/"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">swagger2word 跨平台json 格式化工具</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="anzhiyufont anzhiyu-icon-thumbs-up fa-fw" style="font-size: 1.5rem; margin-right: 4px"></i><span>喜欢这篇文章的人也看了</span></div><div class="relatedPosts-list"><div><a href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" title="GitHub博客hexo建站之设置SSH密钥"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2022-06-30</div><div class="title">GitHub博客hexo建站之设置SSH密钥</div></div></a></div><div><a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/" title="各种开源协议介绍"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-09-29</div><div class="title">各种开源协议介绍</div></div></a></div><div><a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" title="Docker 私有仓库搭建"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-09</div><div class="title">Docker 私有仓库搭建</div></div></a></div><div><a href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/" title="Linux网络基础，路由的追踪"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-18</div><div class="title">Linux网络基础，路由的追踪</div></div></a></div><div><a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" title="OpenResty 执行流程阶段"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-17</div><div class="title">OpenResty 执行流程阶段</div></div></a></div><div><a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" title="Portainer安装配置"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/" alt="cover"><div class="content is-center"><div class="date"><i class="anzhiyufont anzhiyu-icon-calendar-days fa-fw"></i> 2021-10-09</div><div class="title">Portainer安装配置</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="author-info-avatar"><img class="avatar-img" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/64496e511b09c.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__description">技术决定未来....</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-bars"></i><span>文章目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">文字里面添加图片</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">给文章添加目录</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">yilia上一页下一页显示的问题</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="anzhiyufont anzhiyu-icon-history"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/05/Unicode-character-issue-0-to-255/" title="Unicode character issue 0 to 255">Unicode character issue 0 to 255</a><time datetime="2024-06-05T03:16:29.000Z" title="发表于 2024-06-05 11:16:29">2024-06-05</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/" title="HAProxy 原理 &amp; dash board 各指标含义">HAProxy 原理 &amp; dash board 各指标含义</a><time datetime="2022-08-04T03:05:01.000Z" title="发表于 2022-08-04 11:05:01">2022-08-04</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" title="GitHub博客hexo建站之设置SSH密钥">GitHub博客hexo建站之设置SSH密钥</a><time datetime="2022-06-30T06:27:23.000Z" title="发表于 2022-06-30 14:27:23">2022-06-30</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2021/11/17/hello-world/" title="Hello World">Hello World</a><time datetime="2021-11-17T01:41:10.000Z" title="发表于 2021-11-17 09:41:10">2021-11-17</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" title="ssh端口转发笔记">ssh端口转发笔记</a><time datetime="2021-10-23T10:33:25.000Z" title="发表于 2021-10-23 18:33:25">2021-10-23</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div id="footer-bar-tips"><div class="copyright">&copy;2020 - 2024 By <a class="footer-bar-link" href="/" title="jlynet" target="_blank">jlynet</a></div></div><div id="footer-type-tips"></div></div><div class="footer-bar-right"><a class="footer-bar-link" href="https://gitee.com/jlynet-openSrc" title="jlynet.cn开源">jlynet.cn开源</a></div></div></div></footer></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="sidebar-site-data site-data is-center"><a href="/archives/" title="archive"><div class="headline">文章</div><div class="length-num">62</div></a><a href="/tags/" title="tag"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/" title="category"><div class="headline">分类</div><div class="length-num">8</div></a></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" href="javascript:void(0);" title="显示模式"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span>显示模式</span></a></div><div class="back-menu-list-groups"><div class="back-menu-list-group"><div class="back-menu-list-title">网页</div><div class="back-menu-list"><a class="back-menu-item" href="https://blog.anheyu.com/" title="博客"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="/img/favicon.ico" alt="博客"/><span class="back-menu-item-text">博客</span></a></div></div><div class="back-menu-list-group"><div class="back-menu-list-title">项目</div><div class="back-menu-list"><a class="back-menu-item" href="https://image.anheyu.com/" title="安知鱼图床"><img class="back-menu-item-icon" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null,this.src=&quot;/img/404.jpg&quot;" data-lazy-src="https://image.anheyu.com/favicon.ico" alt="安知鱼图床"/><span class="back-menu-item-text">安知鱼图床</span></a></div></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-tags"><div class="item-headline"></div><div class="card-tag-cloud"><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 入门教程<sup>2</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 最佳实践<sup>14</sup></a><a href="/tags/Java-%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-Arthas-%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/" style="font-size: 0.88rem;">Java 诊断工具 Arthas 高级命令教程<sup>25</sup></a><a href="/tags/Spring/" style="font-size: 0.88rem;">Spring<sup>1</sup></a><a href="/tags/SpringBoot/" style="font-size: 0.88rem;">SpringBoot<sup>1</sup></a><a href="/tags/Tomcat/" style="font-size: 0.88rem;">Tomcat<sup>1</sup></a><a href="/tags/docker/" style="font-size: 0.88rem;">docker<sup>2</sup></a><a href="/tags/hexo/" style="font-size: 0.88rem;">hexo<sup>3</sup></a><a href="/tags/java/" style="font-size: 0.88rem;">java<sup>4</sup></a><a href="/tags/linux/" style="font-size: 0.88rem;">linux<sup>8</sup></a><a href="/tags/nginx/" style="font-size: 0.88rem;">nginx<sup>2</sup></a><a href="/tags/php/" style="font-size: 0.88rem;">php<sup>1</sup></a><a href="/tags/shell/" style="font-size: 0.88rem;">shell<sup>6</sup></a><a href="/tags/ssh/" style="font-size: 0.88rem;">ssh<sup>1</sup></a><a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 0.88rem;">中间件<sup>1</sup></a><a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" style="font-size: 0.88rem;">技术笔记<sup>17</sup></a><a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 0.88rem;">网络<sup>2</sup></a><a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 0.88rem;">随笔<sup>12</sup></a></div></div><hr/></div></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="anzhiyufont anzhiyu-icon-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="anzhiyufont anzhiyu-icon-arrows-left-right"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="anzhiyufont anzhiyu-icon-gear"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="anzhiyufont anzhiyu-icon-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></button></div></div><div id="nav-music"><a id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()" accesskey="m">播放音乐</a><div id="console-music-bg"></div><meting-js id="8152976493" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random" volume="0.7"></meting-js></div><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="anzhiyufont anzhiyu-icon-arrow-left"></i></div><div class="rightMenu-item" id="menu-forward"><i class="anzhiyufont anzhiyu-icon-arrow-right"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="anzhiyufont anzhiyu-icon-arrow-rotate-right" style="font-size: 1rem;"></i></div><div class="rightMenu-item" id="menu-top"><i class="anzhiyufont anzhiyu-icon-arrow-up"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="anzhiyufont anzhiyu-icon-paste"></i><span>粘贴文本</span></div><a class="rightMenu-item" id="menu-commenttext"><i class="anzhiyufont anzhiyu-icon-comment-medical"></i><span>引用到评论</span></a><div class="rightMenu-item" id="menu-newwindow"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="anzhiyufont anzhiyu-icon-link"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="anzhiyufont anzhiyu-icon-images"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="anzhiyufont anzhiyu-icon-download"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-newwindowimg"><i class="anzhiyufont anzhiyu-icon-window-restore"></i><span>新窗口打开图片</span></div><div class="rightMenu-item" id="menu-search"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-searchBaidu"><i class="anzhiyufont anzhiyu-icon-magnifying-glass"></i><span>百度搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="anzhiyufont anzhiyu-icon-backward"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="anzhiyufont anzhiyu-icon-forward"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open(&quot;https://y.qq.com/n/ryqq/playlist/8802438608&quot;, &quot;_blank&quot;);" style="display: none;"><i class="anzhiyufont anzhiyu-icon-radio"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-link" id="menu-randomPost"><i class="anzhiyufont anzhiyu-icon-shuffle"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="anzhiyufont anzhiyu-icon-cube"></i><span>博客分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="anzhiyufont anzhiyu-icon-tags"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item" id="menu-copy" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-copy"></i><span>复制地址</span></a><a class="rightMenu-item" id="menu-commentBarrage" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-message"></i><span class="menu-commentBarrage-text">关闭热评</span></a><a class="rightMenu-item" id="menu-darkmode" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-circle-half-stroke"></i><span class="menu-darkmode-text">深色模式</span></a><a class="rightMenu-item" id="menu-translate" href="javascript:void(0);"><i class="anzhiyufont anzhiyu-icon-language"></i><span>轉為繁體</span></a></div></div><div id="rightmenu-mask"></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.cbd.int/@fancyapps/ui@5.0.28/dist/fancybox/fancybox.umd.js"></script><script src="https://cdn.cbd.int/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://cdn.cbd.int/vanilla-lazyload@17.8.5/dist/lazyload.iife.min.js"></script><script src="https://cdn.cbd.int/node-snackbar@0.1.16/dist/snackbar.min.js"></script><canvas id="universe"></canvas><script async src="https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/dark/dark.js"></script><script>// 消除控制台打印
+var HoldLog = console.log;
+console.log = function () {};
+let now1 = new Date();
+queueMicrotask(() => {
+  const Log = function () {
+    HoldLog.apply(console, arguments);
+  }; //在恢复前输出日志
+  const grt = new Date("04/01/2021 00:00:00"); //此处修改你的建站时间或者网站上线时间
+  now1.setTime(now1.getTime() + 250);
+  const days = (now1 - grt) / 1000 / 60 / 60 / 24;
+  const dnum = Math.floor(days);
+  const ascll = [
+    `欢迎使用安知鱼!`,
+    `生活明朗, 万物可爱`,
+    `
+        
+       █████╗ ███╗   ██╗███████╗██╗  ██╗██╗██╗   ██╗██╗   ██╗
+      ██╔══██╗████╗  ██║╚══███╔╝██║  ██║██║╚██╗ ██╔╝██║   ██║
+      ███████║██╔██╗ ██║  ███╔╝ ███████║██║ ╚████╔╝ ██║   ██║
+      ██╔══██║██║╚██╗██║ ███╔╝  ██╔══██║██║  ╚██╔╝  ██║   ██║
+      ██║  ██║██║ ╚████║███████╗██║  ██║██║   ██║   ╚██████╔╝
+      ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝   ╚═╝    ╚═════╝
+        
+        `,
+    "已上线",
+    dnum,
+    "天",
+    "©2020 By 安知鱼 V1.6.12",
+  ];
+  const ascll2 = [`NCC2-036`, `调用前置摄像头拍照成功，识别为【小笨蛋】.`, `Photo captured: `, `🤪`];
 
-      <div class="tags">
-          <a href="/tags/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/" rel="tag"><i class="ic i-tag"></i> 技术笔记</a>
-          <a href="/tags/%E9%9A%8F%E7%AC%94/" rel="tag"><i class="ic i-tag"></i> 随笔</a>
-          <a href="/tags/hexo/" rel="tag"><i class="ic i-tag"></i> hexo</a>
-      </div>
-  </div>
+  setTimeout(
+    Log.bind(
+      console,
+      `\n%c${ascll[0]} %c ${ascll[1]} %c ${ascll[2]} %c${ascll[3]}%c ${ascll[4]}%c ${ascll[5]}\n\n%c ${ascll[6]}\n`,
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      "color:#425AEF",
+      "",
+      "color:#425AEF",
+      ""
+    )
+  );
+  setTimeout(
+    Log.bind(
+      console,
+      `%c ${ascll2[0]} %c ${ascll2[1]} %c \n${ascll2[2]} %c\n${ascll2[3]}\n`,
+      "color:white; background-color:#4fd953",
+      "",
+      "",
+      'background:url("https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/tinggge.gif") no-repeat;font-size:450%'
+    )
+  );
 
-   <footer>
+  setTimeout(Log.bind(console, "%c WELCOME %c 你好，小笨蛋.", "color:white; background-color:#4f90d9", ""));
 
-    <div class="meta">
-  <span class="item">
-    <span class="icon">
-      <i class="ic i-calendar-check"></i>
-    </span>
-    <span class="text">更新于</span>
-    <time title="修改时间：2022-06-30 12:12:02" itemprop="dateModified" datetime="2022-06-30T12:12:02+08:00">2022-06-30</time>
-  </span>
-</div>
+  setTimeout(
+    console.warn.bind(
+      console,
+      "%c ⚡ Powered by 安知鱼 %c 你正在访问 jlynet 的博客.",
+      "color:white; background-color:#f0ad4e",
+      ""
+    )
+  );
 
-      
-<div class="reward">
-  <button><i class="ic i-heartbeat"></i> 赞赏</button>
-  <p>请我喝[茶]~(￣▽￣)~*</p>
-  <div id="qr">
-      
-      <div>
-        <img data-src="/images/wechatpay.png" alt="jlynet 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div>
-        <img data-src="/images/alipay.png" alt="jlynet 支付宝">
-        <p>支付宝</p>
-      </div>
-      
-      <div>
-        <img data-src="/images/paypal.png" alt="jlynet 贝宝">
-        <p>贝宝</p>
-      </div>
-  </div>
-</div>
+  setTimeout(Log.bind(console, "%c W23-12 %c 你已打开控制台.", "color:white; background-color:#4f90d9", ""));
 
-      
+  setTimeout(
+    console.warn.bind(console, "%c S013-782 %c 你现在正处于监控中.", "color:white; background-color:#d9534f", "")
+  );
+});</script><script async src="/anzhiyu/random.js"></script><div class="js-pjax"><input type="hidden" name="page-type" id="page-type" value="post"></div><script>var visitorMail = "";
+</script><script async data-pjax src="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/waterfall/waterfall.js"></script><script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/qrcodejs/1.0.0/qrcode.min.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.1.9/icon/ali_iconfont_css.css"><link rel="stylesheet" href="https://cdn.cbd.int/anzhiyu-theme-static@1.0.0/aplayer/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.cbd.int/anzhiyu-blog-static@1.0.1/js/APlayer.min.js"></script><script src="https://cdn.cbd.int/hexo-anzhiyu-music@1.0.1/assets/js/Meting2.min.js"></script><script src="https://cdn.cbd.int/pjax@0.2.8/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
 
-<div id="copyright">
-<ul>
-  <li class="author">
-    <strong>本文作者： </strong>jlynet <i class="ic i-at"><em>@</em></i>生活科技馆
-  </li>
-  <li class="link">
-    <strong>本文链接：</strong>
-    <a href="https://jlynet.github.io/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/" title="hexo命令说明">https://jlynet.github.io/2021/07/28/hexo命令说明/</a>
-  </li>
-  <li class="license">
-    <strong>版权声明： </strong>本站所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC9kZWVkLnpo"><i class="ic i-creative-commons"><em>(CC)</em></i>BY-NC-SA</span> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
+document.addEventListener('pjax:send', function () {
+  // removeEventListener scroll 
+  anzhiyu.removeGlobalFnEvent('pjax')
+  anzhiyu.removeGlobalFnEvent('themeChange')
 
-  </footer>
-
-</article>
-
-  </div>
+  document.getElementById('rightside').classList.remove('rightside-show')
   
-
-<div class="post-nav">
-    <div class="item left">
-    </div>
-    <div class="item right">
-      
-
-  <a href="/2021/07/28/swagger2word/" itemprop="url" rel="next" data-background-image="https:&#x2F;&#x2F;tva2.sinaimg.cn&#x2F;mw690&#x2F;6833939bly1gipexbei4hj20zk0m8npd.jpg" title="swagger2word 跨平台json 格式化工具">
-  <span class="type">下一篇</span>
-  <span class="category"><i class="ic i-flag"></i> 个人作品展示</span>
-  <h3>swagger2word 跨平台json 格式化工具</h3>
-  </a>
-
-    </div>
-</div>
-
-  
-  <div class="wrap" id="comments"></div>
-
-
-        </div>
-        <div id="sidebar">
-          
-
-<div class="inner">
-
-  <div class="panels">
-    <div class="inner">
-      <div class="contents panel pjax" data-title="文章目录">
-          <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">文字里面添加图片</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">给文章添加目录</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">yilia上一页下一页显示的问题</span></a></li></ol>
-      </div>
-      <div class="related panel pjax" data-title="系列文章">
-        <ul>
-          <li class="active"><a href="/2021/07/28/hexo%E5%91%BD%E4%BB%A4%E8%AF%B4%E6%98%8E/" rel="bookmark" title="hexo命令说明">hexo命令说明</a></li><li><a href="/2021/09/29/%E5%90%84%E7%A7%8D%E5%BC%80%E6%BA%90%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D/" rel="bookmark" title="各种开源协议介绍">各种开源协议介绍</a></li><li><a href="/2021/10/09/Docker-%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" rel="bookmark" title="Docker 私有仓库搭建">Docker 私有仓库搭建</a></li><li><a href="/2021/10/09/Portainer%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/" rel="bookmark" title="Portainer安装配置">Portainer安装配置</a></li><li><a href="/2021/10/10/%E4%BB%8EClover%E5%88%B0OpenCore/" rel="bookmark" title="从Clover到OpenCore">从Clover到OpenCore</a></li><li><a href="/2021/10/17/OpenResty-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E9%98%B6%E6%AE%B5/" rel="bookmark" title="OpenResty 执行流程阶段">OpenResty 执行流程阶段</a></li><li><a href="/2021/10/17/ngx-lua-%E6%A8%A1%E5%9D%97%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3%EF%BC%88%E5%9F%BA%E4%BA%8Eopenresty%EF%BC%89/" rel="bookmark" title="ngx_lua 模块详细讲解（基于openresty）">ngx_lua 模块详细讲解（基于openresty）</a></li><li><a href="/2021/10/18/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%EF%BC%8C%E8%B7%AF%E7%94%B1%E7%9A%84%E8%BF%BD%E8%B8%AA/" rel="bookmark" title="Linux网络基础，路由的追踪">Linux网络基础，路由的追踪</a></li><li><a href="/2021/10/21/%E8%A7%A3%E5%86%B3SpringBoot-2-3-MultipartFile%E4%B8%BA%E7%A9%BA%E7%9A%84%E9%97%AE%E9%A2%98/" rel="bookmark" title="解决SpringBoot 2.3 MultipartFile为空的问题">解决SpringBoot 2.3 MultipartFile为空的问题</a></li><li><a href="/2021/10/23/ssh%E7%AB%AF%E5%8F%A3%E8%BD%AC%E5%8F%91%E7%AC%94%E8%AE%B0/" rel="bookmark" title="ssh端口转发笔记">ssh端口转发笔记</a></li><li><a href="/2022/06/30/GitHub%E5%8D%9A%E5%AE%A2hexo%E5%BB%BA%E7%AB%99%E4%B9%8B%E8%AE%BE%E7%BD%AESSH%E5%AF%86%E9%92%A5/" rel="bookmark" title="GitHub博客hexo建站之设置SSH密钥">GitHub博客hexo建站之设置SSH密钥</a></li><li><a href="/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/" rel="bookmark" title="HAProxy 原理 & dash board 各指标含义">HAProxy 原理 & dash board 各指标含义</a></li>
-        </ul>
-      </div>
-      <div class="overview panel" data-title="站点概览">
-        <div class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <img class="image" itemprop="image" alt="jlynet"
-      data-src="/images/avatar.jpg">
-  <p class="name" itemprop="name">jlynet</p>
-  <div class="description" itemprop="description">技术决定未来....</div>
-</div>
-
-<nav class="state">
-    <div class="item posts">
-      <a href="/archives/">
-        <span class="count">61</span>
-        <span class="name">文章</span>
-      </a>
-    </div>
-    <div class="item categories">
-      <a href="/categories/">
-        <span class="count">6</span>
-        <span class="name">分类</span>
-      </a>
-    </div>
-    <div class="item tags">
-      <a href="/tags/">
-        <span class="count">16</span>
-        <span class="name">标签</span>
-      </a>
-    </div>
-</nav>
-
-<div class="social">
-</div>
-
-<ul class="menu">
-  
-    
-  <li class="item">
-    <a href="/" rel="section"><i class="ic i-home"></i>首页</a>
-  </li>
-
-
-</ul>
-
-      </div>
-    </div>
-  </div>
-
-  <ul id="quick">
-    <li class="prev pjax">
-    </li>
-    <li class="up"><i class="ic i-arrow-up"></i></li>
-    <li class="down"><i class="ic i-arrow-down"></i></li>
-    <li class="next pjax">
-    </li>
-    <li class="percent"></li>
-  </ul>
-</div>
-
-
-        </div>
-        <div class="dimmer"></div>
-      </div>
-    </main>
-    <footer id="footer">
-      <div class="inner">
-        <div class="widgets">
-          
-<div class="rpost pjax">
-  <h2>随机文章</h2>
-  <ul>
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/Arthas%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0%E5%BA%94%E7%94%A8LoggerLevel%E6%A1%88%E4%BE%8B/" title="Arthas 动态更新应用Logger Level 案例">Arthas 动态更新应用Logger Level 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassc%E5%91%BD%E4%BB%A4/" title="Arthas sc命令">Arthas sc命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasdump%E5%91%BD%E4%BB%A4/" title="Arthas dump命令">Arthas dump命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasarthas-boot%E6%94%AF%E6%8C%81%E7%9A%84%E5%8F%82%E6%95%B0%E6%A1%88%E4%BE%8B/" title="Arthas arthas-boot支持的参数 案例">Arthas arthas-boot支持的参数 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthassysprop%E5%91%BD%E4%BB%A4/" title="Arthas sysprop命令">Arthas sysprop命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/%E5%AD%A6%E4%B9%A0Arthasclassloader%E6%A1%88%E4%BE%8B/" title="Arthas 理解Spring Boot应用的ClassLoader结构 案例">Arthas 理解Spring Boot应用的ClassLoader结构 案例</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthastt%E5%91%BD%E4%BB%A4/" title="Arthas tt命令">Arthas tt命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasjvm%E5%91%BD%E4%BB%A4/" title="Arthas jvm命令">Arthas jvm命令</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/Arthas-%E5%9F%BA%E7%A1%80%E6%95%99%E7%A8%8B/" title="Arthas 基础教程">Arthas 基础教程</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/java%E6%8A%80%E6%9C%AF%E6%A0%88/" title="分类于 java技术栈">java技术栈</a>
-</div>
-
-    <span><a href="/2021/08/07/Java%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7Arthas%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4%E6%95%99%E7%A8%8B/Arthasgetstatic%E5%91%BD%E4%BB%A4/" title="Arthas getstatic命令">Arthas getstatic命令</a></span>
-  </li>
-
-  </ul>
-</div>
-<div>
-  <h2>最新评论</h2>
-  <ul class="leancloud-recent-comment"></ul>
-</div>
-
-        </div>
-        <div class="status">
-  <div class="copyright">
-    
-    &copy; 2010 – 
-    <span itemprop="copyrightYear">2023</span>
-    <span class="with-love">
-      <i class="ic i-sakura rotate"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">jlynet @ 爱上猫的小鱼儿</span>
-  </div>
-  <div class="powered-by">
-    基于 <span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> & Theme.<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2FtZWhpbWUvaGV4by10aGVtZS1zaG9rYQ==">Shoka</span>
-  </div>
-</div>
-
-      </div>
-    </footer>
-  </div>
-<script data-config type="text/javascript">
-  var LOCAL = {
-    path: '2021/07/28/hexo命令说明/',
-    favicon: {
-      show: "（●´3｀●）やれやれだぜ",
-      hide: "(´Д｀)大変だ！"
-    },
-    search : {
-      placeholder: "文章搜索",
-      empty: "关于 「 ${query} 」，什么也没搜到",
-      stats: "${time} ms 内找到 ${hits} 条结果"
-    },
-    valine: true,fancybox: true,
-    copyright: '复制成功，转载请遵守 <i class="ic i-creative-commons"></i>BY-NC-SA 协议。',
-    ignores : [
-      function(uri) {
-        return uri.includes('#');
-      },
-      function(uri) {
-        return new RegExp(LOCAL.path+"$").test(uri);
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
       }
-    ]
-  };
-</script>
+    }
+  }
 
-<script src="https://cdn.polyfill.io/v2/polyfill.js"></script>
+  typeof typed === 'object' && typed.destroy()
 
-<script src="//cdn.jsdelivr.net/combine/npm/pace-js@1.0.2/pace.min.js,npm/pjax@0.2.8/pjax.min.js,npm/whatwg-fetch@3.4.0/dist/fetch.umd.min.js,npm/animejs@3.2.0/lib/anime.min.js,npm/algoliasearch@4/dist/algoliasearch-lite.umd.js,npm/instantsearch.js@4/dist/instantsearch.production.min.js,npm/lozad@1/dist/lozad.min.js,npm/quicklink@2/dist/quicklink.umd.js"></script>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+})
 
-<script src="/js/app.js?v=0.2.5"></script>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof panguInit === 'function' && panguInit()
 
-</body>
-</html>
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script charset="UTF-8" src="https://cdn.cbd.int/anzhiyu-theme-static@1.1.5/accesskey/accesskey.js"></script></div><div id="popup-window"><div class="popup-window-title">通知</div><div class="popup-window-divider"></div><div class="popup-window-content"><div class="popup-tip">你好呀</div><div class="popup-link"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i></div></div></div></body></html>
