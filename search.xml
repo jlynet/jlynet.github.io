@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>Unicode character issue 0 to 255</title>
+      <link href="/2024/06/05/Unicode-character-issue-0-to-255/"/>
+      <url>/2024/06/05/Unicode-character-issue-0-to-255/</url>
+      
+        <content type="html"><![CDATA[<h1><span id="代码实现">代码实现</span></h1><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.sendRedirect(<span class="string">"test.html?name=我是中文aaaa"</span>);</span><br></pre></td></tr></tbody></table></figure><h1><span id="运行容器">运行容器</span></h1><blockquote><p>Tomcat 8.5.100</p></blockquote><h1><span id="出现的错误">出现的错误</span></h1><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Caused by: java.lang.IllegalArgumentException: The Unicode character [Б] at code point [1,041] cannot be encoded as it is outside the permitted range of 0 to 255.</span><br><span class="line">        at org.apache.coyote.http2.HPackHuffman.encode(HPackHuffman.java:452)</span><br><span class="line">        at org.apache.coyote.http2.HpackEncoder.writeHuffmanEncodableValue(HpackEncoder.java:229)</span><br><span class="line">        at org.apache.coyote.http2.HpackEncoder.encode(HpackEncoder.java:191)</span><br><span class="line">        at org.apache.coyote.http2.Http2UpgradeHandler.doWriteHeaders(Http2UpgradeHandler.java:727)</span><br><span class="line">        at org.apache.coyote.http2.Http2UpgradeHandler.writeHeaders(Http2UpgradeHandler.java:680)</span><br><span class="line">        at org.apache.coyote.http2.Stream.writeHeaders(Stream.java:466)</span><br><span class="line">        at org.apache.coyote.http2.StreamProcessor.prepareResponse(StreamProcessor.java:151)</span><br><span class="line">        at org.apache.coyote.AbstractProcessor.action(AbstractProcessor.java:379)</span><br><span class="line">        at org.apache.coyote.Response.action(Response.java:211)</span><br><span class="line">        at org.apache.coyote.Response.sendHeaders(Response.java:440)</span><br><span class="line">        at org.apache.coyote.http2.Http2OutputBuffer.doWrite(Http2OutputBuffer.java:57)</span><br><span class="line">        at org.apache.coyote.Response.doWrite(Response.java:615)</span><br><span class="line">        at org.apache.catalina.connector.OutputBuffer.realWriteBytes(OutputBuffer.java:340)</span><br><span class="line">        at org.apache.catalina.connector.OutputBuffer.flushByteBuffer(OutputBuffer.java:784)</span><br><span class="line">        at org.apache.catalina.connector.OutputBuffer.append(OutputBuffer.java:689)</span><br><span class="line">        at org.apache.catalina.connector.OutputBuffer.writeBytes(OutputBuffer.java:388)</span><br><span class="line">        at org.apache.catalina.connector.OutputBuffer.write(OutputBuffer.java:366)</span><br><span class="line">        at org.apache.catalina.connector.CoyoteOutputStream.write(CoyoteOutputStream.java:96)</span><br></pre></td></tr></tbody></table></figure><h1><span id="解决">解决</span></h1><blockquote><p>参考 <code>https://gitee.com/jlynet-openSrc/jlynet-Tomcat.git</code></p></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> 默认分类 </category>
+          
+          <category> 技术笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 技术笔记 </tag>
+            
+            <tag> Tomcat </tag>
+            
+            <tag> 中间件 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HAProxy 原理 &amp; dash board 各指标含义</title>
       <link href="/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/"/>
       <url>/2022/08/04/HAProxy-%E5%8E%9F%E7%90%86-dash-board-%E5%90%84%E6%8C%87%E6%A0%87%E5%90%AB%E4%B9%89/</url>
