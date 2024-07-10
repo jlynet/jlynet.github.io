@@ -1312,3 +1312,60 @@ CDN:
     # waterfall:
     # ali_iconfont_css:
     # accesskey_js:
+
+
+# 评论：1、畅言；2、Disqus；3、Gitment；4、Giteement
+# 不需要使用某项，直接设置值为false，或注释掉
+# 具体请参考wiki：https://github.com/JoeyBling/hexo-theme-yilia-plus/wiki
+
+# 1、畅言
+changyan_appid: false
+changyan_conf: false
+
+# 2、Disqus 在hexo根目录的config里也有disqus_shortname字段，优先使用yilia-plus的
+disqus: false
+
+# 3、Gitment----基于GitHub的评论系统(关闭请设置gitment_owner为false) npm install --save gitment --registry=https://registry.npmmirror.com
+# 关于如何集成:https://www.jianshu.com/p/ac7658cc912f
+# https://github.com/settings/developers
+# gitment:
+#   enable: true #这里必须为开启
+#   github_user: 'jlynet'
+#   github_repo: 'https://github.com/jlynet/comments.git' #新建一个存储评论的仓库，这里填写仓库名
+#   client_id: '6b381612a868a478b8ee'           #client ID
+#   client_secret: '223dafcc07f3c45cc332f92ba2325b1520cfc5c9'       #client secret
+
+# 4、Giteement----【国内用户建议使用这个，相对比较快】 npm install --save giteement --registry=https://registry.npmmirror.com
+# 关于如何集成:https://www.jianshu.com/p/f5c4633524c7
+# 基于码云的评论系统(https://gitee.com/zhousiwei/giteement)
+giteement:
+  enable: false  # 是否启用码云评论系统
+  # 是否使用官方js(false可以提升访问速度)
+  remote: false
+  redirect_uri: ''   # 应用回调地址(请和配置的第三方应用保持一致)
+  # 不能更改(网上开源项目`https://github.com/Rob--W/cors-anywhere`作者提供的专门用来跨域服务器的配置)
+  oauth_uri: https://cors-anywhere.herokuapp.com/https://gitee.com/oauth/token
+  giteeID: ''  # 你的码云账号英文名
+  # 存储评论的 repo name(需要在码云仓库创建公开仓库)
+  repo: ''
+  gitment_oauth:
+    client_id: ''           #client ID
+    client_secret: ''       #client secret
+
+
+
+# Gitment
+# Introduction: https://imsun.net/posts/gitment-introduction/
+gitment:
+  enable: true
+  mint: true # RECOMMEND, A mint on Gitment, to support count, language and proxy_gateway
+  count: true # Show comments count in post meta area
+  lazy: false # Comments lazy loading with a button
+  cleanly: false # Hide 'Powered by ...' on footer, and more
+  language: # Force language, or auto switch by theme
+  github_user: {you github user id}
+  github_repo: 随便写一个你的公开的git仓库就行,到时候评论会作为那个项目的issue
+  client_id: {刚才申请的ClientID}
+  client_secret: {刚才申请的Client Secret}
+  proxy_gateway: # Address of api proxy, See: https://github.com/aimingoo/intersect
+  redirect_protocol: # Protocol of redirect_uri with force_redirect_protocol when mint enabled

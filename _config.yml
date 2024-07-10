@@ -4,13 +4,13 @@
 
 
 # Site
-title: 生活科技馆
+title: 爱上猫的小鱼儿
 subtitle: '--个人博客'
 description: '技术决定未来....'
 keywords: [java,php,linux,win,jlynet,jlynet.cn,jlynet.com,爱上猫的小鱼儿]
 author: jlynet
 language: zh-CN
-timezone: ''
+timezone: 'Asia/Shanghai'
 
 
 # URL
