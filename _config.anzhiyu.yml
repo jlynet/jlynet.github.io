@@ -515,10 +515,11 @@ footer:
     linkList:
       - link: https://gitee.com/jlynet-openSrc
         text: jlynet.cn开源
-      # - link: https://image.anheyu.com
-      #   text: 图床
-      # - link: https://beian.miit.gov.cn/
-      #   text: 湘ICP备-xxxxxxx号
+      - link: https://beian.mps.gov.cn/#/query/webSearch
+        text: 桂公网安备45010302003312号
+      - link: https://beian.miit.gov.cn/
+        text: 桂ICP备2024037367号
+      
     subTitle:
       enable: false
       # Typewriter Effect (打字效果)
