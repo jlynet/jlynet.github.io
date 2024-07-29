@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>SoftManageTools</title>
+      <link href="/2024/07/29/SoftManageTools/"/>
+      <url>/2024/07/29/SoftManageTools/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Unicode character issue 0 to 255</title>
       <link href="/2024/06/05/Unicode-character-issue-0-to-255/"/>
       <url>/2024/06/05/Unicode-character-issue-0-to-255/</url>
@@ -1575,7 +1588,7 @@
       <link href="/2021/07/28/Lockbox/"/>
       <url>/2021/07/28/Lockbox/</url>
       
-        <content type="html"><![CDATA[<blockquote><p>基于Qt5框架开发的Lockbox，一款跨平台密码记事本管理工具</p></blockquote><p><img src="/2021/07/28/Lockbox/Lockbox-00.png" alt="创建密码箱"></p><p><img src="/2021/07/28/Lockbox/Lockbox-01.png" alt="登录界面"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02.png" alt="主界面"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02-1.png" alt="笔记记事本类型保存"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02-2.png" alt="银行类笔记类型保存"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02-3.png" alt="电子信箱网站类保存"></p><p><img src="/2021/07/28/Lockbox/Lockbox-03.png" alt="分类界面标题搜索"></p>]]></content>
+        <content type="html"><![CDATA[<blockquote><p>基于Qt5/Qt6框架开发的Lockbox，一款跨平台密码记事本管理工具。</p></blockquote><p><img src="/2021/07/28/Lockbox/Lockbox-00.png" alt="创建密码箱"></p><p><img src="/2021/07/28/Lockbox/Lockbox-01.png" alt="登录界面"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02.png" alt="主界面"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02-1.png" alt="笔记记事本类型保存"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02-2.png" alt="银行类笔记类型保存"></p><p><img src="/2021/07/28/Lockbox/Lockbox-02-3.png" alt="电子信箱网站类保存"></p><p><img src="/2021/07/28/Lockbox/Lockbox-03.png" alt="分类界面标题搜索"></p>]]></content>
       
       
       <categories>
@@ -1590,11 +1603,11 @@
     
     
     <entry>
-      <title>swagger2word 跨平台json 格式化工具</title>
+      <title>swagger2word 跨平台的代码生成与接口设计文档导出工具</title>
       <link href="/2021/07/28/swagger2word/"/>
       <url>/2021/07/28/swagger2word/</url>
       
-        <content type="html"><![CDATA[<blockquote><p>基于java 框架开发的 swagger2word，一款跨平台的json格式化工具</p></blockquote><p><img src="/2021/07/28/swagger2word/swagger2word-01.png" alt="树状操作展示模板"></p>]]></content>
+        <content type="html"><![CDATA[<blockquote><p>基于java 框架开发的 swagger2word代码生成与接口设计文档导出工具，并具备按照swagger2规范定义的接口协议导出对应的接口文档与项目代码。</p></blockquote><p><img src="/2021/07/28/swagger2word/swagger2word-01.png" alt="树状操作展示模板"></p>]]></content>
       
       
       <categories>

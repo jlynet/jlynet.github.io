@@ -38,7 +38,6 @@
 
 https://jlynet.github.io
 
-
 常见命令：
 
 ```bash
@@ -67,6 +66,8 @@ hexo d -g #⽣成并上传
 hexo new "JsonFormatTool" 
 hexo new "swagger2word"
 hexo new "Lockbox"
+hexo new "SoftManageTools"
+
 hexo new "Arthas安装使用"
 hexo new "awk命令使用介绍"
 

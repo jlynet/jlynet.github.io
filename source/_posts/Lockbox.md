@@ -5,8 +5,7 @@ categories: [个人作品展示]
 description: 基于Qt5框架开发的Lockbox，一款跨平台密码记事本管理工具
 tags:
 ---
-
-> 基于Qt5框架开发的Lockbox，一款跨平台密码记事本管理工具
+> 基于Qt5/Qt6框架开发的Lockbox，一款跨平台密码记事本管理工具。
 
 ![创建密码箱](Lockbox-00.png)
 

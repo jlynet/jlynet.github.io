@@ -73,7 +73,7 @@ social:
 author_status:
   enable: false
   # 可以是任何图片，建议放表情包或者emoji图片，效果都很好，[表情包速查](https://emotion.xiaokang.me/)
-  statusImg: "https://bu.dusays.com/2023/08/24/64e6ce9c507bb.png"
+  statusImg: "/img/64e6ce9c507bb.png"
   skills:
     # - 🤖️ 数码科技爱好者
     # - 🔍 分享与热心帮助
@@ -517,6 +517,7 @@ footer:
         text: jlynet.cn开源
       - link: https://beian.mps.gov.cn/#/query/webSearch
         text: 桂公网安备45010302003312号
+        icon: anzhiyu-icon-github
       - link: https://beian.miit.gov.cn/
         text: 桂ICP备2024037367号
       
@@ -802,8 +803,8 @@ aside:
     content: 欢迎来看我的博客鸭~
   card_weixin:
     enable: false
-    face: https://bu.dusays.com/2023/01/13/63c02edf44033.png
-    backFace: https://bu.dusays.com/2023/05/13/645fa415e8694.png
+    face: /img/63c02edf44033.png
+    backFace: /img/645fa415e8694.png
   card_recent_post:
     enable: true
     limit: 5 # if set 0 will show all
