@@ -38,7 +38,13 @@
 
 https://jlynet.github.io
 
-常见命令：
+# 安装
+
+```
+npm install -g hexo hexo-cli --registry=https://registry.npmmirror.com
+```
+
+# 常见命令
 
 ```bash
 $ hexo new "postName" #新建⽂章
@@ -51,18 +57,18 @@ $ hexo version #查看Hexo的版本
 $ hexo clean #清楚
 ```
 
-组合命令：
+# 组合命令
 
 ```bash
 hexo s -g #⽣成并本地预览
 hexo d -g #⽣成并上传
 ```
 
-新建⽂章：
+# 新建⽂章
 
 ```bash
 
-
+#个人产品
 hexo new "JsonFormatTool" 
 hexo new "swagger2word"
 hexo new "Lockbox"
@@ -122,15 +128,11 @@ hexo new "Arthasjad命令"
 hexo new "Arthasdump命令"
 hexo new "Arthasclassloader命令"
 
-
+#其他
 hexo new "PHP和Java中的SHA256"
-
 hexo new "各种开源协议介绍"
-
 hexo new "etCache 缓存框架的使用以及源码分析"
-
 hexo new "Docker 私有仓库搭建"
-
 hexo new "Portainer安装配置"
 hexo new "从Clover到OpenCore"
 hexo new "OpenResty 执行流程阶段"
@@ -138,16 +140,19 @@ hexo new "ngx_lua 模块详细讲解（基于openresty）"
 hexo new "Linux网络基础，路由的追踪"
 hexo new "解决SpringBoot 2.3 MultipartFile为空的问题"
 hexo new "ssh端口转发笔记"
-
 hexo new "GitHub博客hexo建站之设置SSH密钥"
-
 hexo new "HAProxy 原理 & dash board 各指标含义"
+
+hexo new "intellij-plugin-license"
 ```
 
-新建⻚⾯:
+# 新建⻚⾯
 
 ```bash
 hexo new page "个人作品展示"
+hexo new page "intellij-plugin-license"
+
+
 ```
 
 cd themes/yilia-plus;
