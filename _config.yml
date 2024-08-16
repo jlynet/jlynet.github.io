@@ -129,8 +129,7 @@ pjax: true
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # git clone --depth=1 https://github.com/JoeyBling/hexo-theme-yilia-plus.git themes/yilia-plus
-theme:  anzhiyu # shoka anzhiyu yilia-plus
-
+theme:  anzhiyu # next anzhiyu yilia-plus
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment

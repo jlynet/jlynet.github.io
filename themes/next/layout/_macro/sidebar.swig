@@ -48,3 +48,28 @@
   </aside>
   <div id="sidebar-dimmer"></div>
 {% endmacro %}
+      {% if theme.sidebar.b2t %}
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          {% if theme.sidebar.scrollpercent %}
+            <span id="scrollpercent"><span>0</span>%</span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+<!-- Insert google ad blocks -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Comment_Below -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-6129496365361356"
+     data-ad-slot="8323610673"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+    </div>
+  </aside>
+{% endmacro %}
